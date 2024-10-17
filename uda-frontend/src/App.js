@@ -7,6 +7,7 @@ import Activation from './components/Activation';
 import Home from './components/Home';
 import AirQuality from './components/iot/AirQuality/AirQuality';
 import AirQualityInstance from './components/iot/AirQuality/AirQualityInstance';
+import AirQualityByDate from './components/iot/AirQuality/AirQualityByDate';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/air-quality" element={<AirQuality />} />
         <Route path="/air-quality/:id" element={<AirQualityInstance />} />
+        <Route path="/air-quality/date/:date" element={<AirQualityByDate />} />
 
 
 

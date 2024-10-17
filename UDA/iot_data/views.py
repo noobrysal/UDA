@@ -5,11 +5,40 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from .models import AirQuality, SoilQuality, WaterQuality
 from .serializers import AirQualitySerializer, SoilQualitySerializer, WaterQualitySerializer
+from django.utils.dateparse import parse_date
 
 # Viewset for AirQuality
 class AirQualityViewSet(viewsets.ModelViewSet):
-    queryset = AirQuality.objects.all()
     serializer_class = AirQualitySerializer
+    authentication_classes = []
+    permission_classes = []
+
+    def get_queryset(self):
+        queryset = AirQuality.objects.all()
+
+        # Get 'month' query parameter
+        month = self.request.query_params.get('month')
+        date_param = self.request.query_params.get('date')
+
+        if date_param:
+            date = parse_date(date_param)
+            if date:
+                # Filter by date if date_param is provided
+                queryset = queryset.filter(
+                    timestamp__year=date.year,
+                    timestamp__month=date.month,
+                    timestamp__day=date.day
+                )
+        elif month:
+            month_date = parse_date(month)
+            if month_date:
+                # Filter by year and month if month_param is provided
+                queryset = queryset.filter(
+                    timestamp__year=month_date.year,
+                    timestamp__month=month_date.month
+                )
+
+        return queryset
 
     def retrieve(self, request, pk=None):
         try:
