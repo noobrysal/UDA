@@ -29,7 +29,7 @@ const supabaseUrl = 'https://kohjcrdirmvamsjcefew.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtvaGpjcmRpcm12YW1zamNlZmV3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyNzMzMDYxMywiZXhwIjoyMDQyOTA2NjEzfQ.dcjFj_XWSg_Zq8BJQSnI_SfqzjtuG98cu3nZSIzgfBo';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-const AirQualityByDate = () => {
+const DateTest = () => {
     const { date } = useParams();  // URL date in YYYY-MM-DD format
     const [airData, setAirData] = useState([]);
     const [selectedHour, setSelectedHour] = useState('00'); // Default to the first hour
@@ -117,7 +117,7 @@ const AirQualityByDate = () => {
             const index = chartElement[0].index; // Get the index of the clicked data point
             const selectedInstance = filteredData[index]; // Get the corresponding instance
             if (selectedInstance) {
-                navigate(`/air-quality/id/${selectedInstance.id}`); // Navigate to the instance detail page
+                navigate(`/air-quality/datetest/id/${selectedInstance.id}`); // Navigate to the instance detail page
             }
         }
     };
@@ -172,4 +172,4 @@ const AirQualityByDate = () => {
     );
 };
 
-export default AirQualityByDate;
+export default DateTest;

@@ -25,7 +25,7 @@ const getAirQualityForMonth = async (year, month) => {
     return data;
 };
 
-const AirQuality = () => {
+const CalendarTest = () => {
     const [airData, setAirData] = useState([]);
     const [selectedDate, setSelectedDate] = useState(new Date());
     const navigate = useNavigate();
@@ -51,7 +51,7 @@ const AirQuality = () => {
         const month = String(value.getMonth() + 1).padStart(2, '0');
         const day = String(value.getDate()).padStart(2, '0');
         const formattedDate = `${year}-${month}-${day}`;
-        navigate(`/air-quality/date/${formattedDate}`);
+        navigate(`/air-quality/datetest/${formattedDate}`);
     };
 
     return (
@@ -68,4 +68,4 @@ const AirQuality = () => {
     );
 };
 
-export default AirQuality;
+export default CalendarTest;
