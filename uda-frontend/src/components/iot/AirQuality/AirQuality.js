@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createClient } from '@supabase/supabase-js';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
+import { supabase } from './supabaseClient';
 
-const supabaseUrl = 'https://kohjcrdirmvamsjcefew.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtvaGpjcmRpcm12YW1zamNlZmV3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyNzMzMDYxMywiZXhwIjoyMDQyOTA2NjEzfQ.dcjFj_XWSg_Zq8BJQSnI_SfqzjtuG98cu3nZSIzgfBo';
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 const getAirQualityForMonth = async (year, month) => {
     const startOfMonth = `${year}-${String(month).padStart(2, '0')}-01`;

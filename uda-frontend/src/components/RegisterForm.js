@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { supabase } from './supabaseClient';
 
 const RegisterForm = () => {
     const [formData, setFormData] = useState({
@@ -21,22 +21,35 @@ const RegisterForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        if (formData.password !== formData.re_password) {
+            toast.error('Passwords do not match.');
+            return;
+        }
+
         try {
-            const response = await axios.post('http://127.0.0.1:8000/auth/users/', formData);
+            const { user, error } = await supabase.auth.signUp({
+                email: formData.email,
+                password: formData.password,
+            }, {
+                data: {
+                    user_metadata: { display_name: formData.username }
+                }
+            });
+
+            if (error) throw error;
+
+            // Here you can store the username or perform additional actions if needed
+            // For example, you might want to insert the user info into your user table
+
             toast.success('Registration successful, check your email for activation before logging in.');
-            console.log('Registration successful:', response.data);
+            console.log('Registration successful:', user);
 
             setTimeout(() => {
                 navigate('/login');
             }, 3000);
         } catch (error) {
-            if (error.response && error.response.data) {
-                const errorMessages = Object.values(error.response.data).flat().join(' ');
-                toast.error(`Registration failed: ${errorMessages}`);
-            } else {
-                toast.error('Registration failed. Please try again.');
-            }
-            console.error('Registration failed:', error.response ? error.response.data : error.message);
+            toast.error(`Registration failed: ${error.message}`);
+            console.error('Registration failed:', error.message);
         }
     };
 
@@ -44,7 +57,7 @@ const RegisterForm = () => {
         <div style={styles.container}>
             <ToastContainer />
             <div style={styles.formContainer}>
-                <h1 style={styles.heading}>Welcome to Student Management System!</h1>
+                <h1 style={styles.heading}>Welcome to Unified Dashboard Analytics!</h1>
                 <h2 style={styles.formHeading}>Register</h2>
                 <form onSubmit={handleSubmit} style={styles.form}>
                     <div style={styles.inputGroup}>

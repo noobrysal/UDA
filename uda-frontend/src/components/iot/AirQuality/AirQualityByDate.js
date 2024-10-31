@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from './supabaseClient';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Line } from 'react-chartjs-2';
+
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -25,15 +26,12 @@ ChartJS.register(
     Legend
 );
 
-const supabaseUrl = 'https://kohjcrdirmvamsjcefew.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtvaGpjcmRpcm12YW1zamNlZmV3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyNzMzMDYxMywiZXhwIjoyMDQyOTA2NjEzfQ.dcjFj_XWSg_Zq8BJQSnI_SfqzjtuG98cu3nZSIzgfBo';
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 const AirQualityByDate = () => {
-    const { date } = useParams();  // URL date in YYYY-MM-DD format
+    const { date } = useParams();
     const [airData, setAirData] = useState([]);
-    const [selectedHour, setSelectedHour] = useState('00'); // Default to the first hour
-    const navigate = useNavigate(); // Initialize useNavigate
+    const [selectedHour, setSelectedHour] = useState('00');
+    const navigate = useNavigate();
 
     const thresholds = {
         pm25: { safe: 25, warning: 35, danger: 45 },
@@ -53,7 +51,6 @@ const AirQualityByDate = () => {
                     .lt('date', `${date}T23:59:59.999+00`);
 
                 if (error) throw error;
-
                 setAirData(data);
             } catch (error) {
                 console.error('Error fetching air quality:', error);
@@ -75,14 +72,14 @@ const AirQualityByDate = () => {
 
     const getColor = (value, metric) => {
         const { safe, warning } = thresholds[metric];
-        if (value <= safe) return 'rgba(75, 192, 192, 1)'; // Safe
-        if (value <= warning) return 'rgba(255, 206, 86, 1)'; // Warning
-        return 'rgba(255, 99, 132, 1)'; // Danger
+        if (value <= safe) return 'rgba(75, 192, 192, 1)';
+        if (value <= warning) return 'rgba(255, 206, 86, 1)';
+        return 'rgba(255, 99, 132, 1)';
     };
 
     const createChartConfig = (label, data, metric) => {
         return {
-            labels: filteredData.map(item => new Date(item.date).toISOString().split('T')[1].substring(0, 8)), // Format to HH:MM:SS
+            labels: filteredData.map(item => new Date(item.date).toISOString().split('T')[1].substring(0, 8)),
             datasets: [{
                 label: label + ' Average Level',
                 data: data.map(item => item.value),
@@ -114,10 +111,10 @@ const AirQualityByDate = () => {
 
     const handlePointClick = (event, chartElement) => {
         if (chartElement && chartElement.length > 0) {
-            const index = chartElement[0].index; // Get the index of the clicked data point
-            const selectedInstance = filteredData[index]; // Get the corresponding instance
+            const index = chartElement[0].index;
+            const selectedInstance = filteredData[index];
             if (selectedInstance) {
-                navigate(`/air-quality/id/${selectedInstance.id}`); // Navigate to the instance detail page
+                navigate(`/air-quality/id/${selectedInstance.id}`);
             }
         }
     };
@@ -140,29 +137,36 @@ const AirQualityByDate = () => {
                     ))}
                 </select>
             </div>
+
             {filteredData.length > 0 ? (
                 <>
-                    <div className="chart-container">
-                        <Line
-                            data={createChartConfig('PM2.5', filteredData.map(item => ({ value: item.pm25, id: item.id })), 'pm25')}
-                            options={{
-                                responsive: true,
-                                plugins: {
-                                    legend: { position: 'top' },
-                                    tooltip: {
-                                        callbacks: {
-                                            label: function (tooltipItem) {
-                                                return `Value: ${tooltipItem.raw}`; // Customize tooltip as needed
+                    {['pm25', 'pm10', 'humidity', 'temperature', 'oxygen'].map((metric, index) => (
+                        <div key={index} className="chart-container">
+                            <Line
+                                data={createChartConfig(metric.toUpperCase(), filteredData.map(item => ({ value: item[metric], id: item.id })), metric)}
+                                options={{
+                                    responsive: true,
+                                    plugins: {
+                                        legend: { position: 'top' },
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function (tooltipItem) {
+                                                    const value = tooltipItem.raw;
+                                                    const thresholdRemark = Object.keys(thresholds[metric]).find(
+                                                        (key) => value <= thresholds[metric][key]
+                                                    ) || 'Emergency';
+                                                    return [`Value: ${value}`, `Status: ${thresholdRemark}`];
+                                                },
                                             },
                                         },
+                                        title: { display: true, text: `${metric.toUpperCase()} Levels` },
                                     },
-                                },
-                                onClick: handlePointClick, // Add onClick handler here
-                            }}
-                        />
-                        <Legend thresholds={thresholds.pm25} />
-                    </div>
-                    {/* Add other charts for PM10, humidity, temperature, etc. as needed */}
+                                    onClick: handlePointClick,
+                                }}
+                            />
+                            <Legend thresholds={thresholds[metric]} />
+                        </div>
+                    ))}
                 </>
             ) : (
                 <p>No data found for this date.</p>
