@@ -2,171 +2,261 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
+import styled from '@emotion/styled';
 import 'react-toastify/dist/ReactToastify.css';
+import { FaGoogle, FaFacebook } from 'react-icons/fa';
+import logoImage from '../static/logo.png';
+import backgroundImage from '../static/udabackg.png';
+
+const PageContainer = styled.div`
+  display: flex;
+  height: 100vh;
+  background-image: url(${backgroundImage});
+  background-size: cover;
+  background-position: center;
+  color: white;
+  justify-content: center;
+  align-items: center;
+`;
+
+const ContentContainer = styled.div`
+  display: flex;
+  width: 1200px;
+  height: 700px;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+`;
+
+const LogoBox = styled.div`
+  background-color: rgba(46, 150, 0, 0.2);
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 50%;
+  padding: ${({ padding }) => padding || '60px'};
+  gap: ${({ gap }) => gap || '20px'}; /* Gap between children (logo and text) */
+`;
+
+const FormBox = styled.div`
+  background-color: rgba(34, 34, 51, 0.2);
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  width: 50%;
+  padding: 60px;
+`;
+
+const Logo = styled.img`
+  width: 180px;
+  height: auto;
+`;
+
+const LogoHeader = styled.h1`
+  text-align: center;
+  line-height: 1;
+  font-weight: bold; /* Makes the header bold */
+  font-size: ${({ fontSize }) => fontSize || '70px'}; /* Editable font size */
+  margin-top: ${({ marginTop }) => marginTop || '10px'};
+  margin-bottom: ${({ marginBottom }) => marginBottom || '10px'};
+  color: ${({ color }) => color || 'white'}; /* Editable color */
+`;
+
+const LogoText = styled.p`
+  margin-top: ${({ marginTop }) => marginTop || '10px'};
+  font-size: ${({ fontSize }) => fontSize || '20px'}; /* Editable font size */
+  color: ${({ color }) => color || 'white'}; /* Editable color */
+  text-align: center;
+`;
+
+
+
+const LoginHeader = styled.h2`
+  font-size: 50px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: white;
+  margin-top: 0;
+`;
+
+const LoginLink = styled.p`
+  font-size: 16px;
+  color: white;
+  margin-top: -5px;
+  font-weight: lighter;
+
+  a {
+    color: #83d464;
+    text-decoration: none;
+  }
+`;
+
+const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-top: 30px;
+`;
+
+const Input = styled.input`
+  background-color: #d9d9d926;
+  border: none;
+  border-radius: 8px;
+  padding: 18px;
+  font-size: 18px;
+  color: white;
+  margin-bottom: 20px;
+
+  &::placeholder {
+    color: #d9d9d9;
+  }
+`;
+
+const CheckboxContainer = styled.div`
+  display: flex;
+  align-items: center;
+  font-weight: lighter;
+  font-size: 15px;
+  color: white;
+
+  label {
+    margin-left: 8px;
+  }
+`;
+
+const SubmitButton = styled.button`
+  background-color: #7ed956;
+  border: none;
+  border-radius: 8px;
+  padding: 18px;
+  margin-top: 25px;
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+  width: 100%;
+
+  &:hover {
+    background-color: #15b1c2;
+  }
+`;
+
+const RegisterWithText = styled.p`
+  font-size: 16px;
+  color: #b0b3b8;
+  margin-top: 15px;
+  font-weight: lighter;
+`;
+
+const SocialContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+
+  & > button {
+    flex: 1;
+    padding: 14px 20px;
+    border-radius: 8px;
+    border: 1px solid #b0b3b8;
+    background-color: transparent;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 250px;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+`;
 
 const LoginForm = () => {
-    const [formData, setFormData] = useState({
-        email: '',
-        password: ''
-    });
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const navigate = useNavigate();
 
-    const navigate = useNavigate();
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post('http://127.0.0.1:8000/auth/token/login/', {
+        email: formData.email,
+        password: formData.password,
+      });
+      toast.success('Login successful! Redirecting...');
+      localStorage.setItem('accessToken', response.data.auth_token);
+      setTimeout(() => navigate('/home'), 3000);
+    } catch (error) {
+      toast.error('Login failed. Please try again.');
+    }
+  };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        try {
-            const response = await axios.post('http://127.0.0.1:8000/auth/token/login/', {
-                email: formData.email,
-                password: formData.password
-            });
-
-            toast.success('Login successful! Redirecting...');
-            console.log('Login successful:', response.data);
-
-            // Store the token in localStorage
-            localStorage.setItem('accessToken', response.data.auth_token);
-
-            // Redirect to home page or any other page after successful login
-            setTimeout(() => {
-                navigate('/home');
-            }, 3000);
-        } catch (error) {
-            if (error.response && error.response.data) {
-                const errorMessages = Object.values(error.response.data).flat().join(' ');
-                toast.error(`Login failed: ${errorMessages}`);
-            } else {
-                toast.error('Login failed. Please try again.');
-            }
-            console.error('Login failed:', error.response ? error.response.data : error.message);
-        }
-    };
-
-    return (
-        <div style={styles.container}>
-            <ToastContainer />
-            <div style={styles.formContainer}>
-                <h1 style={styles.heading}>Welcome to Unified Dashboard Analytics</h1>
-                <h2 style={styles.formHeading}>Login</h2>
-                <form onSubmit={handleSubmit} style={styles.form}>
-                    <div style={styles.inputGroup}>
-                        <label style={styles.label}>Email:</label>
-                        <input
-                            type="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            required
-                            style={styles.input}
-                        />
-                    </div>
-
-                    <div style={styles.inputGroup}>
-                        <label style={styles.label}>Password:</label>
-                        <input
-                            type="password"
-                            name="password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            required
-                            style={styles.input}
-                        />
-                    </div>
-
-                    <button type="submit" style={styles.submitButton}>Enter</button>
-                </form>
-                <button onClick={() => navigate('/register')} style={styles.registerButton}>
-                    Click here to register
-                </button>
-            </div>
-        </div>
-    );
-};
-
-const styles = {
-    container: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100vh',
-        background: '#2B2F42', // Darker background color
-        padding: '20px',
-    },
-    formContainer: {
-        width: '90%', // Adjusted width for responsiveness
-        maxWidth: '600px', // Maximum width for larger screens
-        background: '#353A50', // Darker background for the form container
-        padding: '30px', // Added more padding
-        borderRadius: '8px',
-        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)', // Box shadow for depth
-        textAlign: 'center', // Center the text
-    },
-    heading: {
-        fontFamily: 'Arial, sans-serif',
-        fontSize: '28px',
-        fontWeight: 'bold',
-        marginBottom: '20px',
-        color: '#ffffff', // White text color
-    },
-    formHeading: {
-        fontFamily: 'Arial, sans-serif',
-        fontSize: '24px',
-        fontWeight: 'bold',
-        marginBottom: '15px',
-        color: '#ffffff', // White text color
-    },
-    form: {
-        display: 'flex',
-        flexDirection: 'column',
-    },
-    inputGroup: {
-        marginBottom: '15px',
-        textAlign: 'left', // Ensure the text alignment is left for input groups
-    },
-    label: {
-        fontSize: '16px',
-        marginBottom: '5px',
-        display: 'block',
-        color: '#ffffff', // White text color
-    },
-    input: {
-        width: '100%',
-        padding: '10px',
-        fontSize: '16px',
-        borderRadius: '4px',
-        border: '1px solid #ccc',
-        boxSizing: 'border-box',
-        marginBottom: '10px',
-        outline: 'none',
-    },
-    submitButton: {
-        width: '100%',
-        padding: '10px',
-        fontSize: '18px',
-        cursor: 'pointer',
-        borderRadius: '5px',
-        backgroundColor: '#2B2F42', // Dark button background
-        color: '#ffffff', // White text color
-        border: 'none',
-        outline: 'none',
-    },
-    registerButton: {
-        width: '100%',
-        padding: '10px',
-        fontSize: '16px',
-        cursor: 'pointer',
-        borderRadius: '5px',
-        backgroundColor: '#2B2F42', // Dark button background
-        color: '#ffffff', // White text color
-        border: 'none',
-        outline: 'none',
-        marginTop: '10px',
-    },
+  return (
+    <PageContainer>
+      <ToastContainer />
+      <ContentContainer>
+        <FormBox>
+          <LoginHeader>Log in</LoginHeader>
+          <LoginLink>
+            Don't have an account? <a href="/register">Sign up.</a>
+          </LoginLink>
+          <Form onSubmit={handleSubmit}>
+            <Input
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={formData.email}
+              onChange={handleChange}
+            />
+            <Input
+              type="password"
+              name="password"
+              placeholder="Enter your password"
+              value={formData.password}
+              onChange={handleChange}
+            />
+            <CheckboxContainer>
+              <input type="checkbox" id="save-password" />
+              <label htmlFor="save-password">Save Password?</label>
+            </CheckboxContainer>
+            <SubmitButton>Continue</SubmitButton>
+          </Form>
+          {/* <RegisterWithText>or register with</RegisterWithText> 
+          <SocialContainer>
+            <button>
+              <FaGoogle /> Google
+            </button>
+            <button>
+              <FaFacebook /> Facebook
+            </button>
+          </SocialContainer>
+          */}
+        </FormBox>
+        <LogoBox padding="80px" gap="30px">
+          <Logo src={logoImage} alt="Logo" logoMarginBottom="20px" />
+          <LogoHeader marginTop="15px" marginBottom="20px">
+            <span style={{ color: '#2fcedb' }}>U</span>NIFIED <br />
+            <span style={{ color: '#13d7b5' }}>D</span>ASHBOARD <br />
+            <span style={{ color: '#ffe470' }}>A</span>NALYTICS
+          </LogoHeader>
+          <LogoText marginTop="-10px" fontSize="25px">
+            Turn data into actions, transform insights into impact.
+          </LogoText>
+        </LogoBox>
+      </ContentContainer>
+    </PageContainer>
+  );
 };
 
 export default LoginForm;

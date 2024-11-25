@@ -5,9 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { supabase } from './supabaseClient';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-
-// Initialize Supabase client
-
+import Sidebar from '../../Sidebar';
 
 // Function to fetch air quality data by ID
 const getAirQualityById = async (id) => {
@@ -25,6 +23,14 @@ const getAirQualityById = async (id) => {
     return data;
 };
 
+const locations = [
+    { id: 1, name: 'Lapasan' },
+    { id: 2, name: 'Agusan' },
+    { id: 3, name: 'USTP-CDO' },
+    { id: 4, name: 'El Salvador' },
+    { id: 5, name: 'Sports Complex' },
+];
+
 // Thresholds for air quality metrics
 const thresholds = {
     pm25: { safe: 25, warning: 35, danger: 45 },
@@ -40,6 +46,12 @@ const getColor = (value, metric) => {
     if (value <= safe) return 'green';
     if (value <= warning) return 'orange';
     return 'red';
+};
+
+// Function to get location name from locationId
+const getLocationName = (locationId) => {
+    const location = locations.find(loc => loc.id === locationId);
+    return location ? location.name : 'Unknown Location';
 };
 
 // Main component to display air quality instance with circular progress bars and legend
@@ -68,50 +80,87 @@ const AirQualityInstance = () => {
         const color = getColor(value, metric);
 
         return (
-            <div className="progress-container" style={{ width: '120px', margin: '20px', textAlign: 'center' }}>
+            <div
+                className="progress-container"
+                style={{
+                    width: '150px',
+                    margin: '20px',
+                    textAlign: 'center',
+                    padding: '15px',
+                    borderRadius: '10px',
+                    backgroundColor: '#f0f0f0', // Light gray background
+                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Subtle shadow for depth    
+                }}
+            >
                 <CircularProgressbar
                     value={percentage}
                     text={`${value}`}
                     styles={buildStyles({
                         pathColor: color,
                         textColor: color,
-                        trailColor: '#d6d6d6',
+                        trailColor: '#ababab',
                         backgroundColor: '#3e98c7',
                     })}
                 />
-                <p>{label}</p>
+                <p style={{ marginTop: '10px', fontSize: '14px', fontWeight: 'bold' }}>{label}</p>
+
+                {/* Legend for each metric */}
+                <div
+                    style={{
+                        marginTop: '10px',
+                        fontSize: '12px',
+                        textAlign: 'left',
+                        lineHeight: '1.5',
+                    }}
+                >
+                    <div>
+                        <span style={{ color: 'green', fontWeight: 'bold' }}>●</span> Safe: &le; {thresholds[metric].safe}
+                    </div>
+                    <div>
+                        <span style={{ color: 'orange', fontWeight: 'bold' }}>●</span> Warning: &le; {thresholds[metric].warning}
+                    </div>
+                    <div>
+                        <span style={{ color: 'red', fontWeight: 'bold' }}>●</span> Danger: &gt; {thresholds[metric].warning}
+                    </div>
+                </div>
             </div>
         );
     };
 
     return (
-        <div className="container-fluid">
-            <h2>Air Quality Data (ID: {id})</h2>
-            {airData ? (
-                <div>
-                    <p><strong>Recorded at:</strong> {new Date(airData.date).toISOString().slice(0, 19).replace("T", " ")}</p>
+        <Sidebar>
+            <div className="container-fluid">
+                <h2>Air Quality Data (ID: {id})</h2>
+                {airData ? (
+                    <div>
+                        <p>
+                            <strong>Recorded at:</strong>{' '}
+                            {new Date(airData.date).toISOString().slice(0, 19).replace('T', ' ')} on{' '}
+                            {getLocationName(airData.locationId)}
+                        </p>
 
-                    {/* Legend Section */}
-                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
-                        <div style={{ marginRight: '10px' }}><span style={{ color: 'green' }}>●</span> Safe</div>
-                        <div style={{ marginRight: '10px' }}><span style={{ color: 'orange' }}>●</span> Warning</div>
-                        <div><span style={{ color: 'red' }}>●</span> Danger</div>
+                        {/* Progress Bars */}
+                        <div
+                            style={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                flexWrap: 'wrap',
+                                gap: '20px',
+                            }}
+                        >
+                            {renderProgressBar(airData.pm25, 'pm25', 'PM2.5')}
+                            {renderProgressBar(airData.pm10, 'pm10', 'PM10')}
+                            {renderProgressBar(airData.humidity, 'humidity', 'Humidity')}
+                            {renderProgressBar(airData.temperature, 'temperature', 'Temperature')}
+                            {renderProgressBar(airData.oxygen, 'oxygen', 'Oxygen')}
+                        </div>
                     </div>
-
-                    {/* Progress Bars */}
-                    <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap' }}>
-                        {renderProgressBar(airData.pm25, 'pm25', 'PM2.5')}
-                        {renderProgressBar(airData.pm10, 'pm10', 'PM10')}
-                        {renderProgressBar(airData.humidity, 'humidity', 'Humidity')}
-                        {renderProgressBar(airData.temperature, 'temperature', 'Temperature')}
-                        {renderProgressBar(airData.oxygen, 'oxygen', 'Oxygen')}
-                    </div>
-                </div>
-            ) : (
-                <p>Loading...</p>
-            )}
-            <ToastContainer />
-        </div>
+                ) : (
+                    <p>Loading...</p>
+                )}
+                <ToastContainer />
+            </div>
+        </Sidebar>
     );
 };
 
