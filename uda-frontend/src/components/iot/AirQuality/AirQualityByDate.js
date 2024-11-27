@@ -88,9 +88,8 @@ const AirQualityByDate = () => {
             { max: Infinity, label: "Extreme Danger", color: "rgba(139, 0, 0, 1)" },
         ],
         oxygen: [
-            { max: 25, label: "Safe", color: "rgba(75, 192, 192, 1)" },
-            { max: 50, label: "Warning", color: "rgba(255, 206, 86, 1)" },
-            { max: Infinity, label: "Danger", color: "rgba(255, 99, 132, 1)" },
+            { max: Infinity, label: "Safe", color: "rgba(75, 192, 192, 1)" },
+            { max: 19.5, label: "Poor", color: "rgba(255, 206, 86, 1)" },
         ],
     };
 
@@ -132,7 +131,16 @@ const AirQualityByDate = () => {
 
     const createChartConfig = (label, data, metric) => {
         return {
-            labels: filteredData.map(item => new Date(item.date).toISOString().split('T')[1].substring(0, 8)),
+            labels: filteredData.map(item => {
+                const time = new Date(item.date).toLocaleString('en-US', {
+                    timeZone: 'UTC',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true,
+                });
+                return time; // Will return time like "5:45:04 AM"
+            }),
             datasets: [{
                 label: label + ' Average Level',
                 data: data.map(item => item.value),
@@ -147,6 +155,7 @@ const AirQualityByDate = () => {
             }],
         };
     };
+
 
     const Legend = ({ thresholds, filteredData, metric }) => {
         // Ensure filteredData is defined and has length
@@ -181,7 +190,7 @@ const AirQualityByDate = () => {
                 {/* Legend Container */}
                 <div className="legend-container" style={{ marginRight: '20px', width: '50%' }}>
                     {thresholds.map((threshold, index) => (
-                        <div key={index} style={{ backgroundColor: threshold.color, padding: '5px', borderRadius: '5px', display: 'block', marginBottom: '3px' }}>
+                        <div key={index} style={{ backgroundColor: threshold.color, padding: '5px', borderRadius: '5px', display: 'block', marginBottom: '3px', color: '#f5f5f5' }}>
                             <span style={{ fontWeight: 'bold' }}>{threshold.label}</span>: ≤ {threshold.max}
                         </div>
                     ))}
