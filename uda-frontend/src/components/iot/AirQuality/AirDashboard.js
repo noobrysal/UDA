@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, } from 'react';
 import { supabase } from './supabaseClient';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -12,7 +12,6 @@ import {
     Title,
     Tooltip,
     Legend,
-    Colors,
 } from 'chart.js';
 
 // Register chart.js components
@@ -22,12 +21,15 @@ const AirDashboard = () => {
     const [airData, setAirData] = useState([]);
     const [summary, setSummary] = useState([]);
     const [visibleIndices, setVisibleIndices] = useState([0, 1]); // Tracks visible locations for the carousel
+    const [isTransitioning, setIsTransitioning] = useState(false); // Track if a transition is in progress
     const [transitionDirection, setTransitionDirection] = useState('left'); // Track slide direction
     const [filters, setFilters] = useState({
         range: 'day',
         first: { date: '', month: '', weekStart: '' },
         second: { date: '', month: '', weekStart: '' }
     });
+    const [summaryErrorMessage, setSummaryErrorMessage] = useState(null);
+    const [logsErrorMessage, setLogsErrorMessage] = useState(null);
 
     const [comparisonData, setComparisonData] = useState(null); // State for comparison chart data
 
@@ -70,63 +72,104 @@ const AirDashboard = () => {
             { max: Infinity, status: 'Extreme Danger' },
         ],
         oxygen: [
-            { max: Infinity, label: "Safe", color: "rgba(75, 192, 192, 1)" },
-            { max: 19.5, label: "Poor", color: "rgba(255, 206, 86, 1)" },
+            { max: Infinity, status: "Safe", color: "rgba(75, 192, 192, 1)" },
+            { max: 19.5, status: "Poor", color: "rgba(255, 206, 86, 1)" },
         ],
     };
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const startTime = '2024-11-15T00:00:00+00';
-                const endTime = '2024-11-15T23:59:59.999+00';
+    const [summaryFilters, setSummaryFilters] = useState({
+        date: '',
+        time: '',
+        range: 'day',
+        comparisonDate: ''
+    });
 
-                const locationData = await Promise.all(
-                    locations.map(async (location) => {
-                        const { data, error } = await supabase
-                            .from('sensors')
-                            .select('*')
-                            .gte('date', startTime)
-                            .lt('date', endTime)
-                            .eq('locationId', location.id);
+    const handleSummaryFiltersChange = (event) => {
+        const { name, value } = event.target;
+        setSummaryFilters((prevFilters) => ({ ...prevFilters, [name]: value }));
+    };
 
-                        if (error) throw error;
+    const fetchData = async () => {
+        try {
+            const { date, comparisonDate, range } = summaryFilters;
 
-                        return { location: location.name, data };
-                    })
-                );
+            let start, end;
 
-                setAirData(locationData);
-                calculateSummary(locationData);
-            } catch (error) {
-                console.error('Error fetching air quality:', error);
-                toast.error(`Error fetching air quality: ${error.message}`);
+            if (range === 'day') {
+                start = `${date}T00:00:00+00:00`;
+                end = `${date}T23:59:59+00:00`;
+            } else if (range === 'week') {
+                start = calculateStartDate(date, range);
+                end = calculateEndDate(date, range);
+            } else if (range === 'month') {
+                const startDate = new Date(date);
+                startDate.setDate(1);
+                start = `${startDate.toISOString().split('T')[0]}T00:00:00+00:00`;
+                const endDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0);
+                end = `${endDate.toISOString().split('T')[0]}T23:59:59.999+00:00`;
             }
-        };
 
-        fetchData();
-    }, [locations]);
+            const comparisonStart = `${comparisonDate}T00:00:00+00:00`;
+            const comparisonEnd = `${comparisonDate}T23:59:59+00:00`;
+
+            const locationData = [];
+
+            for (const location of locations) {
+                const { data, error } = await supabase
+                    .from('sensors')
+                    .select('*')
+                    .gte('date', start)
+                    .lt('date', end)
+                    .eq('locationId', location.id);
+
+                if (error) throw error;
+
+                const comparisonData = await supabase
+                    .from('sensors')
+                    .select('*')
+                    .gte('date', comparisonStart)
+                    .lt('date', comparisonEnd)
+                    .eq('locationId', location.id);
+
+                if (comparisonData.error) throw comparisonData.error;
+
+                locationData.push({ location: location.name, data, comparisonData: comparisonData.data });
+            }
+
+            setAirData(locationData);
+            calculateSummary(locationData);
+            toast.success('Summary data fetched successfully.');
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            toast.error('Error fetching data. Please try again.');
+        }
+    };
 
     useEffect(() => {
         const timer = setInterval(() => {
-            setTransitionDirection(transitionDirection === 'left' ? 'right' : 'left');
-            setVisibleIndices((prevIndices) => {
-                const nextStart = (prevIndices[1] + 1) % locations.length;
-                return [nextStart, (nextStart + 1) % locations.length];
-            });
+            if (!isTransitioning) {
+                setTransitionDirection(transitionDirection === 'left' ? 'right' : 'left');
+                setTimeout(() => {
+                    setVisibleIndices((prevIndices) => {
+                        const nextStart = (prevIndices[1] + 1) % locations.length;
+                        return [nextStart, (nextStart + 1) % locations.length];
+                    });
+                }, 500); // delay the update by 500ms
+            }
         }, 5000);
 
         return () => clearInterval(timer);
-    }, [locations.length, transitionDirection]);
+    }, [locations.length, isTransitioning, transitionDirection]);
 
     const calculateSummary = (locationData) => {
         const summaries = locationData.map(({ location, data }) => {
+
             const calculateMetric = (metric) => {
                 const values = data.map((item) => item[metric]).filter((value) => value != null);
                 const avg = values.length > 0 ? values.reduce((acc, val) => acc + val, 0) / values.length : NaN;
                 const status = getStatus(avg, metric);
                 const trend = getTrend(values);
-                return { avg: isNaN(avg) ? null : avg, status, trend };
+                return { avg, status, trend };
             };
 
             return {
@@ -166,41 +209,26 @@ const AirDashboard = () => {
     };
 
     const renderSummaryPanel = (metric, label, locationSummary) => {
-        // Ensure locationSummary and metric are valid
-        if (!locationSummary || !locationSummary[metric]) {
+        const metricData = locationSummary[metric];
+        if (isNaN(metricData.avg)) {
             return (
                 <div style={styles.summaryPanel}>
                     <h5>{label}</h5>
-                    <p>Data for this metric is missing or not available.</p>
+                    <p>Data for this time / location not available</p>
+                    <p>Status: <span style={styles.status?.['Missing'] || {}}>Missing</span></p>
                 </div>
             );
         }
 
-        // Destructure the metric's data with fallback
-        const { avg, status, trend } = locationSummary[metric] || {};
-
-        // Handle missing avg value
-        if (avg == null) { // Check for null or undefined
-            return (
-                <div style={styles.summaryPanel}>
-                    <h5>{label}</h5>
-                    <p>Data for this date not found / available</p>
-                    <p>Status: <span>Missing</span></p>
-                </div>
-            );
-        }
-
-        // Render the summary panel
         return (
             <div style={styles.summaryPanel}>
                 <h5>{label}</h5>
-                <p>{avg.toFixed(2)} μg/m³</p>
-                <p>Status: <span style={styles.status?.[status] || {}}>{status}</span></p>
-                {renderTrendIndicator?.(trend)}
+                <p>{metricData.avg.toFixed(2)}</p>
+                <p>Status: <span style={styles.status?.[metricData.status] || {}}>{metricData.status || 'Unknown'}</span></p>
+                {renderTrendIndicator?.(metricData.trend)}
             </div>
         );
     };
-
 
     const fetchComparisonData = async () => {
         setComparisonData(null); // Clear chart
@@ -240,6 +268,7 @@ const AirDashboard = () => {
 
             const comparisonResult = calculateComparison(firstData, secondData);
             setComparisonData(comparisonResult);
+            toast.success('Comparison data fetched successfully.');
         } catch (error) {
             console.error('Error fetching comparison data:', error);
             toast.error('Error fetching comparison data.');
@@ -509,8 +538,6 @@ const AirDashboard = () => {
         locationId: null,
     });
 
-    const [errorMessage, setErrorMessage] = useState('');  // State to manage error messages
-
     const handleLogFiltersChange = (e) => {
         const { name, value } = e.target;
 
@@ -529,11 +556,11 @@ const AirDashboard = () => {
 
         // Validate inputs
         if (!date || !locationId) {
-            setErrorMessage('Please select both a location and a date.');
+            setLogsErrorMessage('Please select both a location and a date.');
             return;
         }
 
-        setErrorMessage('');  // Clear any previous error messages
+        setLogsErrorMessage('');  // Clear any previous error messages
 
         const start = calculateStartDate(date, range);
         const end = calculateEndDate(date, range);
@@ -547,20 +574,22 @@ const AirDashboard = () => {
 
         if (error) {
             console.error('Error fetching logs:', error);
-            setErrorMessage('An error occurred while fetching logs.');
+            setLogsErrorMessage('An error occurred while fetching logs.');
             return;
         }
 
         // Check if no logs were found
         if (!data || data.length === 0) {
-            setErrorMessage('No logs found for the selected date and location.');
+            setLogsErrorMessage('No logs found for the selected date and location.');
             return;
         }
-
+        toast.success('Logs fetched successfully.');
         generateLogs(data);
+
     };
 
     const generateLogs = (data) => {
+        console.log('generateLogs called');
         const thresholds = {
             pm25: thresholds1.pm25.slice(2), // Unhealthy to Emergency
             pm10: thresholds1.pm10.slice(2), // Unhealthy to Emergency
@@ -617,15 +646,105 @@ const AirDashboard = () => {
     }, [logFilters]);
 
 
-
     return (
         <div style={styles.body}>
             <Sidebar>
                 <div style={styles.container}>
                     <h1 style={styles.dashboardTitle}>Air Quality Dashboard</h1>
+                    <div style={styles.summaryContainer}>
+                        <h2 style={styles.sectionTitle}>Summary</h2>
+
+                        {/* Filters */}
+                        <div style={styles.summaryFiltersContainer}>
+                            <div style={{ marginBottom: "20px" }}>
+                                <label>
+                                    Range:
+                                    <select
+                                        name="range"
+                                        value={summaryFilters.range}
+                                        onChange={handleSummaryFiltersChange}
+                                    >
+                                        <option value="day">Day</option>
+                                        <option value="week">Week</option>
+                                        <option value="month">Month</option>
+                                    </select>
+                                </label>
+                                {(summaryFilters.range === 'day' || summaryFilters.range === 'week') && (
+                                    <label>
+                                        Date:
+                                        <input
+                                            type="date"
+                                            name="date"
+                                            value={summaryFilters.date}
+                                            onChange={handleSummaryFiltersChange}
+                                        />
+                                    </label>
+                                )}
+                                {(summaryFilters.range === 'day' || summaryFilters.range === 'week') && (
+                                    <label>
+                                        Comparison Date:
+                                        <input
+                                            type="date"
+                                            name="comparisonDate"
+                                            value={summaryFilters.comparisonDate}
+                                            onChange={handleSummaryFiltersChange}
+                                        />
+                                    </label>
+                                )}
+                                {summaryFilters.range === 'month' && (
+                                    <label>
+                                        Month:
+                                        <select
+                                            name="month"
+                                            value={summaryFilters.month}
+                                            onChange={handleSummaryFiltersChange}
+                                        >
+                                            {monthNames.map((month, index) => (
+                                                <option key={index} value={index + 1}>
+                                                    {month}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </label>
+                                )}
+                                {summaryFilters.range === 'month' && (
+                                    <label>
+                                        Comparison Month:
+                                        <select
+                                            name="comparisonMonth"
+                                            value={summaryFilters.comparisonMonth}
+                                            onChange={handleSummaryFiltersChange}
+                                        >
+                                            {monthNames.map((month, index) => (
+                                                <option key={index} value={index + 1}>
+                                                    {month}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </label>
+                                )}
+                                <button style={styles.button} onClick={fetchData}>Fetch Data</button>
+                            </div>
+
+
+                            {/* Summary */}
+                            {summaryErrorMessage ? (
+                                <div style={{ color: "red" }}>{summaryErrorMessage}</div>
+                            ) : Object.keys(summary).length > 0 ? (
+                                <div style={{ display: "flex", gap: "20px" }}>
+                                    {/* Loop through all available metrics */}
+                                    {["pm25", "pm10", "humidity", "temperature", "oxygen"].map((metric) => {
+                                        const metricSummary = summary[metric];
+                                    })}
+                                </div>
+                            ) : (
+                                <p>No summary available for the selected filters.</p>
+                            )}
+                        </div>
+                    </div>
                     <div
-                        className={`location-panels ${transitionDirection === 'left' ? 'slide-left' : 'slide-right'}`}
-                        onAnimationEnd={() => setTransitionDirection('')} // Reset animation after it ends
+                        className={`location-panels ${transitionDirection === 'left' ? 'left' : 'right'}`}
+                        onAnimationEnd={() => setIsTransitioning(false)} // Reset isTransitioning after animation ends
                         style={styles.locationPanels}
                     >
                         {visibleIndices.map((index) => {
@@ -891,12 +1010,12 @@ const AirDashboard = () => {
                                     <option value="month">Month</option>
                                 </select>
                             </label>
-                            <button onClick={fetchLogs}>Fetch Logs</button>
+                            <button style={styles.button} onClick={fetchLogs}>Fetch Logs</button>
                         </div>
 
                         {/* Logs */}
-                        {errorMessage ? (
-                            <div style={{ color: 'red' }}>{errorMessage}</div>
+                        {logsErrorMessage ? (
+                            <div style={{ color: 'red' }}>{logsErrorMessage}</div>
                         ) : Object.keys(logs).length > 0 ? (
                             <div style={{ display: "flex", gap: "20px", }}>
                                 {/* Loop through all available metrics, including oxygen */}
@@ -937,8 +1056,6 @@ const AirDashboard = () => {
                             <p>No logs available for the selected filters.</p>
                         )}
                     </div>
-
-
                     <ToastContainer />
                 </div>
             </Sidebar >
@@ -947,6 +1064,7 @@ const AirDashboard = () => {
 
 
 };
+
 const styles = {
     body: {
         backgroundColor: '#808080', // Soft gray for the dashboard background
@@ -971,20 +1089,35 @@ const styles = {
         textAlign: 'center',
         marginBottom: '20px',
     },
+    summaryFiltersContainer: {
+        marginTop: '20px',
+        marginBottom: '20px',
+        padding: '15px',
+        backgroundColor: '#f5f5f5',
+        borderRadius: '10px',
+        boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+    },
     locationPanels: {
         display: 'flex',
         flexWrap: 'wrap', // Wrap panels for smaller screens
         gap: '20px',
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
         marginBottom: '30px',
     },
     locationPanel: {
         flex: '1 1 calc(33.333% - 20px)', // Three columns on larger screens
-        backgroundColor: '#ffffff',
+        backgroundColor: '#f5f5f5',
         padding: '15px',
         borderRadius: '10px',
         boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
         textAlign: 'center',
-        transition: 'transform 0.3s, box-shadow 0.3s',
+        transition: 'transform 0.5s ease-in-out',
+    },
+    left: {
+        transform: 'translateX(-100%)',
+    },
+    right: {
+        transform: 'translateX(100%)',
     },
     locationPanelHover: {
         transform: 'scale(1.05)', // Hover effect for panels
@@ -1003,7 +1136,7 @@ const styles = {
     },
     summaryPanel: {
         flex: '1 1 calc(45% - 10px)', // Two panels per row
-        backgroundColor: '#fafafa',
+        backgroundColor: '#f5f5f5',
         padding: '10px',
         borderRadius: '10px',
         border: 'solid black 1px',
@@ -1012,12 +1145,12 @@ const styles = {
     },
     comparisonContainer: {
         display: 'flex',
-        flexWrap: 'wrap', // Responsive flex layout
+        flexWrap: 'nowrap', // Responsive flex layout
         gap: '20px',
         marginBottom: '30px',
     },
     legendDiv: {
-
+        backgroundColor: '#f5f5f5',
         boxShadow: '0 1px 3px rgba(0, 0, 0, 0.3)',
         padding: '5px 0 40px 30px',
         borderRadius: '10px',
@@ -1025,7 +1158,7 @@ const styles = {
     flexItem: {
         flex: '1 1 calc(50% - 20px)', // Two items per row
         padding: '15px',
-        backgroundColor: '#ffffff',
+        backgroundColor: '#f5f5f5',
         borderRadius: '10px',
         boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
         display: 'flex', // Enable flexbox
@@ -1049,6 +1182,7 @@ const styles = {
         margin: '20px',
     },
     button: {
+        marginLeft: '20px',
         display: 'inline-block',
         padding: '10px 20px',
         backgroundColor: '#007bff',
@@ -1079,6 +1213,11 @@ const styles = {
             fontSize: '14px',
         },
     },
+    '@media (min-width: 768px)': {
+        comparisonContainer: {
+            flexWrap: 'nowrap',
+        }
+    }
 };
 
 
