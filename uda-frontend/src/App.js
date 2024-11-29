@@ -18,8 +18,7 @@ function App() {
         <Route path="/login" element={<LoginForm />} />
         <Route path="/" element={<LandingPage />} />
         <Route path="/air-dashboard" element={<AirDashboard />} />
-        <Route path="/air-quality" element={<AirQuality />} />
-        <Route path="/air-quality/date/:date/location/:locationId" element={<AirQualityByDate />} />
+        <Route path="/air-quality/" element={<AirQualityByDate />} />
         <Route path="/air-quality/id/:id" element={<AirQualityInstance />} />
       </Routes>
     </div>
