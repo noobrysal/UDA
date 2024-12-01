@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 
-import { useParams, useNavigate } from "react-router-dom";
-import { supabase } from "./supabaseClient";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import { Line } from "react-chartjs-2";
-import Sidebar from "../../Sidebar";
-import Calendar from "react-calendar";
-import "react-calendar/dist/Calendar.css";
+import { useParams, useNavigate } from 'react-router-dom';
+import { supabase } from './supabaseClient';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { Line } from 'react-chartjs-2';
+// import Sidebar from '../../Sidebar';
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -508,207 +508,208 @@ const AirQualityByDate = () => {
     };
 
     return (
-        <Sidebar>
-            <div className="container-fluid">
-                <h2 style={{ textAlign: "center", marginBottom: "40px" }}>
-                    Air Quality Data for {date} at {locationName}
-                </h2>
-                <div>
-                    <h3 style={{ textAlign: "center", marginBottom: "40px" }}>
-                        Select Date:
-                    </h3>
-                    <Calendar
-                        value={selectedDate}
-                        onChange={(date) => {
-                            setSelectedDate(date);
-                            setViewMode("average");
-                        }}
-                        onActiveStartDateChange={handleMonthChange}
-                        tileContent={tileContent}
-                    />
-                </div>
-                <div className="view-toggle">
-                    <button
-                        onClick={() =>
-                            setViewMode(viewMode === "hourly" ? "average" : "hourly")
-                        }
+        // <Sidebar>
+
+        <div className="container-fluid">
+            <h2 style={{ textAlign: "center", marginBottom: "40px" }}>
+                Air Quality Data for {date} at {locationName}
+            </h2>
+            <div>
+                <h3 style={{ textAlign: "center", marginBottom: "40px" }}>
+                    Select Date:
+                </h3>
+                <Calendar
+                    value={selectedDate}
+                    onChange={(date) => {
+                        setSelectedDate(date);
+                        setViewMode("average");
+                    }}
+                    onActiveStartDateChange={handleMonthChange}
+                    tileContent={tileContent}
+                />
+            </div>
+            <div className="view-toggle">
+                <button
+                    onClick={() =>
+                        setViewMode(viewMode === "hourly" ? "average" : "hourly")
+                    }
+                >
+                    {viewMode === "hourly"
+                        ? "Show Hourly Averages"
+                        : "Show Hourly Data"}
+                </button>
+            </div>
+            <div className="dropdowns-container">
+                {/* Location Dropdown */}
+                <div className="form-group">
+                    <label htmlFor="locationSelect">Select Location:</label>
+                    <select
+                        id="locationSelect"
+                        className="form-control"
+                        value={selectedLocation}
+                        onChange={(e) => setSelectedLocation(e.target.value)}
                     >
-                        {viewMode === "hourly"
-                            ? "Show Hourly Averages"
-                            : "Show Hourly Data"}
-                    </button>
+                        {locations.map((location) => (
+                            <option key={location.id} value={location.id}>
+                                {location.name}
+                            </option>
+                        ))}
+                    </select>
                 </div>
-                <div className="dropdowns-container">
-                    {/* Location Dropdown */}
+
+                {/* Hour Dropdown */}
+                {viewMode === "hourly" && (
                     <div className="form-group">
-                        <label htmlFor="locationSelect">Select Location:</label>
+                        <label htmlFor="hourSelect">Select Hour:</label>
                         <select
-                            id="locationSelect"
+                            id="hourSelect"
                             className="form-control"
-                            value={selectedLocation}
-                            onChange={(e) => setSelectedLocation(e.target.value)}
+                            value={selectedHour}
+                            onChange={(e) => setSelectedHour(e.target.value)}
                         >
-                            {locations.map((location) => (
-                                <option key={location.id} value={location.id}>
-                                    {location.name}
-                                </option>
-                            ))}
+                            {Array.from({ length: 24 }, (_, i) => {
+                                const date = new Date();
+                                date.setHours(i, 0, 0, 0);
+                                return (
+                                    <option key={i} value={i.toString().padStart(2, "0")}>
+                                        {date.toLocaleString("en-US", {
+                                            hour: "2-digit",
+                                            minute: "2-digit",
+                                            hour12: true,
+                                        })}
+                                    </option>
+                                );
+                            })}
                         </select>
                     </div>
+                )}
+            </div>
 
-                    {/* Hour Dropdown */}
-                    {viewMode === "hourly" && (
-                        <div className="form-group">
-                            <label htmlFor="hourSelect">Select Hour:</label>
-                            <select
-                                id="hourSelect"
-                                className="form-control"
-                                value={selectedHour}
-                                onChange={(e) => setSelectedHour(e.target.value)}
-                            >
-                                {Array.from({ length: 24 }, (_, i) => {
-                                    const date = new Date();
-                                    date.setHours(i, 0, 0, 0);
-                                    return (
-                                        <option key={i} value={i.toString().padStart(2, "0")}>
-                                            {date.toLocaleString("en-US", {
-                                                hour: "2-digit",
-                                                minute: "2-digit",
-                                                hour12: true,
-                                            })}
-                                        </option>
-                                    );
-                                })}
-                            </select>
-                        </div>
-                    )}
-                </div>
+            <div className="charts-flex-container">
+                {["pm25", "pm10", "humidity", "temperature", "oxygen"].map(
+                    (metric, index) => (
+                        <div key={index} className="chart-item">
+                            <div className="chart-container">
+                                {/* Render Hourly Data Chart */}
+                                {viewMode === "hourly" && (
+                                    filteredData.length > 0 ? (
+                                        <Line
+                                            data={createChartConfig(
+                                                metric.toUpperCase(),
+                                                filteredData.map((item) => ({
+                                                    value: item[metric],
+                                                    id: item.id,
+                                                })),
+                                                metric
+                                            )}
+                                            options={{
+                                                responsive: true,
+                                                spanGaps: true,
+                                                plugins: {
+                                                    legend: { position: "top", backgroundColor: calculateAverageColor(filteredData, metric) },
+                                                    tooltip: {
+                                                        callbacks: {
+                                                            label: function (tooltipItem) {
+                                                                const value = tooltipItem.raw;
+                                                                const metricThresholds = thresholds[metric];
 
-                <div className="charts-flex-container">
-                    {["pm25", "pm10", "humidity", "temperature", "oxygen"].map(
-                        (metric, index) => (
-                            <div key={index} className="chart-item">
-                                <div className="chart-container">
-                                    {/* Render Hourly Data Chart */}
-                                    {viewMode === "hourly" && (
-                                        filteredData.length > 0 ? (
-                                            <Line
-                                                data={createChartConfig(
-                                                    metric.toUpperCase(),
-                                                    filteredData.map((item) => ({
-                                                        value: item[metric],
-                                                        id: item.id,
-                                                    })),
-                                                    metric
-                                                )}
-                                                options={{
-                                                    responsive: true,
-                                                    spanGaps: true,
-                                                    plugins: {
-                                                        legend: { position: "top", backgroundColor: calculateAverageColor(filteredData, metric) },
-                                                        tooltip: {
-                                                            callbacks: {
-                                                                label: function (tooltipItem) {
-                                                                    const value = tooltipItem.raw;
-                                                                    const metricThresholds = thresholds[metric];
+                                                                // Find the appropriate threshold for the current value
+                                                                const matchedThreshold =
+                                                                    metricThresholds.find(
+                                                                        (threshold) => value <= threshold.max
+                                                                    );
 
-                                                                    // Find the appropriate threshold for the current value
-                                                                    const matchedThreshold =
-                                                                        metricThresholds.find(
-                                                                            (threshold) => value <= threshold.max
-                                                                        );
+                                                                // Get the label or fallback to "Emergency" if no match is found
+                                                                const thresholdRemark = matchedThreshold
+                                                                    ? matchedThreshold.label
+                                                                    : "Emergency";
 
-                                                                    // Get the label or fallback to "Emergency" if no match is found
-                                                                    const thresholdRemark = matchedThreshold
-                                                                        ? matchedThreshold.label
-                                                                        : "Emergency";
-
-                                                                    return [
-                                                                        `Value: ${value}`,
-                                                                        `Status: ${thresholdRemark}`,
-                                                                    ];
-                                                                },
+                                                                return [
+                                                                    `Value: ${value}`,
+                                                                    `Status: ${thresholdRemark}`,
+                                                                ];
                                                             },
                                                         },
-                                                        title: {
-                                                            display: true,
-                                                            text: `${metric.toUpperCase()} Levels`,
-                                                            padding: { bottom: 10 },
-                                                        },
                                                     },
-                                                    onClick: handlePointClick,
-                                                }}
-                                            />
-                                        ) : (
-                                            <p>No data found for this hour.</p>
-                                        )
-                                    )}
+                                                    title: {
+                                                        display: true,
+                                                        text: `${metric.toUpperCase()} Levels`,
+                                                        padding: { bottom: 10 },
+                                                    },
+                                                },
+                                                onClick: handlePointClick,
+                                            }}
+                                        />
+                                    ) : (
+                                        <p>No data found for this hour.</p>
+                                    )
+                                )}
 
-                                    {/* Render Average Data Chart */}
-                                    {viewMode === "average" && (
-                                        airData.length > 0 ? (
-                                            <Line
-                                                data={createChartConfigForAverage(
-                                                    metric.toUpperCase(),
-                                                    getFilteredDataForAverage(airData, metric), // Use the preprocessed data for hourly averages
-                                                    metric
-                                                )}
-                                                options={{
-                                                    responsive: true,
-                                                    spanGaps: true,
-                                                    plugins: {
-                                                        legend: { position: "top" },
-                                                        tooltip: {
-                                                            callbacks: {
-                                                                label: function (tooltipItem) {
-                                                                    const value = tooltipItem.raw;
-                                                                    const metricThresholds = thresholds[metric];
+                                {/* Render Average Data Chart */}
+                                {viewMode === "average" && (
+                                    airData.length > 0 ? (
+                                        <Line
+                                            data={createChartConfigForAverage(
+                                                metric.toUpperCase(),
+                                                getFilteredDataForAverage(airData, metric), // Use the preprocessed data for hourly averages
+                                                metric
+                                            )}
+                                            options={{
+                                                responsive: true,
+                                                spanGaps: true,
+                                                plugins: {
+                                                    legend: { position: "top" },
+                                                    tooltip: {
+                                                        callbacks: {
+                                                            label: function (tooltipItem) {
+                                                                const value = tooltipItem.raw;
+                                                                const metricThresholds = thresholds[metric];
 
-                                                                    const matchedThreshold =
-                                                                        metricThresholds.find(
-                                                                            (threshold) => value <= threshold.max
-                                                                        );
-                                                                    const thresholdRemark = matchedThreshold
-                                                                        ? matchedThreshold.label
-                                                                        : "Emergency";
+                                                                const matchedThreshold =
+                                                                    metricThresholds.find(
+                                                                        (threshold) => value <= threshold.max
+                                                                    );
+                                                                const thresholdRemark = matchedThreshold
+                                                                    ? matchedThreshold.label
+                                                                    : "Emergency";
 
-                                                                    return [
-                                                                        `Value: ${value}`,
-                                                                        `Status: ${thresholdRemark}`,
-                                                                    ];
-                                                                },
+                                                                return [
+                                                                    `Value: ${value}`,
+                                                                    `Status: ${thresholdRemark}`,
+                                                                ];
                                                             },
                                                         },
-                                                        title: {
-                                                            display: true,
-                                                            text: `${metric.toUpperCase()} Hourly Averages`,
-                                                            padding: { bottom: 10 },
-                                                        },
                                                     },
-                                                    onClick: handlePointClick,
-                                                }}
-                                            />
+                                                    title: {
+                                                        display: true,
+                                                        text: `${metric.toUpperCase()} Hourly Averages`,
+                                                        padding: { bottom: 10 },
+                                                    },
+                                                },
+                                                onClick: handlePointClick,
+                                            }}
+                                        />
+                                    )
+                                        : (
+                                            <p>No data found for this day.</p>
                                         )
-                                            : (
-                                                <p>No data found for this day.</p>
-                                            )
 
-                                    )}
-                                    <Legend
-                                        thresholds={thresholds[metric]}
-                                        filteredData={filteredData}
-                                        metric={metric}
-                                        data={airData}
-                                    />
-                                </div>
+                                )}
+                                <Legend
+                                    thresholds={thresholds[metric]}
+                                    filteredData={filteredData}
+                                    metric={metric}
+                                    data={airData}
+                                />
                             </div>
-                        )
-                    )}
-                </div>
+                        </div>
+                    )
+                )}
+            </div>
 
 
-                <ToastContainer />
-                <style jsx>{`
+            <ToastContainer />
+            <style jsx>{`
 
                 .react-calendar {
                 width: 100%;
@@ -767,8 +768,8 @@ const AirQualityByDate = () => {
                 background-color:#808080;
                 }
             `}</style>
-            </div>
-        </Sidebar>
+        </div>
+        // </Sidebar>
     );
 };
 

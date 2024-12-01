@@ -4,9 +4,8 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import styled from '@emotion/styled';
 import 'react-toastify/dist/ReactToastify.css';
-import { FaGoogle, FaFacebook } from 'react-icons/fa';
-import logoImage from '../static/logo.png';
-import backgroundImage from '../static/udabackg.png';
+import logoImage from '../assets/logo.png';
+import backgroundImage from '../assets/udabackg.png';
 
 const PageContainer = styled.div`
   display: flex;
