@@ -4,7 +4,6 @@ import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { createGlobalStyle } from 'styled-components'; // <-- Import createGlobalStyle
 import RegisterForm from './components/RegisterForm';
 import LoginForm from './components/LoginForm';
-import AirQuality from './components/iot/AirQuality/AirQuality';
 import AirDashboard from './components/iot/AirQuality/AirDashboard';
 import AirQualityInstance from './components/iot/AirQuality/AirQualityInstance';
 import AirQualityByDate from './components/iot/AirQuality/AirQualityByDate';
@@ -65,8 +64,7 @@ const AppContent = () => {
 
           {/* Routes with Sidebar */}
           <Route path="/air-dashboard" element={<AirDashboard />} />
-          <Route path="/air-quality" element={<AirQuality />} />
-          <Route path="/air-quality/date/:date/location/:locationId" element={<AirQualityByDate />} />
+          <Route path="/air-quality" element={<AirQualityByDate />} />
           <Route path="/air-quality/id/:id" element={<AirQualityInstance />} />
         </Routes>
       </div>

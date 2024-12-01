@@ -384,12 +384,12 @@ const AirDashboard = () => {
 
         if (range === 'week') {
             // For week, the start date is the given date
-            return startDate.toLocal().split('T')[0] + 'T00:00:00+00:00';
+            return startDate.toISOString().replace('Z', '+00:00').split('.')[0]; // Ensure date is in yyyy-MM-ddTHH:mm:ss+00:00 format
         } else if (range === 'month') {
             startDate.setUTCDate(1);
         }
 
-        return startDate.toLocaleString("en-US").split('T')[0] + 'T00:00:00+00:00';
+        return startDate.toISOString().replace('Z', '+00:00').split('.')[0]; // Ensure date is in yyyy-MM-ddTHH:mm:ss+00:00 format
     };
 
     const calculateEndDate = (date, range) => {
@@ -404,7 +404,7 @@ const AirDashboard = () => {
             endDate.setUTCDate(0);
         }
 
-        return endDate.toLocaleString("en-US").split('T')[0] + 'T23:59:59+00:00';
+        return endDate.toISOString().replace('Z', '+00:00').split('.')[0]; // Ensure date is in yyyy-MM-ddTHH:mm:ss+00:00 format
     };
 
     const calculateComparison = (firstData, secondData) => {
@@ -692,7 +692,11 @@ const AirDashboard = () => {
 
         if (name === "date") {
             const date = new Date(value);
-            updatedValue = date.toLocaleString("en-US").split("T")[0]; // Ensure UTC date without time
+            // Format the date to include the time component and the correct time zone offset
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            updatedValue = date.toISOString().split("T")[0]; // Ensure date is in yyyy-MM-ddTHH:mm:ss+00:00 format
         }
 
         setLogFilters({ ...logFilters, [name]: updatedValue });
@@ -732,7 +736,6 @@ const AirDashboard = () => {
         }
         toast.success('Logs fetched successfully.');
         generateLogs(data);
-
     };
 
     const generateLogs = (data) => {
@@ -760,7 +763,16 @@ const AirDashboard = () => {
         data.forEach((entry) => {
             ["pm25", "pm10", "humidity", "temperature", "oxygen"].forEach((metric) => {
                 const value = entry[metric];
-                const timestamp = entry.date;
+                const timestamp = new Date(entry.date).toLocaleString("en-US", {
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                    hour12: false,
+                    timeZone: "Asia/Manila" // Adjust to the desired time zone
+                });
                 const remark = entry[`${metric}Remarks`];
 
                 // Match threshold for each metric
@@ -1312,7 +1324,16 @@ const AirDashboard = () => {
                                                             >
                                                                 {log.threshold}
                                                             </em>{" "}
-                                                            at {new Date(log.timestamp).toLocaleString('en-US', { timeZone: 'UTC' })}
+                                                            at {new Date(log.timestamp).toLocaleString('en-US', {
+                                                                year: 'numeric',
+                                                                month: '2-digit',
+                                                                day: '2-digit',
+                                                                hour12: true,
+                                                                hour: '2-digit',
+                                                                minute: '2-digit',
+                                                                second: '2-digit',
+                                                                timeZone: 'Asia/Manila' // Adjust to the desired time zone
+                                                            })}
                                                         </li>
                                                     ))}
                                                 </ul>
