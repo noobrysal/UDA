@@ -43,37 +43,37 @@ const AirDashboard = () => {
 
     const thresholds = {
         pm25: [
-            { max: 25, status: 'Good' },
-            { max: 35, status: 'Fair' },
-            { max: 45, status: 'Unhealthy' },
-            { max: 55, status: 'Very Unhealthy' },
-            { max: 90, status: 'Severely Unhealthy' },
-            { max: Infinity, status: 'Emergency' },
+            { min: 0, max: 24.99, status: "Good", color: "rgba(75, 192, 192, 1)" },
+            { min: 25, max: 34.99, status: "Fair", color: "rgba(154, 205, 50, 1)" },
+            { min: 34.9, max: 44.99, status: "Unhealthy", color: "rgba(255, 206, 86, 1)" },
+            { min: 45, max: 54.99, status: "Very Unhealthy", color: "rgba(255, 140, 0, 1)" },
+            { min: 55, max: 89.99, status: "Severely Unhealthy", color: "rgba(255, 99, 132, 1)" },
+            { min: 90, max: Infinity, status: "Emergency", color: "rgba(139, 0, 0, 1)" },
         ],
         pm10: [
-            { max: 50, status: 'Good' },
-            { max: 100, status: 'Fair' },
-            { max: 150, status: 'Unhealthy' },
-            { max: 200, status: 'Very Unhealthy' },
-            { max: 300, status: 'Severely Unhealthy' },
-            { max: Infinity, status: 'Emergency' },
+            { min: 0, max: 49.99, status: "Good", color: "rgba(75, 192, 192, 1)" },
+            { min: 50, max: 99.99, status: "Fair", color: "rgba(154, 205, 50, 1)" },
+            { min: 100, max: 149.99, status: "Unhealthy", color: "rgba(255, 206, 86, 1)" },
+            { min: 150, max: 199.99, status: "Very Unhealthy", color: "rgba(255, 140, 0, 1)" },
+            { min: 200, max: 299.99, status: "Severely Unhealthy", color: "rgba(255, 99, 132, 1)" },
+            { min: 300, max: Infinity, status: "Emergency", color: "rgba(139, 0, 0, 1)" },
         ],
         humidity: [
-            { max: 25, status: 'Poor' },
-            { max: 30, status: 'Fair' },
-            { max: 60, status: 'Good' },
-            { max: 70, status: 'Fair' },
-            { max: Infinity, status: 'Poor' },
+            { min: 0, max: 23.99, status: "Poor", color: "rgba(139, 0, 0, 1)" },
+            { min: 24, max: 29.99, status: "Fair", color: "rgba(255, 206, 86, 1)" },
+            { min: 30, max: 59.99, status: "Good", color: "rgba(75, 192, 192, 1)" },
+            { min: 60, max: 69.99, status: "Fair", color: "rgba(154, 205, 50, 1)" },
+            { min: 70, max: Infinity, status: "Poor", color: "rgba(255, 99, 132, 1)" },
         ],
         temperature: [
-            { max: 33, status: 'Good' },
-            { max: 41, status: 'Caution' },
-            { max: 54, status: 'Danger' },
-            { max: Infinity, status: 'Extreme Danger' },
+            { min: 0, max: 32.99, status: "Good", color: "rgba(75, 192, 192, 1)" },
+            { min: 33, max: 40.99, status: "Caution", color: "rgba(255, 206, 86, 1)" },
+            { min: 41, max: 53.99, status: "Danger", color: "rgba(255, 140, 0, 1)" },
+            { min: 54, max: Infinity, status: "Extreme Danger", color: "rgba(139, 0, 0, 1)" },
         ],
         oxygen: [
-            { max: Infinity, status: "Safe", color: "rgba(75, 192, 192, 1)" },
-            { max: 19.5, status: "Poor", color: "rgba(255, 206, 86, 1)" },
+            { min: 0, max: 19.49, status: "Poor", color: "rgba(255, 206, 86, 1)" },
+            { min: 19.5, max: Infinity, status: "Safe", color: "rgba(75, 192, 192, 1)" },
         ],
     };
 
@@ -93,26 +93,58 @@ const AirDashboard = () => {
         try {
             const { date, comparisonDate, range } = summaryFilters;
 
-            let start, end;
+            if (date === comparisonDate) {
+                toast.error('Main date range and comparison date range should be different.');
+                return;
+            }
 
+            let start, end, comparisonStart, comparisonEnd;
+
+            // Helper function to format date to locale string
+            const formatDateToLocaleString = (date) => {
+                return new Date(date).toLocaleString("en-US", {
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
+                    hour12: true,
+                    timeZone: "Asia/Manila" // Respect the timezone from the database
+                });
+            };
+
+            // Calculate start and end dates for the main date range
             if (range === 'day') {
-                start = `${date}T00:00:00+00:00`;
-                end = `${date}T23:59:59+00:00`;
+                start = `${date}T00:00:00+08:00`;
+                end = `${date}T23:59:59+08:00`;
             } else if (range === 'week') {
                 start = calculateStartDate(date, range);
                 end = calculateEndDate(date, range);
             } else if (range === 'month') {
                 const startDate = new Date(date);
                 startDate.setDate(1);
-                start = `${startDate.toISOString().split('T')[0]}T00:00:00+00:00`;
+                start = `${startDate.toISOString().split('T')[0]}T00:00:00+08:00`;
                 const endDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0);
-                end = `${endDate.toISOString().split('T')[0]}T23:59:59.999+00:00`;
+                end = `${endDate.toISOString().split('T')[0]}T23:59:59.999+08:00`;
             }
 
-            const comparisonStart = `${comparisonDate}T00:00:00+00:00`;
-            const comparisonEnd = `${comparisonDate}T23:59:59+00:00`;
+            // Calculate start and end dates for the comparison date range using the same range
+            if (range === 'day') {
+                comparisonStart = `${comparisonDate}T00:00:00+08:00`;
+                comparisonEnd = `${comparisonDate}T23:59:59+08:00`;
+            } else if (range === 'week') {
+                comparisonStart = calculateStartDate(comparisonDate, range);
+                comparisonEnd = calculateEndDate(comparisonDate, range);
+            } else if (range === 'month') {
+                const comparisonStartDate = new Date(comparisonDate);
+                comparisonStartDate.setDate(1);
+                comparisonStart = `${comparisonStartDate.toISOString().split('T')[0]}T00:00:00+08:00`;
+                const comparisonEndDate = new Date(comparisonStartDate.getFullYear(), comparisonStartDate.getMonth() + 1, 0);
+                comparisonEnd = `${comparisonEndDate.toISOString().split('T')[0]}T23:59:59.999+08:00`;
+            }
 
             const locationData = [];
+            let hasData = false;
+            let hasMainData = false;
+            let hasComparisonData = false;
 
             for (const location of locations) {
                 const { data, error } = await supabase
@@ -124,17 +156,51 @@ const AirDashboard = () => {
 
                 if (error) throw error;
 
-                const comparisonData = await supabase
+                const summaryComparisonData = await supabase
                     .from('sensors')
                     .select('*')
                     .gte('date', comparisonStart)
                     .lt('date', comparisonEnd)
                     .eq('locationId', location.id);
 
-                if (comparisonData.error) throw comparisonData.error;
+                if (summaryComparisonData.error) throw summaryComparisonData.error;
 
-                locationData.push({ location: location.name, data, comparisonData: comparisonData.data });
+                if (data.length > 0) {
+                    hasMainData = true;
+                }
+
+                if (summaryComparisonData.data.length > 0) {
+                    hasComparisonData = true;
+                }
+
+                if (data.length > 0 || summaryComparisonData.data.length > 0) {
+                    hasData = true;
+                }
+
+                locationData.push({ location: location.name, data, summaryComparisonData: summaryComparisonData.data });
             }
+
+            if (!hasData) {
+                const formattedStart = formatDateToLocaleString(start);
+                const formattedComparisonStart = formatDateToLocaleString(comparisonStart);
+                toast.error(`No data found for both ${formattedStart} and ${formattedComparisonStart}`);
+                return;
+            }
+
+            if (!hasMainData) {
+                const formattedStart = formatDateToLocaleString(start);
+                toast.error(`No data found for the main date range starting at ${formattedStart}`);
+                return;
+            }
+
+            if (!hasComparisonData) {
+                const formattedComparisonStart = formatDateToLocaleString(comparisonStart);
+                toast.error(`No data found for the comparison date range starting at ${formattedComparisonStart}`);
+                return;
+            }
+            hasData = false;
+            hasMainData = false;
+            hasComparisonData = false;
 
             setAirData(locationData);
             calculateSummary(locationData);
@@ -252,15 +318,10 @@ const AirDashboard = () => {
                 secondDate = `${second.year || currentYear}-${second.month}-01`;
             }
 
-            console.log('First Date:', firstDate);
-            console.log('Second Date:', secondDate);
-            console.log('Location:', location);
-
             const firstData = await fetchDataForTimeRange(firstDate, first.hour, range, location);
             const secondData = await fetchDataForTimeRange(secondDate, second.hour, range, location);
 
             if (!firstData.length || !secondData.length) {
-                console.warn('No data found for one or both ranges.');
                 toast.warning('No data found for one or both ranges.');
                 setComparisonData(null); // Clear chart
                 return;
@@ -291,8 +352,6 @@ const AirDashboard = () => {
             end = calculateEndDate(date, range);
         }
 
-        console.log('Query range:', { start, end, location });
-
         const { data, error } = await supabase
             .from('sensors')
             .select('*')
@@ -302,7 +361,6 @@ const AirDashboard = () => {
 
         if (error) throw error;
 
-        console.log('Fetched data:', data);
         return data;
     };
 
@@ -313,13 +371,13 @@ const AirDashboard = () => {
         if (isNaN(startDate)) throw new RangeError('Invalid date value');
 
         if (range === 'week') {
-            const day = startDate.getUTCDay();
-            startDate.setUTCDate(startDate.getUTCDate() - day);
+            // For week, the start date is the given date
+            return startDate.toLocal().split('T')[0] + 'T00:00:00+00:00';
         } else if (range === 'month') {
             startDate.setUTCDate(1);
         }
 
-        return startDate.toISOString().split('T')[0] + 'T00:00:00+00:00';
+        return startDate.toLocaleString("en-US").split('T')[0] + 'T00:00:00+00:00';
     };
 
     const calculateEndDate = (date, range) => {
@@ -327,14 +385,14 @@ const AirDashboard = () => {
         if (isNaN(endDate)) throw new RangeError('Invalid date value');
 
         if (range === 'week') {
-            const day = endDate.getUTCDay();
-            endDate.setUTCDate(endDate.getUTCDate() + (6 - day));
+            // For week, the end date is 6 days after the given date
+            endDate.setUTCDate(endDate.getUTCDate() + 6);
         } else if (range === 'month') {
             endDate.setUTCMonth(endDate.getUTCMonth() + 1);
             endDate.setUTCDate(0);
         }
 
-        return endDate.toISOString().split('T')[0] + 'T23:59:59+00:00';
+        return endDate.toLocaleString("en-US").split('T')[0] + 'T23:59:59+00:00';
     };
 
     const calculateComparison = (firstData, secondData) => {
@@ -359,37 +417,37 @@ const AirDashboard = () => {
 
     const thresholds1 = {
         pm25: [
-            { max: 25, label: "Good", color: "rgba(75, 192, 192, 1)" },
-            { max: 35, label: "Fair", color: "rgba(154, 205, 50, 1)" },
-            { max: 45, label: "Unhealthy", color: "rgba(255, 206, 86, 1)" },
-            { max: 55, label: "Very Unhealthy", color: "rgba(255, 140, 0, 1)" },
-            { max: 90, label: "Severely Unhealthy", color: "rgba(255, 99, 132, 1)" },
-            { max: Infinity, label: "Emergency", color: "rgba(139, 0, 0, 1)" },
+            { min: 0, max: 24.99, label: "Good", color: "rgba(75, 192, 192, 1)" },
+            { min: 25, max: 34.99, label: "Fair", color: "rgba(154, 205, 50, 1)" },
+            { min: 34.9, max: 44.99, label: "Unhealthy", color: "rgba(255, 206, 86, 1)" },
+            { min: 45, max: 54.99, label: "Very Unhealthy", color: "rgba(255, 140, 0, 1)" },
+            { min: 55, max: 89.99, label: "Severely Unhealthy", color: "rgba(255, 99, 132, 1)" },
+            { min: 90, max: Infinity, label: "Emergency", color: "rgba(139, 0, 0, 1)" },
         ],
         pm10: [
-            { max: 50, label: "Good", color: "rgba(75, 192, 192, 1)" },
-            { max: 100, label: "Fair", color: "rgba(154, 205, 50, 1)" },
-            { max: 150, label: "Unhealthy", color: "rgba(255, 206, 86, 1)" },
-            { max: 200, label: "Very Unhealthy", color: "rgba(255, 140, 0, 1)" },
-            { max: 300, label: "Severely Unhealthy", color: "rgba(255, 99, 132, 1)" },
-            { max: Infinity, label: "Emergency", color: "rgba(139, 0, 0, 1)" },
+            { min: 0, max: 49.99, label: "Good", color: "rgba(75, 192, 192, 1)" },
+            { min: 50, max: 99.99, label: "Fair", color: "rgba(154, 205, 50, 1)" },
+            { min: 100, max: 149.99, label: "Unhealthy", color: "rgba(255, 206, 86, 1)" },
+            { min: 150, max: 199.99, label: "Very Unhealthy", color: "rgba(255, 140, 0, 1)" },
+            { min: 200, max: 299.99, label: "Severely Unhealthy", color: "rgba(255, 99, 132, 1)" },
+            { min: 300, max: Infinity, label: "Emergency", color: "rgba(139, 0, 0, 1)" },
         ],
         humidity: [
-            { max: 24, label: "Poor", color: "rgba(139, 0, 0, 1)" },
-            { max: 30, label: "Fair", color: "rgba(255, 206, 86, 1)" },
-            { max: 60, label: "Good", color: "rgba(75, 192, 192, 1)" },
-            { max: 70, label: "Fair", color: "rgba(154, 205, 50, 1)" },
-            { max: Infinity, label: "Poor", color: "rgba(255, 99, 132, 1)" },
+            { min: 0, max: 23.99, label: "Poor", color: "rgba(139, 0, 0, 1)" },
+            { min: 24, max: 29.99, label: "Fair", color: "rgba(255, 206, 86, 1)" },
+            { min: 30, max: 59.99, label: "Good", color: "rgba(75, 192, 192, 1)" },
+            { min: 60, max: 69.99, label: "Fair", color: "rgba(154, 205, 50, 1)" },
+            { min: 70, max: Infinity, label: "Poor", color: "rgba(255, 99, 132, 1)" },
         ],
         temperature: [
-            { max: 33, label: "Good", color: "rgba(75, 192, 192, 1)" },
-            { max: 41, label: "Caution", color: "rgba(255, 206, 86, 1)" },
-            { max: 54, label: "Danger", color: "rgba(255, 140, 0, 1)" },
-            { max: Infinity, label: "Extreme Danger", color: "rgba(139, 0, 0, 1)" },
+            { min: 0, max: 32.99, label: "Good", color: "rgba(75, 192, 192, 1)" },
+            { min: 33, max: 40.99, label: "Caution", color: "rgba(255, 206, 86, 1)" },
+            { min: 41, max: 53.99, label: "Danger", color: "rgba(255, 140, 0, 1)" },
+            { min: 54, max: Infinity, label: "Extreme Danger", color: "rgba(139, 0, 0, 1)" },
         ],
         oxygen: [
-            { max: Infinity, label: "Safe", color: "rgba(75, 192, 192, 1)" },
-            { max: 19.5, label: "Poor", color: "rgba(255, 206, 86, 1)" },
+            { min: 0, max: 19.49, label: "Poor", color: "rgba(255, 206, 86, 1)" },
+            { min: 19.5, max: Infinity, label: "Safe", color: "rgba(75, 192, 192, 1)" },
         ],
     };
 
@@ -522,12 +580,9 @@ const AirDashboard = () => {
 
     const handleDateChange = (e, field, rangeType) => {
         const { value } = e.target;
-        const date = new Date(value);
-        const utcDate = date.toISOString().split("T")[0]; // Convert to UTC date
-
         setFilters((prevFilters) => ({
             ...prevFilters,
-            [rangeType]: { ...prevFilters[rangeType], [field]: utcDate },
+            [rangeType]: { ...prevFilters[rangeType], [field]: value },
         }));
     };
 
@@ -545,7 +600,7 @@ const AirDashboard = () => {
 
         if (name === "date") {
             const date = new Date(value);
-            updatedValue = date.toISOString().split("T")[0]; // Ensure UTC date without time
+            updatedValue = date.toLocaleString("en-US").split("T")[0]; // Ensure UTC date without time
         }
 
         setLogFilters({ ...logFilters, [name]: updatedValue });
@@ -775,10 +830,7 @@ const AirDashboard = () => {
                                     onChange={(e) => setFilters({ ...filters, location: e.target.value })}
                                     style={styles.rangeSelect}
                                 >
-                                    {/* Show placeholder option only when no location is selected */}
                                     <option value="">Select a location</option>
-
-                                    {/* Conditionally render locations */}
                                     {filters.range && locations.length > 0 ? (
                                         locations.map((location) => (
                                             <option key={location.id} value={location.id}>
@@ -805,7 +857,7 @@ const AirDashboard = () => {
 
                             {/* Week Range */}
                             {filters.range === 'week' && (
-                                <div >
+                                <div>
                                     <div style={styles.datePicker}>
                                         <label style={styles.label}>First Starting Week Date:</label>
                                         <input
@@ -894,9 +946,7 @@ const AirDashboard = () => {
                                             type="date"
                                             id="first-date"
                                             value={filters.first.date}
-                                            onChange={(e) =>
-                                                handleDateChange(e, 'date', 'first')
-                                            }
+                                            onChange={(e) => handleDateChange(e, 'date', 'first')}
                                         />
                                         {filters.range === 'hour' && (
                                             <>
@@ -927,9 +977,7 @@ const AirDashboard = () => {
                                             type="date"
                                             id="second-date"
                                             value={filters.second.date}
-                                            onChange={(e) =>
-                                                handleDateChange(e, 'date', 'second')
-                                            }
+                                            onChange={(e) => handleDateChange(e, 'date', 'second')}
                                         />
                                         {filters.range === 'hour' && (
                                             <>
@@ -1041,7 +1089,16 @@ const AirDashboard = () => {
                                                             >
                                                                 {log.threshold}
                                                             </em>{" "}
-                                                            at {new Date(log.timestamp).toLocaleString('en-US', { timeZone: 'UTC' })}
+                                                            at {new Date(log.timestamp).toLocaleString("en-US", {
+                                                                year: "numeric",
+                                                                month: "2-digit",
+                                                                day: "2-digit",
+                                                                hour: "2-digit",
+                                                                minute: "2-digit",
+                                                                second: "2-digit",
+                                                                hour12: true,
+
+                                                            })}
                                                         </li>
                                                     ))}
                                                 </ul>

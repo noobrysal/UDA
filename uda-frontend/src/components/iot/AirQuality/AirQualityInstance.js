@@ -34,37 +34,82 @@ const locations = [
 // Updated thresholds for air quality metrics
 const thresholds1 = {
     pm25: [
-        { max: 25, label: "Good", color: "rgba(75, 192, 192, 1)" },
-        { max: 35, label: "Fair", color: "rgba(154, 205, 50, 1)" },
-        { max: 45, label: "Unhealthy", color: "rgba(255, 206, 86, 1)" },
-        { max: 55, label: "Very Unhealthy", color: "rgba(255, 140, 0, 1)" },
-        { max: 90, label: "Severely Unhealthy", color: "rgba(255, 99, 132, 1)" },
-        { max: Infinity, label: "Emergency", color: "rgba(139, 0, 0, 1)" },
+        { min: 0, max: 25, label: "Good", color: "rgba(75, 192, 192, 1)" },
+        { min: 25, max: 35, label: "Fair", color: "rgba(154, 205, 50, 1)" },
+        { min: 35, max: 45, label: "Unhealthy", color: "rgba(255, 206, 86, 1)" },
+        {
+            min: 45,
+            max: 55,
+            label: "Very Unhealthy",
+            color: "rgba(255, 140, 0, 1)",
+        },
+        {
+            min: 55,
+            max: 90,
+            label: "Severely Unhealthy",
+            color: "rgba(255, 99, 132, 1)",
+        },
+        {
+            min: 90,
+            max: Infinity,
+            label: "Emergency",
+            color: "rgba(139, 0, 0, 1)",
+        },
     ],
     pm10: [
-        { max: 50, label: "Good", color: "rgba(75, 192, 192, 1)" },
-        { max: 100, label: "Fair", color: "rgba(154, 205, 50, 1)" },
-        { max: 150, label: "Unhealthy", color: "rgba(255, 206, 86, 1)" },
-        { max: 200, label: "Very Unhealthy", color: "rgba(255, 140, 0, 1)" },
-        { max: 300, label: "Severely Unhealthy", color: "rgba(255, 99, 132, 1)" },
-        { max: Infinity, label: "Emergency", color: "rgba(139, 0, 0, 1)" },
+        { min: 0, max: 50, label: "Good", color: "rgba(75, 192, 192, 1)" },
+        { min: 50, max: 100, label: "Fair", color: "rgba(154, 205, 50, 1)" },
+        {
+            min: 100,
+            max: 150,
+            label: "Unhealthy",
+            color: "rgba(255, 206, 86, 1)",
+        },
+        {
+            min: 150,
+            max: 200,
+            label: "Very Unhealthy",
+            color: "rgba(255, 140, 0, 1)",
+        },
+        {
+            min: 200,
+            max: 300,
+            label: "Severely Unhealthy",
+            color: "rgba(255, 99, 132, 1)",
+        },
+        {
+            min: 300,
+            max: Infinity,
+            label: "Emergency",
+            color: "rgba(139, 0, 0, 1)",
+        },
     ],
     humidity: [
-        { max: 24, label: "Poor", color: "rgba(139, 0, 0, 1)" },
-        { max: 30, label: "Fair", color: "rgba(255, 206, 86, 1)" },
-        { max: 60, label: "Good", color: "rgba(75, 192, 192, 1)" },
-        { max: 70, label: "Fair", color: "rgba(154, 205, 50, 1)" },
-        { max: Infinity, label: "Poor", color: "rgba(255, 99, 132, 1)" },
+        { min: 0, max: 24, label: "Poor", color: "rgba(139, 0, 0, 1)" },
+        { min: 24, max: 30, label: "Fair", color: "rgba(255, 206, 86, 1)" },
+        { min: 30, max: 60, label: "Good", color: "rgba(75, 192, 192, 1)" },
+        { min: 60, max: 70, label: "Fair", color: "rgba(154, 205, 50, 1)" },
+        { min: 70, max: Infinity, label: "Poor", color: "rgba(255, 99, 132, 1)" },
     ],
     temperature: [
-        { max: 33, label: "Good", color: "rgba(75, 192, 192, 1)" },
-        { max: 41, label: "Caution", color: "rgba(255, 206, 86, 1)" },
-        { max: 54, label: "Danger", color: "rgba(255, 140, 0, 1)" },
-        { max: Infinity, label: "Extreme Danger", color: "rgba(139, 0, 0, 1)" },
+        { min: 0, max: 33, label: "Good", color: "rgba(75, 192, 192, 1)" },
+        { min: 33, max: 41, label: "Caution", color: "rgba(255, 206, 86, 1)" },
+        { min: 41, max: 54, label: "Danger", color: "rgba(255, 140, 0, 1)" },
+        {
+            min: 54,
+            max: Infinity,
+            label: "Extreme Danger",
+            color: "rgba(139, 0, 0, 1)",
+        },
     ],
     oxygen: [
-        { max: Infinity, label: "Safe", color: "rgba(75, 192, 192, 1)" },
-        { max: 19.5, label: "Poor", color: "rgba(255, 206, 86, 1)" },
+        { min: 0, max: 19.5, label: "Poor", color: "rgba(255, 206, 86, 1)" },
+        {
+            min: 19.5,
+            max: Infinity,
+            label: "Safe",
+            color: "rgba(75, 192, 192, 1)",
+        },
     ],
 };
 
@@ -187,7 +232,18 @@ const AirQualityInstance = () => {
             <div style={styles.mainContent}>
                 <h1>Air Quality Data (ID: {id})</h1>
                 <h2><strong>Recorded at:</strong>{' '}{getLocationName(airData.locationId)}</h2>
-                <h2><strong>Recorded on:</strong>{' '}{new Date(airData.date).toISOString().slice(0, 19).replace('T', ' ')}</h2>
+                <h2>
+                    <strong>Recorded on:</strong>{' '}
+                    {new Date(airData.date).toLocaleString("en-US", {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                        hour12: true,
+                    })}
+                </h2>
                 <div style={styles.metrics}>
                     {renderProgressBar(airData.pm25, 'pm25', 'PM2.5')}
                     {renderProgressBar(airData.pm10, 'pm10', 'PM10')}
