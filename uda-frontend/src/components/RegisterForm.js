@@ -5,8 +5,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { supabase } from './supabaseClient';
 import styled from '@emotion/styled';
 import { FaGoogle, FaFacebook } from 'react-icons/fa';
-import logoImage from '../static/logo.png';
-import backgroundImage from '../static/udabackg.png';
+import logoImage from '../assets/logo.png';
+import backgroundImage from '../assets/udabackg.png';
 
 const PageContainer = styled.div`
   display: flex;

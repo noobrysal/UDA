@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { supabase } from './supabaseClient';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-import Sidebar from '../../Sidebar';
+// import Sidebar from '../../Sidebar';
 
 // Function to fetch air quality data by ID
 const getAirQualityById = async (id) => {
@@ -183,7 +183,7 @@ const AirQualityInstance = () => {
 
     return (
         <div style={styles.airQualityInstance}>
-            <Sidebar />
+            {/* <Sidebar /> */}
             <div style={styles.mainContent}>
                 <h1>Air Quality Data (ID: {id})</h1>
                 <h2><strong>Recorded at:</strong>{' '}{getLocationName(airData.locationId)}</h2>

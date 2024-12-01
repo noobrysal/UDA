@@ -5,7 +5,7 @@ import { supabase } from './supabaseClient';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Line } from 'react-chartjs-2';
-import Sidebar from '../../Sidebar';
+// import Sidebar from '../../Sidebar';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import {
@@ -410,7 +410,7 @@ const AirQualityByDate = () => {
     };
 
     return (
-        <Sidebar>
+        // <Sidebar>
 
             <div className="container-fluid">
                 <h2 style={{ textAlign: 'center', marginBottom: '40px' }}>Air Quality Data for {date} at {locationName}</h2>
@@ -619,7 +619,7 @@ const AirQualityByDate = () => {
                 }
             `}</style>
             </div>
-        </Sidebar>
+        // </Sidebar>
     );
 };
 

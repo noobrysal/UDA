@@ -1,222 +1,214 @@
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import logoImage from '../static/logo.png';
-import Sidebar from './Sidebar';
+import React from 'react';
+import { useTheme } from '@mui/material';
+import { useNavigate } from 'react-router-dom'; 
+import { tokens } from '../theme';
+import logoImage from '../assets/logo.png'; 
+import backgroundImage from '../assets/udabackg4.png'; 
 
 const LandingPage = ({
-  logoPosition = { top: '10%', left: '62%' },
-  buttonPosition = { top: '72%', left: '70.2%' },
+    buttonPosition = { top: '72%', left: '36%' }, // Adjust button position slightly to the right
 }) => {
-  const navigate = useNavigate();
+    const theme = useTheme();
+    const colors = tokens(theme.palette.mode);
+    const navigate = useNavigate();
 
-  const colors = {
-    black: '#000000',
-    grey: {
-      100: '#f0f0f0',
-      200: '#d3d3d3',
-      300: '#a0a0a0',
-      400: '#7d7d7d',
-      500: '#5a5a5a',
-      700: '#3f3f3f',
-      900: '#1c1c1c',
-    },
-    cyan: {
-      100: '#00bcd4',
-      200: '#0097a7',
-      400: '#006f75',
-      700: '#004d56',
-    },
-    teal: {
-      100: '#80cbc4',
-      200: '#4db6ac',
-      400: '#00796b',
-      700: '#004d40',
-    },
-    yellow: {
-      100: '#ffeb3b',
-      200: '#fbc02d',
-      400: '#f57f17',
-      700: '#c65100',
-    },
-  };
-
-  const buttonStyles = {
-    padding: '10px 40px',
-    fontSize: '18px',
-    backgroundColor: colors.grey[100],
-    color: colors.grey[900],
-    border: 'none',
-    borderRadius: '25px',
-    cursor: 'pointer',
-    fontWeight: 'bold',
-    transition: 'transform 0.2s, background-color 0.3s, box-shadow 0.3s',
-    outline: 'none',
-    position: 'absolute',
-    ...buttonPosition,
-  };
-
-  const handleMouseOver = (e) => {
-    e.target.style.backgroundColor = colors.grey[200];
-    e.target.style.boxShadow = `0px 5px 15px ${colors.cyan[400]}`;
-    e.target.style.transform = 'translateY(-2px)';
-  };
-
-  const handleMouseOut = (e) => {
-    e.target.style.backgroundColor = colors.grey[100];
-    e.target.style.boxShadow = 'none';
-    e.target.style.transform = 'translateY(0)';
-  };
-
-  const handleMouseDown = (e) => {
-    e.target.style.transform = 'translateY(2px)';
-    e.target.style.boxShadow = `0px 2px 8px ${colors.grey[300]}`;
-  };
-
-  const handleMouseUp = (e) => {
-    e.target.style.transform = 'translateY(-2px)';
-    e.target.style.boxShadow = `0px 5px 15px ${colors.grey[400]}`;
-  };
-
-  useEffect(() => {
-    document.body.style.overflowX = 'hidden';
-    return () => {
-      document.body.style.overflowX = 'auto';
+    // Button styles
+    const buttonStyles = {
+        padding: '10px 40px',
+        marginTop: '20px',
+        marginLeft: '20px',
+        fontSize: '18px',
+        backgroundColor: colors.grey[100],
+        color: colors.grey[900],
+        border: 'none',
+        borderRadius: '25px',
+        cursor: 'pointer',
+        fontWeight: 'bold',
+        transition: 'transform 0.2s, background-color 0.3s, box-shadow 0.3s', 
+        outline: 'none',
+        position: 'absolute', 
+        ...buttonPosition, // Use passed buttonPosition
     };
-  }, []);
 
-  return (
-    <Sidebar>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          minHeight: '100vh',
-          width: '100vw',
-          padding: '50px',
-          backgroundColor: colors.black,
-          color: colors.grey[100],
-          overflow: 'hidden',
-          position: 'relative',
-          flexDirection: 'row',
-        }}
-      >
-        {/* Gradient "stickers" */}
-        <div
-          style={{
-            position: 'absolute',
-            top: '-105%',
-            left: '15%',
-            width: '1100px',
-            height: '1100px',
-            background: `radial-gradient(circle, ${colors.cyan[100]} 0%, transparent 70%)`,
-            borderRadius: '50%',
-            zIndex: 0,
-          }}
-        ></div>
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '-90%',
-            left: '-35%',
-            width: '1100px',
-            height: '1100px',
-            background: `radial-gradient(circle, ${colors.teal[100]} 0%, transparent 70%)`,
-            borderRadius: '50%',
-            zIndex: 0,
-          }}
-        ></div>
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '-90%',
-            right: '-35%',
-            width: '1100px',
-            height: '1100px',
-            background: `radial-gradient(circle, ${colors.yellow[100]} 0%, transparent 70%)`,
-            borderRadius: '50%',
-            zIndex: 0,
-          }}
-        ></div>
+    const handleMouseOver = (e) => {
+        e.target.style.backgroundColor = colors.grey[200];
+        e.target.style.boxShadow = `0px 5px 15px ${colors.yellow[100]}`;
+        e.target.style.transform = 'translateY(-2px)';
+    };
 
-        {/* Content: Text */}
+    const handleMouseOut = (e) => {
+        e.target.style.backgroundColor = colors.grey[100];
+        e.target.style.boxShadow = 'none';
+        e.target.style.transform = 'translateY(0)';
+    };
+
+    const handleMouseDown = (e) => {
+        e.target.style.transform = 'translateY(2px)';
+        e.target.style.boxShadow = `0px 2px 8px ${colors.grey[300]}`;
+    };
+
+    const handleMouseUp = (e) => {
+        e.target.style.transform = 'translateY(-2px)';
+        e.target.style.boxShadow = `0px 5px 15px ${colors.grey[400]}`;
+    };
+
+    return (
         <div
-          style={{
-            marginLeft: '50px',
-            maxWidth: '50%',
-            textAlign: 'left',
-            zIndex: 1,
-            position: 'relative',
-          }}
+            style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                minHeight: '100vh',
+                width: '100vw',
+                padding: '10px',
+                backgroundColor: '#000000', 
+                backgroundImage: `url(${backgroundImage})`,
+                backgroundSize: 'cover', 
+                backgroundRepeat: 'no-repeat', 
+                backgroundPosition: 'center', 
+                backgroundAttachment: 'fixed', 
+                color: colors.grey[100],
+                overflow: 'hidden',
+                position: 'relative',
+                flexDirection: 'row',
+            }}
         >
-          <h1
-            style={{
-              marginBottom: '20px',
-              fontSize: 'clamp(40px, 8vw, 100px)', // Responsive text size
-              fontWeight: 'bold',
-              lineHeight: '1.1',
-            }}
-          >
-            <span style={{ color: colors.cyan[700] }}>U</span>NIFIED <br />
-            <span style={{ color: colors.teal[700] }}>D</span>ASHBOARD <br />
-            <span style={{ color: colors.yellow[700] }}>A</span>NALYTICS
-          </h1>
-          <hr
-            style={{
-              width: '90%', // Adjusted for responsiveness
-              border: `1px solid ${colors.grey[100]}`,
-              margin: '0',
-            }}
-          />
-          <p
-            style={{
-              paddingTop: '20px',
-              fontSize: 'clamp(16px, 3vw, 25px)', // Responsive paragraph size
-              color: colors.grey[100],
-              lineHeight: '1.2',
-              fontWeight: 'lighter',
-            }}
-          >
-            Turn data into actions,<br />transform insights into impact.
-          </p>
+            {/* Left container for Title and Description */}
+            <div
+                style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'flex-start',
+                    paddingLeft: '50px',
+                    width: '50%',
+                    backgroundColor: 'transparent',
+                }}
+            >
+                <h1 style={{
+                    marginBottom: '10px',
+                    fontSize: '7vw', 
+                    fontWeight: 'bold',
+                    lineHeight: '1.1',
+                }}>
+                    <span style={{ color: colors.cyan[700] }}>U</span>NIFIED
+                </h1>
+                <h1 style={{
+                    marginBottom: '10px',
+                    fontSize: '7vw',
+                    fontWeight: 'bold',
+                    lineHeight: '1.1',
+                }}>
+                    <span style={{ color: colors.teal[700] }}>D</span>ASHBOARD
+                </h1>
+                <h1 style={{
+                    marginBottom: '10px',
+                    fontSize: '7vw',
+                    fontWeight: 'bold',
+                    lineHeight: '1.1',
+                }}>
+                    <span style={{ color: colors.yellow[700] }}>A</span>NALYTICS
+                </h1>
+                <hr style={{
+                    width: '95%',
+                    border: `1px solid ${colors.grey[100]}`,
+                    marginTop: '10px',
+                }} />
+                <p style={{
+                    fontSize: '1.5rem',
+                    color: colors.grey[100],
+                    lineHeight: '1.2',
+                    fontWeight: 'lighter',
+                }}>
+                    Turn data into actions,<br />Transform insights into impact.
+                </p>
+            </div>
+
+            {/* Right container for Logo and Button */}
+            <div
+                style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    paddingRight: '50px',
+                    width: '50%',
+                    backgroundColor: 'transparent', 
+                    position: 'relative',
+                }}
+            >
+                {/* Logo */}
+                <div
+                    style={{
+                        position: 'absolute',
+                        top: '15%', 
+                    }}
+                >
+                    <img src={logoImage} alt="Logo" 
+                        style={{ 
+                            marginTop: '-60px',
+                            marginLeft: '50px',
+                            width: '35vw', 
+                            height: 'auto' }} />
+                </div>
+
+                {/* Button */}
+                <div style={{ marginTop: '200px' }}> {/* Adjust vertical margin as necessary */}
+                    <button
+                        style={buttonStyles}
+                        onMouseOver={handleMouseOver}
+                        onMouseOut={handleMouseOut}
+                        onMouseDown={handleMouseDown}
+                        onMouseUp={handleMouseUp}
+                        onClick={() => navigate('/login')} 
+                    >
+                        Proceed
+                    </button>
+                </div>
+            </div>
+
+            <style>
+                {`
+                @media (max-width: 1440px) {
+                    h1 {
+                        font-size: 5.5vw; 
+                    }
+
+                    img {
+                        width: 28vw; 
+                    }
+
+                    button {
+                        font-size: 1.2rem;
+                        padding: 12px 35px;
+                    }
+
+                    p {
+                        font-size: 1.3rem;
+                    }
+                }
+
+                @media (max-width: 1024px) {
+                    h1 {
+                        font-size: 4.5vw;
+                    }
+
+                    img {
+                        width: 40vw;
+                    }
+
+                    button {
+                        font-size: 1rem;
+                        padding: 10px 30px;
+                    }
+
+                    p {
+                        font-size: 1.2rem;
+                    }
+                }
+                `}
+            </style>
         </div>
-
-        {/* Logo */}
-        <div
-          style={{
-            position: 'absolute',
-            ...logoPosition,
-            zIndex: 1,
-          }}
-        >
-          <img
-            src={logoImage}
-            alt="Logo"
-            style={{
-              width: 'clamp(400px, 30%, 500px)', // Responsive logo size
-              height: 'auto',
-            }}
-          />
-        </div>
-
-        {/* Button */}
-        <button
-          style={{
-            ...buttonStyles,
-            fontSize: 'clamp(14px, 2vw, 18px)', // Responsive font size
-            padding: 'clamp(8px, 1.5vw, 10px) clamp(20px, 4vw, 40px)', // Responsive padding
-          }}
-          onMouseOver={handleMouseOver}
-          onMouseOut={handleMouseOut}
-          onMouseDown={handleMouseDown}
-          onMouseUp={handleMouseUp}
-          onClick={() => navigate('/login')}
-        >
-          Proceed
-        </button>
-      </div>
-    </Sidebar>
-  );
+    );
 };
 
 export default LandingPage;
