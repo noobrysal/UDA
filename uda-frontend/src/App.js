@@ -9,6 +9,7 @@ import AirQualityInstance from './components/iot/AirQuality/AirQualityInstance';
 import AirQualityByDate from './components/iot/AirQuality/AirQualityByDate';
 import LandingPage from './components/LandingPage';
 import SidebarComponent from './components/global/Sidebar'; // Adjust the import path as needed
+import AirView from './components/iot/AirQuality/AirView';
 
 // Define global styles for scrollbar
 const GlobalStyle = createGlobalStyle`
@@ -45,6 +46,7 @@ const AppContent = () => {
   const sidebarPaths = [
     '/air-dashboard',
     '/air-quality',
+    '/airview',
     '/air-quality/date/:date/location/:locationId',
     '/air-quality/id/:id'
   ];
@@ -66,6 +68,7 @@ const AppContent = () => {
           <Route path="/air-dashboard" element={<AirDashboard />} />
           <Route path="/air-quality" element={<AirQualityByDate />} />
           <Route path="/air-quality/id/:id" element={<AirQualityInstance />} />
+          <Route path="/airview" element={<AirView />} />
         </Routes>
       </div>
     </div>
