@@ -10,9 +10,10 @@ import {
     PointElement,
     LineElement,
     Title,
-    Tooltip,
+    Tooltip as ChartTooltip,
     Legend,
 } from 'chart.js';
+import { Tooltip } from '@mui/material';
 
 ChartJS.register(
     CategoryScale,
@@ -20,7 +21,7 @@ ChartJS.register(
     PointElement,
     LineElement,
     Title,
-    Tooltip,
+    ChartTooltip,
     Legend
 );
 
@@ -97,7 +98,7 @@ const AirView = () => {
         {
             level: "Fair",
             color: "rgba(154, 205, 50, 1)",
-            description: "Air quality is acceptable. However, there may be a risk for some people, particularly those who are unusually sensitive to air pollution.",
+            description: "Air quality is acceptable but may pose a risk to unusually sensitive individuals.",
             icon: "🙂",
             recommendations: [
                 "Generally safe for outdoor activities",
@@ -108,7 +109,7 @@ const AirView = () => {
         {
             level: "Unhealthy",
             color: "rgba(255, 206, 86, 1)",
-            description: "Members of sensitive groups may experience health effects. The general public is less likely to be affected.",
+            description: "Sensitive groups may face health effects. General public is unlikely to be affected.",
             icon: "😷",
             recommendations: [
                 "Reduce prolonged outdoor activities",
@@ -151,13 +152,45 @@ const AirView = () => {
         }
     ];
 
+
     const metrics = [
-        { id: 'pm25', name: 'PM2.5' },
-        { id: 'pm10', name: 'PM10' },
+        {
+            id: 'pm25',
+            name: 'PM2.5',
+            tooltip: 'Ultra-fine dust particles that can enter your bloodstream. Key indicator of air cleanliness and health risk.',
+            getIcon: (status) => {
+                switch (status) {
+                    case 'Good': return '😊';
+                    case 'Fair': return '🙂';
+                    case 'Unhealthy': return '😷';
+                    case 'Very Unhealthy': return '⚠️';
+                    case 'Severely Unhealthy': return '🚫';
+                    case 'Emergency': return '☠️';
+                    default: return '❓';
+                }
+            }
+        },
+        {
+            id: 'pm10',
+            name: 'PM10',
+            tooltip: 'Larger dust particles including pollen and mold. Can trigger allergies and breathing problems.',
+            getIcon: (status) => {
+                switch (status) {
+                    case 'Good': return '😊';
+                    case 'Fair': return '🙂';
+                    case 'Unhealthy': return '😷';
+                    case 'Very Unhealthy': return '⚠️';
+                    case 'Severely Unhealthy': return '🚫';
+                    case 'Emergency': return '☠️';
+                    default: return '❓';
+                }
+            }
+        },
         { id: 'temperature', name: 'Temperature' },
         { id: 'humidity', name: 'Humidity' },
         { id: 'oxygen', name: 'Oxygen' }
     ];
+
 
     useEffect(() => {
         fetchDayData();
@@ -357,7 +390,7 @@ const AirView = () => {
                             <div style={styles.rangeInfo}>
                             </div>
                             <div style={styles.recommendations}>
-                                <h4>Recommendations:</h4>
+                                <h5>Recommendations:</h5>
                                 <ul>
                                     {thresholdInfo[currentSlide].recommendations.map((rec, index) => (
                                         <li key={index}>{rec}</li>
@@ -413,6 +446,8 @@ const AirView = () => {
         hourCard: {
             minWidth: '80px', // Smaller cards on mobile
             padding: '10px',
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)',
+
         },
         levelIndicator: {
             height: '80px', // Smaller height on mobile
@@ -426,7 +461,7 @@ const AirView = () => {
             width: '100%',
             maxWidth: '400px',
             height: 'auto',
-            minHeight: '300px',
+            minHeight: '330px',
         },
     };
 
@@ -487,48 +522,37 @@ const AirView = () => {
     };
 
     const additionalStyles = {
-        sparklineContainer: {
-            height: '30px',
-            width: '100%',
-            marginTop: '5px',
-        },
-        trendIndicator: {
-            fontSize: '12px',
-            marginTop: '5px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '2px',
-        },
+        // ...existing styles...
         tooltip: {
             position: 'absolute',
-            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-            color: 'white',
-            padding: '10px',
-            borderRadius: '5px',
+            backgroundColor: 'rgba(33, 33, 33, 0.95)',
+            color: '#ffffff',
+            padding: '12px 16px',
+            borderRadius: '8px',
             zIndex: 1000,
-            maxWidth: '200px',
+            maxWidth: '250px',
             pointerEvents: 'none',
-            transform: 'translate(-50%, 10px)',
+            transform: 'translate(-50%, -120%)',
             left: '50%',
-        },
-        toggleButton: {
-            padding: '10px 20px',
-            backgroundColor: '#007bff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: 'pointer',
-            marginBottom: '20px',
-            transition: 'background-color 0.3s',
-            '&:hover': {
-                backgroundColor: '#0056b3',
-            },
-        },
-        metricsToggleContainer: {
-            display: 'flex',
-            justifyContent: 'center',
-            width: '100%',
-            marginBottom: '20px',
+            fontSize: '14px',
+            lineHeight: '1.4',
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            backdropFilter: 'blur(8px)',
+            fontWeight: '500',
+            textAlign: 'center',
+            '&:after': {
+                content: '""',
+                position: 'absolute',
+                bottom: '-6px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: '0',
+                height: '0',
+                borderLeft: '6px solid transparent',
+                borderRight: '6px solid transparent',
+                borderTop: '6px solid rgba(33, 33, 33, 0.95)'
+            }
         },
     };
 
@@ -560,23 +584,6 @@ const AirView = () => {
             border: '1px solid #ddd',
             fontSize: '16px',
         },
-        scrollContainer: {
-            overflow: 'auto',
-            padding: '10px 0',
-            /* Hide scrollbar for Chrome/Safari/Opera */
-            '&::-webkit-scrollbar': {
-                display: 'none'
-            },
-            /* Hide scrollbar for IE/Edge/Firefox */
-            msOverflowStyle: 'none',
-            scrollbarWidth: 'none',
-        },
-        timelineContainer: {
-            display: 'flex',
-            gap: '15px',
-            padding: '10px 0',
-            minWidth: 'fit-content',
-        },
         hourCard: {
             display: 'flex',
             flexDirection: 'column',
@@ -585,7 +592,7 @@ const AirView = () => {
             padding: '15px',
             backgroundColor: 'white',
             borderRadius: '8px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
             margin: '0 5px',
         },
         hourLabel: {
@@ -705,10 +712,24 @@ const AirView = () => {
             padding: '10px', // Reduced padding
             borderRadius: '8px',
             maxHeight: '160px', // Increased from 100px
-            overflowY: 'hidden', // Changed from 'auto' to 'hidden'
+            overflowY: 'auto', // Changed from 'hidden' to 'auto'
+            '&::-webkit-scrollbar': {
+                width: '8px',
+            },
+            '&::-webkit-scrollbar-track': {
+                background: 'rgba(255,255,255,0.1)',
+                borderRadius: '4px',
+            },
+            '&::-webkit-scrollbar-thumb': {
+                background: 'rgba(255,255,255,0.3)',
+                borderRadius: '4px',
+                '&:hover': {
+                    background: 'rgba(255,255,255,0.5)',
+                },
+            },
         },
         slideDescription: {
-            fontSize: '12px', // Reduced size
+            fontSize: '16px', // Reduced size
             marginBottom: '5px',
         },
         rangeInfo: {
@@ -719,7 +740,7 @@ const AirView = () => {
             fontWeight: 'bold',
         },
         recommendations: {
-            '& h4': {
+            '& h5': {
                 marginBottom: '3px',
                 fontSize: '12px',
             },
@@ -822,8 +843,10 @@ const AirView = () => {
         },
         trendIndicator: {
             fontSize: '24px',
-            marginTop: '10px',
+            marginTop: '3px',
             fontWeight: 'bold',
+            backgroundColor: '#F5F5DC',
+            borderRadius: '4px',
         },
         noDataLabel: {
             height: '100px',
@@ -834,12 +857,88 @@ const AirView = () => {
             fontSize: '16px',
             fontStyle: 'italic',
         },
-        ...additionalStyles
+        '.has-tooltip': {
+            cursor: 'help',
+        },
+        metricsToggleContainer: {
+            display: 'flex',
+            justifyContent: 'center',
+            marginBottom: '20px',
+        },
+        toggleButton: {
+            padding: '10px 20px',
+            fontSize: '16px',
+            backgroundColor: '#007bff',
+            color: 'white',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'pointer',
+            transition: 'background-color 0.3s',
+            '&:hover': {
+                backgroundColor: '#0056b3',
+            },
+        },
+        statusIcon: {
+            fontSize: '24px',
+
+        },
+        ...additionalStyles,
+        tooltipContainer: {
+            zIndex: 9999,
+            pointerEvents: 'none',
+            transform: 'translate(-50%, -100%)',
+        },
+        tooltipContent: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            color: 'white',
+            padding: '10px 15px',
+            borderRadius: '8px',
+            fontSize: '14px',
+            boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
+            minWidth: '200px',
+            textAlign: 'center',
+            '& h4': {
+                margin: '0 0 8px 0',
+                fontSize: '16px',
+                fontWeight: 'bold',
+            },
+            '& p': {
+                margin: '4px 0',
+                fontSize: '14px',
+            }
+        },
+    };
+
+    const renderTooltip = () => {
+        if (!hoveredData || !hoveredData.value) return null;
+        const { hour, value, metric, trend, position } = hoveredData;
+        const status = getAirQualityStatus(value, metric.id);
+
+        return (
+            <div style={{
+                ...styles.tooltipContainer,
+                display: hoveredData ? 'block' : 'none',
+                position: 'fixed',
+                top: position?.y - 10 || 0,
+                left: position?.x || 0,
+            }}>
+                <div style={styles.tooltipContent}>
+                    <h4>{metric.name} at {formatHour(hour)}</h4>
+                    <p>Value: {value.toFixed(2)}</p>
+                    <p>Status: {status?.label}</p>
+                    <p>Trend: {trend}</p>
+                </div>
+            </div>
+        );
     };
 
     const renderMetricContainer = (metric) => (
         <div style={styles.metricContainer}>
-            <h3 style={styles.metricTitle}>{metric.name}</h3>
+            <Tooltip title={metric.tooltip || ''} placement="top" arrow>
+                <h3 style={styles.metricTitle}>
+                    {metric.name}
+                </h3>
+            </Tooltip>
             <div style={styles.timelineWrapper}>
                 <button
                     onClick={() => handleManualScroll('right')}
@@ -858,6 +957,7 @@ const AirView = () => {
                             const value = hourData?.[metric.id];
                             const previousHourData = hourlyData[(hour - 1 + 24) % 24];
                             const previousValue = previousHourData?.[metric.id];
+                            const status = getAirQualityStatus(value, metric.id)?.label;
 
                             // Simplified trend calculation
                             let trend = 'Stable';
@@ -875,7 +975,19 @@ const AirView = () => {
                                 <div
                                     key={hour}
                                     style={styles.hourCard}
-                                    onMouseEnter={() => setHoveredData({ hour, value, metric, trend })}
+                                    onMouseEnter={(e) => {
+                                        const rect = e.currentTarget.getBoundingClientRect();
+                                        setHoveredData({
+                                            hour,
+                                            value,
+                                            metric,
+                                            trend,
+                                            position: {
+                                                x: rect.left + rect.width / 2,
+                                                y: rect.top
+                                            }
+                                        });
+                                    }}
                                     onMouseLeave={() => setHoveredData(null)}
                                 >
                                     <div style={styles.hourLabel}>{formatHour(hour)}</div>
@@ -885,13 +997,18 @@ const AirView = () => {
                                                 ...styles.levelIndicator,
                                                 backgroundColor: getAirQualityStatus(value, metric.id)?.color
                                             }}>
-                                                {getAirQualityStatus(value, metric.id)?.label}
+                                                {metric.getIcon && (
+                                                    <div style={styles.statusIcon}>
+                                                        {metric.getIcon(status)}
+                                                    </div>
+                                                )}
+                                                {status}
                                                 <div style={{
                                                     ...styles.trendIndicator,
                                                     color: trendColors[trend],
-                                                    fontSize: '14px' // Smaller font size for the trend text
+                                                    fontSize: '14px'
                                                 }}>
-                                                    {trend}
+                                                    {' ' + trend + ' '}
                                                 </div>
                                             </div>
                                         </>
@@ -915,6 +1032,7 @@ const AirView = () => {
 
     return (
         <div style={styles.mainContainer}>
+            {hoveredData && renderTooltip()}
             <div style={styles.contentContainer}>
                 <div style={styles.header}>
                     <h2>24-Hour Air Quality View</h2>

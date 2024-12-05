@@ -292,7 +292,7 @@ const AirQualityByDate = () => {
             datasets: [
                 {
                     label: label + " Average Level",
-                    data: data.map((item) => item.value.toFixed(2)),
+                    data: data.map((item) => item.value?.toFixed(2)),
                     borderColor: "rgba(0, 0, 0, 1)",
                     borderWidth: 1,
                     backgroundColor: averageColor, // Use the average color for the background
@@ -325,7 +325,7 @@ const AirQualityByDate = () => {
             datasets: [
                 {
                     label: `${label} Hourly Average Level`,
-                    data: data.map((item) => item.average.toFixed(2)), // Use the average values
+                    data: data.map((item) => item.average?.toFixed(2)), // Use the average values
                     borderColor: "rgba(0, 0, 0, 1)",
                     borderWidth: 1,
                     backgroundColor: averageColor, // Use the average color for the background
@@ -432,7 +432,7 @@ const AirQualityByDate = () => {
                             {"Average " + metric.toUpperCase()} level for this hour is{" "}
                             {value !== null && value !== undefined ? (
                                 <>
-                                    {value.toFixed(2)}
+                                    {value?.toFixed(2)}
                                     <br></br>
                                     <span
                                         style={{
@@ -464,7 +464,7 @@ const AirQualityByDate = () => {
                             {"Average " + metric.toUpperCase()} level for this day is{" "}
                             {dailyAverageValue !== null && value !== undefined ? (
                                 <>
-                                    {dailyAverageValue.toFixed(2)}
+                                    {dailyAverageValue?.toFixed(2)}
                                     <br></br>
                                     <span
                                         style={{
