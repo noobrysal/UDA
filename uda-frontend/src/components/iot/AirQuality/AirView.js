@@ -14,6 +14,9 @@ import {
     Legend,
 } from 'chart.js';
 import { Tooltip } from '@mui/material';
+import { Box, Button, useTheme } from "@mui/material";
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
 
 ChartJS.register(
     CategoryScale,
@@ -37,6 +40,7 @@ const AirView = () => {
     const [currentSlide, setCurrentSlide] = useState(0);
     const [hoveredData, setHoveredData] = useState(null);
     const [showAdditionalMetrics, setShowAdditionalMetrics] = useState(false);
+    const [selectedHourForNarrative, setSelectedHourForNarrative] = useState(new Date().getHours());
 
     const locations = [
         { id: 1, name: 'Lapasan' },
@@ -584,17 +588,6 @@ const AirView = () => {
             border: '1px solid #ddd',
             fontSize: '16px',
         },
-        hourCard: {
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            minWidth: '120px', // Increased width
-            padding: '15px',
-            backgroundColor: 'white',
-            borderRadius: '8px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
-            margin: '0 5px',
-        },
         hourLabel: {
             fontSize: '16px',
             fontWeight: 'bold',
@@ -657,16 +650,11 @@ const AirView = () => {
             },
         },
         slideshowWrapper: {
-            position: 'fixed',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            backgroundColor: 'rgba(245, 245, 245, 0.95)',
-            backdropFilter: 'blur(5px)',
-            borderTop: '1px solid rgba(0,0,0,0.1)',
-            zIndex: 1000,
-            height: '250px', // Changed from maxHeight to fixed height, increased from 180px
-            overflow: 'hidden', // Changed from 'auto' to 'hidden'
+            position: 'relative', // Change from fixed to relative
+            bottom: 'auto',
+            height: 'auto',
+            backgroundColor: 'transparent',
+            borderTop: 'none',
         },
         slideshowContainer: {
             // Update existing slideshowContainer styles
@@ -681,7 +669,7 @@ const AirView = () => {
         },
         slide: {
             width: '600px',
-            height: '220px', // Increased from 160px
+            height: '270px', // Increased from 160px
             borderRadius: '10px',
             overflow: 'hidden',
         },
@@ -711,7 +699,7 @@ const AirView = () => {
             backgroundColor: 'rgba(255,255,255,0.15)',
             padding: '10px', // Reduced padding
             borderRadius: '8px',
-            maxHeight: '160px', // Increased from 100px
+            maxHeight: '220px', // Increased from 100px
             overflowY: 'auto', // Changed from 'hidden' to 'auto'
             '&::-webkit-scrollbar': {
                 width: '8px',
@@ -778,11 +766,11 @@ const AirView = () => {
             marginBottom: '30px',
         },
         metricContainer: {
-            backgroundColor: 'white',
-            borderRadius: '15px',
-            padding: '20px',
-            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-            marginBottom: '20px',
+            minHeight: '350px', // Added minimum height
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '15px',
+            // Remove backgroundColor, borderRadius, and boxShadow as they're handled by the Box component
         },
         metricTitle: {
             fontSize: '28px',
@@ -843,7 +831,6 @@ const AirView = () => {
         },
         trendIndicator: {
             fontSize: '24px',
-            marginTop: '3px',
             fontWeight: 'bold',
             backgroundColor: '#F5F5DC',
             borderRadius: '4px',
@@ -907,6 +894,42 @@ const AirView = () => {
                 fontSize: '14px',
             }
         },
+        progressWrapper: {
+            width: '100px', // Fixed width
+            height: '180px', // Increased from 150px
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '12px', // Increased from 10px
+            marginTop: '10px'
+        },
+        statusLabel: {
+            fontSize: '16px',
+            fontWeight: 'bold',
+            textAlign: 'center',
+            marginTop: '5px',
+        },
+        hourCard: {
+            // Update existing hourCard style
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            minWidth: '150px', // Increased to accommodate the circular progress bar
+            padding: '15px',
+            backgroundColor: 'white',
+            borderRadius: '8px',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+            margin: '0 5px',
+            transition: 'transform 0.2s ease',
+            '&:hover': {
+                transform: 'translateY(-5px)',
+            },
+        },
+        circularProgressContainer: {
+            width: '100px', // Fixed width
+            height: '100px', // Fixed height
+            position: 'relative'
+        }
     };
 
     const renderTooltip = () => {
@@ -924,7 +947,7 @@ const AirView = () => {
             }}>
                 <div style={styles.tooltipContent}>
                     <h4>{metric.name} at {formatHour(hour)}</h4>
-                    <p>Value: {value.toFixed(2)}</p>
+                    <p>Value: {value.toFixed(3)}</p>
                     <p>Status: {status?.label}</p>
                     <p>Trend: {trend}</p>
                 </div>
@@ -932,162 +955,276 @@ const AirView = () => {
         );
     };
 
-    const renderMetricContainer = (metric) => (
-        <div style={styles.metricContainer}>
-            <Tooltip title={metric.tooltip || ''} placement="top" arrow>
-                <h3 style={styles.metricTitle}>
-                    {metric.name}
-                </h3>
-            </Tooltip>
-            <div style={styles.timelineWrapper}>
-                <button
-                    onClick={() => handleManualScroll('right')}
-                    style={{
-                        ...styles.scrollButton,
-                        padding: window.innerWidth < 768 ? '5px 10px' : '10px 15px',
-                        fontSize: window.innerWidth < 768 ? '16px' : '20px',
-                    }}
-                >
-                    ←
-                </button>
-                <div style={styles.scrollContainer} id={`${metric.id}-container`}>
-                    <div style={styles.timelineContainer}>
-                        {visibleHours.map((hour) => {
-                            const hourData = hourlyData[hour];
-                            const value = hourData?.[metric.id];
-                            const previousHourData = hourlyData[(hour - 1 + 24) % 24];
-                            const previousValue = previousHourData?.[metric.id];
-                            const status = getAirQualityStatus(value, metric.id)?.label;
+    const renderMetricContainer = (metric) => {
+        // Get the maximum value for this metric's scale
+        const getMaxValue = (metricId) => {
+            const thresholdValues = thresholds[metricId];
+            // Use the second-to-last threshold's max value as the gauge maximum
+            return thresholdValues[thresholdValues.length - 2]?.max || 100;
+        };
 
-                            // Simplified trend calculation
-                            let trend = 'Stable';
-                            if (value && previousValue) {
-                                trend = value > previousValue ? 'Worsening' : value < previousValue ? 'Improving' : 'Stable';
-                            }
+        return (
+            <div style={styles.metricContainer}>
+                <Tooltip title={metric.tooltip || ''} placement="top" arrow>
+                    <h3 style={styles.metricTitle}>
+                        {metric.name}
+                    </h3>
+                </Tooltip>
+                <div style={styles.timelineWrapper}>
+                    <button
+                        onClick={() => handleManualScroll('right')}
+                        style={styles.scrollButton}
+                    >
+                        ←
+                    </button>
+                    <div style={styles.scrollContainer} id={`${metric.id}-container`}>
+                        <div style={styles.timelineContainer}>
+                            {visibleHours.map((hour) => {
+                                const hourData = hourlyData[hour];
+                                const value = hourData?.[metric.id];
+                                const previousHourData = hourlyData[(hour - 1 + 24) % 24];
+                                const previousValue = previousHourData?.[metric.id];
+                                const status = getAirQualityStatus(value, metric.id);
+                                const maxValue = getMaxValue(metric.id);
 
-                            const trendColors = {
-                                Improving: '#4CAF50',
-                                Worsening: '#F44336',
-                                Stable: '#9E9E9E'
-                            };
+                                // Simplified trend calculation
+                                let trend = 'Stable';
+                                if (value && previousValue) {
+                                    trend = value > previousValue ? 'Worsening' : value < previousValue ? 'Improving' : 'Stable';
+                                }
 
-                            return (
-                                <div
-                                    key={hour}
-                                    style={styles.hourCard}
-                                    onMouseEnter={(e) => {
-                                        const rect = e.currentTarget.getBoundingClientRect();
-                                        setHoveredData({
-                                            hour,
-                                            value,
-                                            metric,
-                                            trend,
-                                            position: {
-                                                x: rect.left + rect.width / 2,
-                                                y: rect.top
-                                            }
-                                        });
-                                    }}
-                                    onMouseLeave={() => setHoveredData(null)}
-                                >
-                                    <div style={styles.hourLabel}>{formatHour(hour)}</div>
-                                    {value ? (
-                                        <>
-                                            <div style={{
-                                                ...styles.levelIndicator,
-                                                backgroundColor: getAirQualityStatus(value, metric.id)?.color
-                                            }}>
-                                                {metric.getIcon && (
-                                                    <div style={styles.statusIcon}>
-                                                        {metric.getIcon(status)}
-                                                    </div>
-                                                )}
-                                                {status}
+                                const trendColors = {
+                                    Improving: '#4CAF50',
+                                    Worsening: '#F44336',
+                                    Stable: '#9E9E9E'
+                                };
+
+                                return (
+                                    <div
+                                        key={hour}
+                                        style={{
+                                            ...styles.hourCard,
+                                            cursor: 'pointer',
+                                            border: hour === selectedHourForNarrative ? '2px solid #007bff' : 'none'
+                                        }}
+                                        onClick={() => setSelectedHourForNarrative(hour)}
+                                        onMouseEnter={(e) => {
+                                            const rect = e.currentTarget.getBoundingClientRect();
+                                            setHoveredData({
+                                                hour,
+                                                value,
+                                                metric,
+                                                trend,
+                                                position: {
+                                                    x: rect.left + rect.width / 2,
+                                                    y: rect.top
+                                                }
+                                            });
+                                        }}
+                                        onMouseLeave={() => setHoveredData(null)}
+                                    >
+                                        <div style={styles.hourLabel}>{formatHour(hour)}</div>
+                                        {value !== null && value !== undefined ? (
+                                            <div style={styles.progressWrapper}>
+                                                <div style={styles.circularProgressContainer}>
+                                                    <CircularProgressbar
+                                                        value={(value / maxValue) * 100}
+                                                        text={`${value.toFixed(1)}`}
+                                                        styles={buildStyles({
+                                                            rotation: 0,
+                                                            strokeLinecap: 'round',
+                                                            textSize: '16px',
+                                                            pathTransitionDuration: 0.5,
+                                                            pathColor: status?.color || '#75c7b6',
+                                                            textColor: status?.color || '#75c7b6',
+                                                            trailColor: '#d6d6d6',
+                                                        })}
+                                                    />
+                                                </div>
+                                                <div style={{
+                                                    ...styles.statusLabel,
+                                                    color: status?.color || '#75c7b6'
+                                                }}>
+                                                    {status?.label}
+                                                </div>
                                                 <div style={{
                                                     ...styles.trendIndicator,
                                                     color: trendColors[trend],
-                                                    fontSize: '14px'
+                                                    padding: '4px 8px'
                                                 }}>
-                                                    {' ' + trend + ' '}
+                                                    {trend}
                                                 </div>
                                             </div>
-                                        </>
-                                    ) : (
-                                        <div style={styles.noDataLabel}>No Data</div>
-                                    )}
-                                </div>
-                            );
-                        })}
+                                        ) : (
+                                            <div style={styles.noDataLabel}>No Data</div>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
                     </div>
+                    <button
+                        onClick={() => handleManualScroll('left')}
+                        style={styles.scrollButton}
+                    >
+                        →
+                    </button>
                 </div>
-                <button
-                    onClick={() => handleManualScroll('left')}
-                    style={styles.scrollButton}
-                >
-                    →
-                </button>
             </div>
-        </div>
-    );
+        );
+    };
+
+    const generateNarrative = (hour) => {
+        const hourData = hourlyData[hour];
+        if (!hourData) return "No data available for this hour.";
+
+        const status = getAirQualityStatus(hourData.pm25, 'pm25');
+        const time = formatHour(hour);
+
+        let narrative = `At ${time}, the air quality is ${status?.label || 'unavailable'}. `;
+
+        if (hourData.pm25) {
+            narrative += `PM2.5 levels are at ${hourData.pm25.toFixed(1)} µg/m³, which is ${status?.label || 'unavailable'}. `;
+        }
+
+        if (hourData.temperature) {
+            const tempStatus = getAirQualityStatus(hourData.temperature, 'temperature');
+            narrative += `The temperature is ${hourData.temperature.toFixed(1)}°C (${tempStatus?.label || 'normal'}). `;
+        }
+
+        if (hourData.humidity) {
+            const humidStatus = getAirQualityStatus(hourData.humidity, 'humidity');
+            narrative += `Humidity levels are at ${hourData.humidity.toFixed(1)}% (${humidStatus?.label || 'normal'}). `;
+        }
+
+        // Add recommendations based on overall status
+        if (status) {
+            const recommendations = thresholdInfo.find(t => t.level === status.label)?.recommendations || [];
+            if (recommendations.length > 0) {
+                narrative += "\n\nRecommendations:\n• " + recommendations.join('\n• ');
+            }
+        }
+
+        return narrative;
+    };
 
     return (
-        <div style={styles.mainContainer}>
-            {hoveredData && renderTooltip()}
-            <div style={styles.contentContainer}>
-                <div style={styles.header}>
-                    <h2>24-Hour Air Quality View</h2>
-                    <div style={styles.controls}>
-                        <input
-                            type="date"
-                            value={selectedDate}
-                            onChange={(e) => setSelectedDate(e.target.value)}
-                            style={styles.datePicker}
-                        />
-                        <select
-                            value={selectedLocation}
-                            onChange={(e) => setSelectedLocation(Number(e.target.value))}
-                            style={styles.locationSelect}
+        <Box m="20px">
+            {/* HEADER */}
+            <Box display="flex" justifyContent="space-between" alignItems="center" mb="20px">
+                <Box>
+                    <h2 style={{ margin: 0 }}>Air Quality Dashboard</h2>
+                    <p style={{ margin: "5px 0 0 0", color: "#666" }}>Monitor real-time air quality metrics</p>
+                </Box>
+
+                <Box display="flex" gap="10px">
+                    <input
+                        type="date"
+                        value={selectedDate}
+                        onChange={(e) => setSelectedDate(e.target.value)}
+                        style={{ ...styles.datePicker, margin: 0 }}
+                    />
+                    <select
+                        value={selectedLocation}
+                        onChange={(e) => setSelectedLocation(Number(e.target.value))}
+                        style={{ ...styles.locationSelect, margin: 0 }}
+                    >
+                        {locations.map(location => (
+                            <option key={location.id} value={location.id}>
+                                {location.name}
+                            </option>
+                        ))}
+                    </select>
+                </Box>
+            </Box>
+
+            {/* Toggle Button for Additional Metrics */}
+            <Box display="flex" justifyContent="center" mb="20px">
+                <Button
+                    variant="contained"
+                    onClick={() => setShowAdditionalMetrics(!showAdditionalMetrics)}
+                    sx={{
+                        backgroundColor: '#007bff',
+                        '&:hover': { backgroundColor: '#0056b3' }
+                    }}
+                >
+                    {showAdditionalMetrics ? 'Hide Additional Metrics' : 'Show Additional Metrics'}
+                </Button>
+            </Box>
+
+            {/* GRID LAYOUT */}
+            <Box
+                display="grid"
+                gridTemplateColumns="repeat(12, 1fr)"
+                gap="20px"
+            >
+                {/* Main Metrics - PM2.5 and PM10 */}
+                {metrics
+                    .filter(metric => ['pm25', 'pm10'].includes(metric.id))
+                    .map(metric => (
+                        <Box
+                            key={metric.id}
+                            gridColumn="span 6"
+                            bgcolor="white"
+                            borderRadius="8px"
+                            boxShadow="0 4px 6px rgba(0,0,0,0.1)"
+                            p="20px"
                         >
-                            {locations.map(location => (
-                                <option key={location.id} value={location.id}>
-                                    {location.name}
-                                </option>
+                            {renderMetricContainer(metric)}
+                        </Box>
+                    ))}
+
+                {/* Additional Metrics - Stacked in a single column */}
+                {showAdditionalMetrics && (
+                    <Box
+                        gridColumn="span 12"
+                        display="flex"
+                        flexDirection="column"
+                        gap="20px"
+                    >
+                        {metrics
+                            .filter(metric => !['pm25', 'pm10'].includes(metric.id))
+                            .map(metric => (
+                                <Box
+                                    key={metric.id}
+                                    bgcolor="white"
+                                    borderRadius="8px"
+                                    boxShadow="0 4px 6px rgba(0,0,0,0.1)"
+                                    p="20px"
+                                >
+                                    {renderMetricContainer(metric)}
+                                </Box>
                             ))}
-                        </select>
-                    </div>
-                </div>
-
-                {loading ? (
-                    <div style={styles.loading}>Loading...</div>
-                ) : (
-                    <>
-                        <div style={styles.metricsToggleContainer}>
-                            <button
-                                style={styles.toggleButton}
-                                onClick={() => setShowAdditionalMetrics(!showAdditionalMetrics)}
-                            >
-                                {showAdditionalMetrics ? 'Hide Additional Metrics' : 'Show Additional Metrics'}
-                            </button>
-                        </div>
-                        <div style={styles.metricsWrapper}>
-                            {/* Always show PM2.5 and PM10 */}
-                            {metrics
-                                .filter(metric => ['pm25', 'pm10'].includes(metric.id))
-                                .map(metric => renderMetricContainer(metric))}
-
-                            {/* Conditionally show additional metrics */}
-                            {showAdditionalMetrics &&
-                                metrics
-                                    .filter(metric => !['pm25', 'pm10'].includes(metric.id))
-                                    .map(metric => renderMetricContainer(metric))
-                            }
-                        </div>
-                    </>
+                    </Box>
                 )}
-            </div>
-            {renderInfoSlideshow()}
+
+                {/* Info Slideshow and Narrative - Split Layout */}
+                <Box
+                    gridColumn="span 8"
+                    bgcolor="white"
+                    borderRadius="8px"
+                    boxShadow="0 4px 6px rgba(0,0,0,0.1)"
+                    p="20px"
+                >
+                    {renderInfoSlideshow()}
+                </Box>
+
+                {/* Narrative Report */}
+                <Box
+                    gridColumn="span 4"
+                    bgcolor="white"
+                    borderRadius="8px"
+                    boxShadow="0 4px 6px rgba(0,0,0,0.1)"
+                    p="20px"
+                >
+                    <h3 style={{ marginTop: 0, marginBottom: '15px' }}>Air Quality Report</h3>
+                    <p style={{ whiteSpace: 'pre-line' }}>{generateNarrative(selectedHourForNarrative)}</p>
+                </Box>
+            </Box>
+
+            {hoveredData && renderTooltip()}
             <ToastContainer />
-        </div>
+        </Box>
     );
 };
 
