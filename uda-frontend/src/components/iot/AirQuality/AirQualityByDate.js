@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { supabase } from './supabaseClient';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Line } from 'react-chartjs-2';
-// import Sidebar from '../../Sidebar';
+import backgroundImage from '../../../assets/airdash.png';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import {
@@ -18,6 +18,7 @@ import {
     Tooltip,
     Legend,
 } from "chart.js";
+// import { colors } from "@mui/material";
 
 const plugin = {
     id: "increase-legend-spacing",
@@ -43,13 +44,14 @@ ChartJS.register(
 
 const AirQualityByDate = () => {
     const [selectedDate, setSelectedDate] = useState(new Date());
-    const { date, locationId } = useParams(); // Retrieve locationId from the URL
+    const { date } = useParams(); // Retrieve locationId from the URL  !!!!!{ date, locationId }!!!!!!
     const [airData, setAirData] = useState([]);
     const [selectedHour, setSelectedHour] = useState("00");
     const [selectedLocation, setSelectedLocation] = useState(3); // Default to locationId from URL or 1
     const [highlightedDates, setHighlightedDates] = useState([]);
-    const navigate = useNavigate();
+    // const navigate = useNavigate(); 
     const [viewMode, setViewMode] = useState("average"); // 'hourly' or 'average'
+    
 
     useEffect(() => {
     }, [viewMode]);
@@ -160,13 +162,8 @@ const AirQualityByDate = () => {
     const tileContent = ({ date, view }) => {
         if (view === "month") {
             const formattedDate = date.toISOString().split('T')[0];
-
             if (highlightedDates.includes(formattedDate)) {
-                return (
-                    <div style={{ backgroundColor: "#4caf50", borderRadius: "50%" }}>
-                        &nbsp;
-                    </div>
-                );
+                return "highlight-tile"; // Apply custom class for highlighted dates
             }
         }
         return null;
@@ -293,14 +290,15 @@ const AirQualityByDate = () => {
                 {
                     label: label + " Average Level",
                     data: data.map((item) => item.value.toFixed(2)),
-                    borderColor: "rgba(0, 0, 0, 1)",
-                    borderWidth: 1,
+                    borderColor: "white",
+                    borderWidth: 2,
                     backgroundColor: averageColor, // Use the average color for the background
                     pointBackgroundColor: data.map((item) => getColor(item.value, metric)),
-                    pointBorderColor: "rgba(0, 0, 0, 1)",
+                    pointBorderColor: "white",
                     fill: false,
                     pointRadius: 8,
                     pointHoverRadius: 10,
+                    tension: 0.4,
                 },
             ],
         };
@@ -326,14 +324,15 @@ const AirQualityByDate = () => {
                 {
                     label: `${label} Hourly Average Level`,
                     data: data.map((item) => item.average.toFixed(2)), // Use the average values
-                    borderColor: "rgba(0, 0, 0, 1)",
-                    borderWidth: 1,
+                    borderColor: "white",
+                    borderWidth: 2,
                     backgroundColor: averageColor, // Use the average color for the background
                     pointBackgroundColor: data.map((item) => getColor(item.average, metric)),
-                    pointBorderColor: "rgba(0, 0, 0, 1)",
+                    pointBorderColor: "white",
                     fill: false,
                     pointRadius: 8,
                     pointHoverRadius: 10,
+                    tension: 0.4,
                 },
             ],
         };
@@ -506,271 +505,1129 @@ const AirQualityByDate = () => {
 
         return getColor(averageValue, metric);
     };
+    
 
     return (
-        // <Sidebar>
+        <div style={styles.fullContainer}>
+            <header style={styles.header}>
+                <h1 style={styles.title}>
+                    Air Quality Data for {date} at {locationName}
+                </h1>
+            </header>
 
-        <div className="container-fluid">
-            <h2 style={{ textAlign: "center", marginBottom: "40px" }}>
-                Air Quality Data for {date} at {locationName}
-            </h2>
-            <div>
-                <h3 style={{ textAlign: "center", marginBottom: "40px" }}>
-                    Select Date:
-                </h3>
-                <Calendar
-                    value={selectedDate}
-                    onChange={(date) => {
-                        setSelectedDate(date);
-                        setViewMode("average");
-                    }}
-                    onActiveStartDateChange={handleMonthChange}
-                    tileContent={tileContent}
-                />
-            </div>
-            <div className="view-toggle">
-                <button
-                    onClick={() =>
-                        setViewMode(viewMode === "hourly" ? "average" : "hourly")
+            <div style={styles.divGrid}>
+
+                {/* DIV 1 - CALENDAR CONTAINER */}
+                <div style={styles.div1}>
+                    <div style={styles.calendarHeader}>
+                        <h3 style={styles.selectDateTitle}>Select Date:</h3>
+                        <p style={styles.selectRangeSubtitle}>Select Range to Show Data</p>
+                    </div>
+                    <div style={styles.calendarContainer}>
+                        <Calendar
+                            value={selectedDate}
+                            onChange={(date) => {
+                                setSelectedDate(date);
+                                setViewMode("average");
+                            }}
+                            onActiveStartDateChange={handleMonthChange}
+                            tileClassName={tileContent} // Use tileClassName for custom styles
+                        />
+                    </div>
+                    {/* Custom styles using Styled JSX */}
+                    <style jsx>{`
+                    .react-calendar {
+                        width: 100%;
+                        max-width: 500px;
+                        margin: auto;
+                        border-radius: 20px;
+                        padding: 10px;
+                        background-color: rgba(255, 255, 255, 0.6); /* Semi-transparent grey */
                     }
-                >
-                    {viewMode === "hourly"
-                        ? "Show Hourly Averages"
-                        : "Show Hourly Data"}
-                </button>
-            </div>
-            <div className="dropdowns-container">
-                {/* Location Dropdown */}
-                <div className="form-group">
-                    <label htmlFor="locationSelect">Select Location:</label>
-                    <select
-                        id="locationSelect"
-                        className="form-control"
-                        value={selectedLocation}
-                        onChange={(e) => setSelectedLocation(e.target.value)}
-                    >
-                        {locations.map((location) => (
-                            <option key={location.id} value={location.id}>
-                                {location.name}
-                            </option>
-                        ))}
-                    </select>
-                </div>
 
-                {/* Hour Dropdown */}
-                {viewMode === "hourly" && (
-                    <div className="form-group">
-                        <label htmlFor="hourSelect">Select Hour:</label>
-                        <select
-                            id="hourSelect"
-                            className="form-control"
-                            value={selectedHour}
-                            onChange={(e) => setSelectedHour(e.target.value)}
-                        >
-                            {Array.from({ length: 24 }, (_, i) => {
-                                const date = new Date();
-                                date.setHours(i, 0, 0, 0);
-                                return (
-                                    <option key={i} value={i.toString().padStart(2, "0")}>
+                    .react-calendar__tile {
+                        border-radius: 10px; /* Optional: Rounded corners */
+                        position: relative;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        height: 60px; /* Set a consistent height */
+                        width: 60px; /* Set a consistent width */
+                        transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for background and text color */
+                    }
+
+                    .highlight-tile {
+                        background-color: #00732f !important; /* Ensure the highlight covers the whole tile */
+                        color: white !important; /* Make text stand out */
+                        border-radius: 10px; /* Optional: Rounded corners */
+                    }
+
+                    /* Hover effect for green tile */
+                    .react-calendar__tile:hover {
+                        background-color: white !important; /* Change to white on hover */
+                        color: #00732f !important; /* Keep the text color green when hovered */
+                    }
+
+                    /* Active (clicked) tile - turn blue */
+                    .react-calendar__tile--active {
+                        background-color: rgba(0, 123, 255, 0.7) !important; /* Blue tile */
+                        color: white;
+                        border-radius: 10px; /* Optional: Rounded corners */
+                    }
+
+                    /* Active state after clicking */
+                    .react-calendar__tile--active:focus {
+                        background-color: rgba(0, 123, 255, 0.7) !important; /* Blue when clicked */
+                        color: white;
+                    }
+
+                    /* "Today" tile style */
+                    .react-calendar__tile--now {
+                        background-color: rgb(255, 222, 89) !important; /* Highlight today with yellow */
+                        color: black !important; /* Make text color black for better contrast */
+                        border-radius: 10px; /* Optional: Rounded corners */
+                    }
+
+                    /* Make "today" tile turn blue when clicked */
+                    .react-calendar__tile--now.react-calendar__tile--active {
+                        background-color: rgba(0, 123, 255, 0.7) !important; /* Blue when clicked */
+                        color: white;
+                    }
+
+                    .react-calendar__navigation button {
+                        background: rgba(167, 181, 189, 0.5);
+                        color: black;
+                        border: none; /* Remove border for a cleaner look */
+                        border-radius: 5px; /* Optional rounded corners */
+                        font-weight: bold; /* Enhance button text */
+                        padding: 5px 10px; /* Adjust button padding */
+                        transition: background-color 0.3s; /* Smooth hover transition */
+                    }
+
+                    .react-calendar__navigation button:hover {
+                        background: rgba(5, 218, 255, 0.8); /* Darker blue when hovering */
+                    }
+                `}</style>
+                        
+                    {/* Added Button and Dropdowns Below */}
+                        <div style={styles.controlsContainer}>
+                            <div className="view-toggle">
+                            <button
+                                style={styles.controlButton}
+                                onClick={() =>
+                                setViewMode(viewMode === "hourly" ? "average" : "hourly")
+                                }
+                            >
+                                {viewMode === "hourly"
+                                ? "Show Hourly Averages"
+                                : "Show Hourly Data"}
+                            </button>
+                            </div>
+                            <div className="dropdowns-container" style={styles.dropdownContainer}>
+                            {/* Location Dropdown */}
+                            <div className="form-group" style={styles.dropdownGroup}>
+                                <label htmlFor="locationSelect" style={styles.selectButtonLabel}>
+                                Select Location:
+                                </label>
+                                <select
+                                id="locationSelect"
+                                className="form-control"
+                                value={selectedLocation}
+                                onChange={(e) => setSelectedLocation(e.target.value)}
+                                style={styles.calendarSelect}
+                                >
+                                {locations.map((location) => (
+                                    <option key={location.id} value={location.id}>
+                                    {location.name}
+                                    </option>
+                                ))}
+                                </select>
+                            </div>
+                            {/* Hour Dropdown */}
+                            {viewMode === "hourly" && (
+                                <div className="form-group" style={styles.dropdownGroup}>
+                                <label htmlFor="hourSelect" style={styles.selectButtonLabel}>
+                                    Select Hour:
+                                </label>
+                                <select
+                                    id="hourSelect"
+                                    className="form-control"
+                                    value={selectedHour}
+                                    onChange={(e) => setSelectedHour(e.target.value)}
+                                    style={styles.calendarSelect}
+                                >
+                                    {Array.from({ length: 24 }, (_, i) => {
+                                    const date = new Date();
+                                    date.setHours(i, 0, 0, 0);
+                                    return (
+                                        <option key={i} value={i.toString().padStart(2, "0")}>
                                         {date.toLocaleString("en-US", {
                                             hour: "2-digit",
                                             minute: "2-digit",
                                             hour12: true,
                                         })}
-                                    </option>
-                                );
-                            })}
-                        </select>
-                    </div>
-                )}
-            </div>
-
-            <div className="charts-flex-container">
-                {["pm25", "pm10", "humidity", "temperature", "oxygen"].map(
-                    (metric, index) => (
-                        <div key={index} className="chart-item">
-                            <div className="chart-container">
-                                {/* Render Hourly Data Chart */}
-                                {viewMode === "hourly" && (
-                                    filteredData.length > 0 ? (
-                                        <Line
-                                            data={createChartConfig(
-                                                metric.toUpperCase(),
-                                                filteredData.map((item) => ({
-                                                    value: item[metric],
-                                                    id: item.id,
-                                                })),
-                                                metric
-                                            )}
-                                            options={{
-                                                responsive: true,
-                                                spanGaps: true,
-                                                plugins: {
-                                                    legend: { position: "top", backgroundColor: calculateAverageColor(filteredData, metric) },
-                                                    tooltip: {
-                                                        callbacks: {
-                                                            label: function (tooltipItem) {
-                                                                const value = tooltipItem.raw;
-                                                                const metricThresholds = thresholds[metric];
-
-                                                                // Find the appropriate threshold for the current value
-                                                                const matchedThreshold =
-                                                                    metricThresholds.find(
-                                                                        (threshold) => value <= threshold.max
-                                                                    );
-
-                                                                // Get the label or fallback to "Emergency" if no match is found
-                                                                const thresholdRemark = matchedThreshold
-                                                                    ? matchedThreshold.label
-                                                                    : "Emergency";
-
-                                                                return [
-                                                                    `Value: ${value}`,
-                                                                    `Status: ${thresholdRemark}`,
-                                                                ];
-                                                            },
-                                                        },
-                                                    },
-                                                    title: {
-                                                        display: true,
-                                                        text: `${metric.toUpperCase()} Levels`,
-                                                        padding: { bottom: 10 },
-                                                    },
-                                                },
-                                                onClick: handlePointClick,
-                                            }}
-                                        />
-                                    ) : (
-                                        <p>No data found for this hour.</p>
-                                    )
-                                )}
-
-                                {/* Render Average Data Chart */}
-                                {viewMode === "average" && (
-                                    airData.length > 0 ? (
-                                        <Line
-                                            data={createChartConfigForAverage(
-                                                metric.toUpperCase(),
-                                                getFilteredDataForAverage(airData, metric), // Use the preprocessed data for hourly averages
-                                                metric
-                                            )}
-                                            options={{
-                                                responsive: true,
-                                                spanGaps: true,
-                                                plugins: {
-                                                    legend: { position: "top" },
-                                                    tooltip: {
-                                                        callbacks: {
-                                                            label: function (tooltipItem) {
-                                                                const value = tooltipItem.raw;
-                                                                const metricThresholds = thresholds[metric];
-
-                                                                const matchedThreshold =
-                                                                    metricThresholds.find(
-                                                                        (threshold) => value <= threshold.max
-                                                                    );
-                                                                const thresholdRemark = matchedThreshold
-                                                                    ? matchedThreshold.label
-                                                                    : "Emergency";
-
-                                                                return [
-                                                                    `Value: ${value}`,
-                                                                    `Status: ${thresholdRemark}`,
-                                                                ];
-                                                            },
-                                                        },
-                                                    },
-                                                    title: {
-                                                        display: true,
-                                                        text: `${metric.toUpperCase()} Hourly Averages`,
-                                                        padding: { bottom: 10 },
-                                                    },
-                                                },
-                                                onClick: handlePointClick,
-                                            }}
-                                        />
-                                    )
-                                        : (
-                                            <p>No data found for this day.</p>
-                                        )
-
-                                )}
-                                <Legend
-                                    thresholds={thresholds[metric]}
-                                    filteredData={filteredData}
-                                    metric={metric}
-                                    data={airData}
-                                />
+                                        </option>
+                                    );
+                                    })}
+                                </select>
+                                </div>
+                            )}
                             </div>
                         </div>
-                    )
-                )}
+                </div>
+
+                {/* Div 2 - PM2.5 */}
+                <div style={styles.div2}>
+                    <div className="chart-container">
+                        {/* Render Hourly Data Chart */}
+                        {viewMode === "hourly" && filteredData.length > 0 ? (
+                            <Line
+                                data={createChartConfig(
+                                    "PM25",
+                                    filteredData.map((item) => ({
+                                        value: item.pm25,
+                                        borderColor: "white", // Line color set to white
+                                        borderWidth: 2, // Adjust the line thickness
+                                        id: item.id,
+                                    })),
+                                    "pm25"
+                                )}
+                                height={250} // Adjust the height of the chart in pixels
+                                options={{
+                                    responsive: true,
+                                    spanGaps: true,
+                                    scales: {
+                                        x: {
+                                            ticks: {
+                                                color: 'white', // Set X axis tick text color to white
+                                            },
+                                            title: {
+                                                color: 'white', // Set X axis title color to white
+                                            },
+                                        },
+                                        y: {
+                                            ticks: {
+                                                color: 'white', // Set Y axis tick text color to white
+                                            },
+                                            title: {
+                                                color: 'white', // Set Y axis title color to white
+                                            },
+                                        },
+                                    },
+                                    plugins: {
+                                        legend: { position: "top", labels: { color: 'white' } }, // Set legend text color to white
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function (tooltipItem) {
+                                                    const value = tooltipItem.raw;
+                                                    const metricThresholds = thresholds.pm25;
+
+                                                    const matchedThreshold = metricThresholds.find(
+                                                        (threshold) => value <= threshold.max
+                                                    );
+                                                    const thresholdRemark = matchedThreshold
+                                                        ? matchedThreshold.label
+                                                        : "Emergency";
+
+                                                    return [`Value: ${value}`, `Status: ${thresholdRemark}`];
+                                                },
+                                            },
+                                        },
+                                        title: {
+                                            display: true,
+                                            text: "PM2.5",
+                                            padding: { bottom: 10 },
+                                            color: 'white',
+                                            fontSize: 20,
+                                        },
+                                    },
+                                    onClick: handlePointClick,
+                                }}
+                            />
+                        ) : null}
+
+                        {/* Render Average Data Chart */}
+                        {viewMode === "average" && airData.length > 0 ? (
+                            <Line
+                                data={createChartConfigForAverage(
+                                    "PM25",
+                                    getFilteredDataForAverage(airData, "pm25"), // Use the preprocessed data for hourly averages
+                                    "pm25"
+                                )}
+                                height={250} // Adjust the height of the chart in pixels
+                                options={{
+                                    responsive: true,
+                                    spanGaps: true,
+                                    scales: {
+                                        x: {
+                                            ticks: {
+                                                color: 'white', // Set X axis tick text color to white
+                                            },
+                                            title: {
+                                                color: 'white', // Set X axis title color to white
+                                            },
+                                        },
+                                        y: {
+                                            ticks: {
+                                                color: 'white', // Set Y axis tick text color to white
+                                            },
+                                            title: {
+                                                color: 'white', // Set Y axis title color to white
+                                            },
+                                        },
+                                    },
+                                    plugins: {
+                                        legend: { position: "top", labels: { color: 'white' } }, // Set legend text color to white
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function (tooltipItem) {
+                                                    const value = tooltipItem.raw;
+                                                    const metricThresholds = thresholds.pm25;
+
+                                                    const matchedThreshold = metricThresholds.find(
+                                                        (threshold) => value <= threshold.max
+                                                    );
+                                                    const thresholdRemark = matchedThreshold
+                                                        ? matchedThreshold.label
+                                                        : "Emergency";
+
+                                                    return [`Value: ${value}`, `Status: ${thresholdRemark}`];
+                                                },
+                                            },
+                                        },
+                                        title: {
+                                            display: true,
+                                            text: "PM2.5",
+                                            padding: { bottom: 10 },
+                                            color: 'white',
+                                        },
+                                    },
+                                    onClick: handlePointClick,
+                                }}
+                            />
+                        ) : null}
+
+                        {/* Show "No data found for this hour" when there's no data for either chart */}
+                        {(viewMode === "hourly" && filteredData.length === 0) || (viewMode === "average" && airData.length === 0) ? (
+                            <p>No data found for this hour.</p>
+                        ) : null}
+
+                        {/* Legend Component */}
+                        <Legend 
+                            thresholds={thresholds.pm25} 
+                            filteredData={filteredData} 
+                            metric="pm25" 
+                            data={airData}
+                        />
+                    </div>
+                </div>
+
+                {/* Div 3 - PM10 */}
+                <div style={styles.div3}>
+                    <div className="chart-container">
+                        {/* Render Hourly Data Chart for PM10 */}
+                        {viewMode === "hourly" && filteredData.length > 0 ? (
+                            <Line
+                                data={createChartConfig(
+                                    "PM10",
+                                    filteredData.map((item) => ({
+                                        value: item.pm10,
+                                        id: item.id,
+                                    })),
+                                    "pm10"
+                                )}
+                                height={250} // Adjust the height of the chart in pixels
+                                options={{
+                                    responsive: true,
+                                    spanGaps: true,
+                                    plugins: {
+                                        legend: { position: "top", labels: { color: 'white' } },
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function (tooltipItem) {
+                                                    const value = tooltipItem.raw;
+                                                    const metricThresholds = thresholds.pm10;
+
+                                                    const matchedThreshold = metricThresholds.find(
+                                                        (threshold) => value <= threshold.max
+                                                    );
+                                                    const thresholdRemark = matchedThreshold
+                                                        ? matchedThreshold.label
+                                                        : "Emergency";
+
+                                                    return [`Value: ${value}`, `Status: ${thresholdRemark}`];
+                                                },
+                                            },
+                                        },
+                                        title: {
+                                            display: true,
+                                            text: "PM10",
+                                            padding: { bottom: 10 },
+                                            color: 'white',
+                                        },
+                                    },
+                                    scales: {
+                                        x: {
+                                            ticks: {
+                                                color: 'white', // Set X axis tick text color to white
+                                            },
+                                            title: {
+                                                color: 'white', // Set X axis title color to white
+                                            },
+                                        },
+                                        y: {
+                                            ticks: {
+                                                color: 'white', // Set Y axis tick text color to white
+                                            },
+                                            title: {
+                                                color: 'white', // Set Y axis title color to white
+                                            },
+                                        },
+                                    },
+                                    onClick: handlePointClick,
+                                }}
+                            />
+                        ) : null}
+
+                        {/* Render Average Data Chart for PM10 */}
+                        {viewMode === "average" && airData.length > 0 ? (
+                            <Line
+                                data={createChartConfigForAverage(
+                                    "PM10",
+                                    getFilteredDataForAverage(airData, "pm10"), // Use the preprocessed data for hourly averages
+                                    "pm10"
+                                )}
+                                height={250} // Adjust the height of the chart in pixels
+                                options={{
+                                    responsive: true,
+                                    spanGaps: true,
+                                    plugins: {
+                                        legend: { position: "top", labels: { color: 'white' } },
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function (tooltipItem) {
+                                                    const value = tooltipItem.raw;
+                                                    const metricThresholds = thresholds.pm10;
+
+                                                    const matchedThreshold = metricThresholds.find(
+                                                        (threshold) => value <= threshold.max
+                                                    );
+                                                    const thresholdRemark = matchedThreshold
+                                                        ? matchedThreshold.label
+                                                        : "Emergency";
+
+                                                    return [`Value: ${value}`, `Status: ${thresholdRemark}`];
+                                                },
+                                            },
+                                        },
+                                        title: {
+                                            display: true,
+                                            text: "PM10",
+                                            padding: { bottom: 10 },
+                                            color: 'white',
+                                        },
+                                    },
+                                    scales: {
+                                        x: {
+                                            ticks: {
+                                                color: 'white', // Set X axis tick text color to white
+                                            },
+                                            title: {
+                                                color: 'white', // Set X axis title color to white
+                                            },
+                                        },
+                                        y: {
+                                            ticks: {
+                                                color: 'white', // Set Y axis tick text color to white
+                                            },
+                                            title: {
+                                                color: 'white', // Set Y axis title color to white
+                                            },
+                                        },
+                                    },
+                                    onClick: handlePointClick,
+                                }}
+                            />
+                        ) : null}
+
+                        {/* Show "No data found for this hour" when there's no data for either chart */}
+                        {(viewMode === "hourly" && filteredData.length === 0) || (viewMode === "average" && airData.length === 0) ? (
+                            <p>No data found for this hour.</p>
+                        ) : null}
+
+                        {/* Legend Component */}
+                        <Legend 
+                            thresholds={thresholds.pm10} 
+                            filteredData={filteredData} 
+                            metric="pm10" 
+                            data={airData}
+                        />
+                    </div>
+                </div>
+
+                {/* Div 4 - Humidity */}
+                <div style={styles.div4}>
+                    <div className="chart-container">
+                        {/* Render Hourly Data Chart for Humidity */}
+                        {viewMode === "hourly" && filteredData.length > 0 ? (
+                            <Line
+                                data={createChartConfig(
+                                    "Humidity",
+                                    filteredData.map((item) => ({
+                                        value: item.humidity,
+                                        id: item.id,
+                                    })),
+                                    "humidity"
+                                )}
+                                height={250} // Adjust the height of the chart in pixels
+                                options={{
+                                    responsive: true,
+                                    spanGaps: true,
+                                    plugins: {
+                                        legend: { position: "top", labels: { color: 'white' } },
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function (tooltipItem) {
+                                                    const value = tooltipItem.raw;
+                                                    const metricThresholds = thresholds.humidity;
+
+                                                    const matchedThreshold = metricThresholds.find(
+                                                        (threshold) => value <= threshold.max
+                                                    );
+                                                    const thresholdRemark = matchedThreshold
+                                                        ? matchedThreshold.label
+                                                        : "Emergency";
+
+                                                    return [`Value: ${value}`, `Status: ${thresholdRemark}`];
+                                                },
+                                            },
+                                        },
+                                        title: {
+                                            display: true,
+                                            text: "HUMIDITY",
+                                            padding: { bottom: 10 },
+                                            color: 'white',
+                                        },
+                                    },
+                                    scales: {
+                                        x: {
+                                            ticks: {
+                                                color: 'white', // Set X axis tick text color to white
+                                            },
+                                            title: {
+                                                color: 'white', // Set X axis title color to white
+                                            },
+                                        },
+                                        y: {
+                                            ticks: {
+                                                color: 'white', // Set Y axis tick text color to white
+                                            },
+                                            title: {
+                                                color: 'white', // Set Y axis title color to white
+                                            },
+                                        },
+                                    },
+                                    onClick: handlePointClick,
+                                }}
+                            />
+                        ) : null}
+
+                        {/* Render Average Data Chart for Humidity */}
+                        {viewMode === "average" && airData.length > 0 ? (
+                            <Line
+                                data={createChartConfigForAverage(
+                                    "Humidity",
+                                    getFilteredDataForAverage(airData, "humidity"), // Use the preprocessed data for hourly averages
+                                    "humidity"
+                                )}
+                                height={250} // Adjust the height of the chart in pixels
+                                options={{
+                                    responsive: true,
+                                    spanGaps: true,
+                                    plugins: {
+                                        legend: { position: "top", labels: { color: 'white' } },
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function (tooltipItem) {
+                                                    const value = tooltipItem.raw;
+                                                    const metricThresholds = thresholds.humidity;
+
+                                                    const matchedThreshold = metricThresholds.find(
+                                                        (threshold) => value <= threshold.max
+                                                    );
+                                                    const thresholdRemark = matchedThreshold
+                                                        ? matchedThreshold.label
+                                                        : "Emergency";
+
+                                                    return [`Value: ${value}`, `Status: ${thresholdRemark}`];
+                                                },
+                                            },
+                                        },
+                                        title: {
+                                            display: true,
+                                            text: "HUMIDITY",
+                                            padding: { bottom: 10 },
+                                            color: 'white',
+                                        },
+                                    },
+                                    scales: {
+                                        x: {
+                                            ticks: {
+                                                color: 'white', // Set X axis tick text color to white
+                                            },
+                                            title: {
+                                                color: 'white', // Set X axis title color to white
+                                            },
+                                        },
+                                        y: {
+                                            ticks: {
+                                                color: 'white', // Set Y axis tick text color to white
+                                            },
+                                            title: {
+                                                color: 'white', // Set Y axis title color to white
+                                            },
+                                        },
+                                    },
+                                    onClick: handlePointClick,
+                                }}
+                            />
+                        ) : null}
+
+                        {/* Show "No data found for this hour" when there's no data for either chart */}
+                        {(viewMode === "hourly" && filteredData.length === 0) || (viewMode === "average" && airData.length === 0) ? (
+                            <p>No data found for this hour.</p>
+                        ) : null}
+
+                        {/* Legend Component */}
+                        <Legend 
+                            thresholds={thresholds.humidity} 
+                            filteredData={filteredData} 
+                            metric="humidity" 
+                            data={airData}
+                        />
+                    </div>
+                </div>
+
+                {/* Div 5 - Temperature */}
+                <div style={styles.div5}>
+                    <div className="chart-container">
+                        {/* Render Hourly Data Chart for Temperature */}
+                        {viewMode === "hourly" && filteredData.length > 0 ? (
+                            <Line
+                                data={createChartConfig(
+                                    "Temperature",
+                                    filteredData.map((item) => ({
+                                        value: item.temperature,
+                                        id: item.id,
+                                    })),
+                                    "temperature"
+                                )}
+                                height={250} // Adjust the height of the chart in pixels
+                                options={{
+                                    responsive: true,
+                                    spanGaps: true,
+                                    plugins: {
+                                        legend: { position: "top", labels: { color: 'white' } },
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function (tooltipItem) {
+                                                    const value = tooltipItem.raw;
+                                                    const metricThresholds = thresholds.temperature;
+
+                                                    const matchedThreshold = metricThresholds.find(
+                                                        (threshold) => value <= threshold.max
+                                                    );
+                                                    const thresholdRemark = matchedThreshold
+                                                        ? matchedThreshold.label
+                                                        : "Emergency";
+
+                                                    return [`Value: ${value}`, `Status: ${thresholdRemark}`];
+                                                },
+                                            },
+                                        },
+                                        title: {
+                                            display: true,
+                                            text: "TEMPERATURE",
+                                            padding: { bottom: 10 },
+                                            color: 'white',
+                                        },
+                                    },
+                                    scales: {
+                                        x: {
+                                            ticks: {
+                                                color: 'white', // Set X axis tick text color to white
+                                            },
+                                            title: {
+                                                color: 'white', // Set X axis title color to white
+                                            },
+                                        },
+                                        y: {
+                                            ticks: {
+                                                color: 'white', // Set Y axis tick text color to white
+                                            },
+                                            title: {
+                                                color: 'white', // Set Y axis title color to white
+                                            },
+                                        },
+                                    },
+                                    onClick: handlePointClick,
+                                }}
+                            />
+                        ) : null}
+
+                        {/* Render Average Data Chart for Temperature */}
+                        {viewMode === "average" && airData.length > 0 ? (
+                            <Line
+                                data={createChartConfigForAverage(
+                                    "Temperature",
+                                    getFilteredDataForAverage(airData, "temperature"), // Use the preprocessed data for hourly averages
+                                    "temperature"
+                                )}
+                                height={250} // Adjust the height of the chart in pixels
+                                options={{
+                                    responsive: true,
+                                    spanGaps: true,
+                                    plugins: {
+                                        legend: { position: "top", labels: { color: 'white' } },
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function (tooltipItem) {
+                                                    const value = tooltipItem.raw;
+                                                    const metricThresholds = thresholds.temperature;
+
+                                                    const matchedThreshold = metricThresholds.find(
+                                                        (threshold) => value <= threshold.max
+                                                    );
+                                                    const thresholdRemark = matchedThreshold
+                                                        ? matchedThreshold.label
+                                                        : "Emergency";
+
+                                                    return [`Value: ${value}`, `Status: ${thresholdRemark}`];
+                                                },
+                                            },
+                                        },
+                                        title: {
+                                            display: true,
+                                            text: "TEMPERATURE",
+                                            padding: { bottom: 10 },
+                                            color: 'white',
+                                        },
+                                    },
+                                    scales: {
+                                        x: {
+                                            ticks: {
+                                                color: 'white', // Set X axis tick text color to white
+                                            },
+                                            title: {
+                                                color: 'white', // Set X axis title color to white
+                                            },
+                                        },
+                                        y: {
+                                            ticks: {
+                                                color: 'white', // Set Y axis tick text color to white
+                                            },
+                                            title: {
+                                                color: 'white', // Set Y axis title color to white
+                                            },
+                                        },
+                                    },
+                                    onClick: handlePointClick,
+                                }}
+                            />
+                        ) : null}
+
+                        {/* Show "No data found for this hour" when there's no data for either chart */}
+                        {(viewMode === "hourly" && filteredData.length === 0) || (viewMode === "average" && airData.length === 0) ? (
+                            <p>No data found for this hour.</p>
+                        ) : null}
+
+                        {/* Legend Component */}
+                        <Legend 
+                            thresholds={thresholds.temperature} 
+                            filteredData={filteredData} 
+                            metric="temperature" 
+                            data={airData}
+                        />
+                    </div>
+                </div>
+
+                {/* Div 6 - Oxygen */}
+                <div style={styles.div6}>
+                    <div className="chart-container">
+                        {/* Render Hourly Data Chart for Oxygen */}
+                        {viewMode === "hourly" && filteredData.length > 0 ? (
+                            <Line
+                                data={createChartConfig(
+                                    "Oxygen",
+                                    filteredData.map((item) => ({
+                                        value: item.oxygen,
+                                        id: item.id,
+                                    })),
+                                    "oxygen"
+                                )}
+                                height={250} // Adjust the height of the chart in pixels
+                                options={{
+                                    responsive: true,
+                                    spanGaps: true,
+                                    plugins: {
+                                        legend: { position: "top", labels: { color: 'white' } },
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function (tooltipItem) {
+                                                    const value = tooltipItem.raw;
+                                                    const metricThresholds = thresholds.oxygen;
+
+                                                    const matchedThreshold = metricThresholds.find(
+                                                        (threshold) => value <= threshold.max
+                                                    );
+                                                    const thresholdRemark = matchedThreshold
+                                                        ? matchedThreshold.label
+                                                        : "Emergency";
+
+                                                    return [`Value: ${value}`, `Status: ${thresholdRemark}`];
+                                                },
+                                            },
+                                        },
+                                        title: {
+                                            display: true,
+                                            text: "OXYGEN",
+                                            padding: { bottom: 10 },
+                                            color: 'white',
+                                        },
+                                    },
+                                    scales: {
+                                        x: {
+                                            ticks: {
+                                                color: 'white', // Set X axis tick text color to white
+                                            },
+                                            title: {
+                                                color: 'white', // Set X axis title color to white
+                                            },
+                                        },
+                                        y: {
+                                            ticks: {
+                                                color: 'white', // Set Y axis tick text color to white
+                                            },
+                                            title: {
+                                                color: 'white', // Set Y axis title color to white
+                                            },
+                                        },
+                                    },
+                                    onClick: handlePointClick,
+                                }}
+                            />
+                        ) : null}
+
+                        {/* Render Average Data Chart for Oxygen */}
+                        {viewMode === "average" && airData.length > 0 ? (
+                            <Line
+                                data={createChartConfigForAverage(
+                                    "Oxygen",
+                                    getFilteredDataForAverage(airData, "oxygen"), // Use the preprocessed data for hourly averages
+                                    "oxygen"
+                                )}
+                                height={250} // Adjust the height of the chart in pixels
+                                options={{
+                                    responsive: true,
+                                    spanGaps: true,
+                                    plugins: {
+                                        legend: { position: "top", labels: { color: 'white' } },
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function (tooltipItem) {
+                                                    const value = tooltipItem.raw;
+                                                    const metricThresholds = thresholds.oxygen;
+
+                                                    const matchedThreshold = metricThresholds.find(
+                                                        (threshold) => value <= threshold.max
+                                                    );
+                                                    const thresholdRemark = matchedThreshold
+                                                        ? matchedThreshold.label
+                                                        : "Emergency";
+
+                                                    return [`Value: ${value}`, `Status: ${thresholdRemark}`];
+                                                },
+                                            },
+                                        },
+                                        title: {
+                                            display: true,
+                                            text: "OXYGEN",
+                                            padding: { bottom: 10 },
+                                            color: 'white',
+                                        },
+                                    },
+                                    scales: {
+                                        x: {
+                                            ticks: {
+                                                color: 'white', // Set X axis tick text color to white
+                                            },
+                                            title: {
+                                                color: 'white', // Set X axis title color to white
+                                            },
+                                        },
+                                        y: {
+                                            ticks: {
+                                                color: 'white', // Set Y axis tick text color to white
+                                            },
+                                            title: {
+                                                color: 'white', // Set Y axis title color to white
+                                            },
+                                        },
+                                    },
+                                    onClick: handlePointClick,
+                                }}
+                            />
+                        ) : null}
+
+                        {/* Show "No data found for this hour" when there's no data for either chart */}
+                        {(viewMode === "hourly" && filteredData.length === 0) || (viewMode === "average" && airData.length === 0) ? (
+                            <p>No data found for this hour.</p>
+                        ) : null}
+
+                        {/* Legend Component */}
+                        <Legend 
+                            thresholds={thresholds.oxygen} 
+                            filteredData={filteredData} 
+                            metric="oxygen" 
+                            data={airData}
+                        />
+                    </div>
+                </div>
+                <ToastContainer />
             </div>
-
-
-            <ToastContainer />
-            <style jsx>{`
-
-                .react-calendar {
-                width: 100%;
-                max-width: 500px;
-                margin: auto;
-                border: 1px solid #ddd;
-                border-radius: 10px;
-                padding: 10px;
-                }
-
-                .react-calendar__tile--active {
-                background: #007bff;
-                color: white;
-                 },
-    
-                .h2 {
-                    width: 50%;
-                }
-                .dropdowns-container {
-                    display: flex;
-                    gap: 20px;
-                    align-items: flex-end;
-                    margin-bottom: 20px;
-                    flex-wrap: wrap;
-                }
-                    
-                .charts-flex-container {
-                    display: flex;
-                    flex-wrap: wrap;
-                    justify-content: space-around;
-                    gap: 20px;
-                }
-
-                .chart-item {
-                    width: 100%;
-                    max-width: 500px;
-                    margin: 20px 0;
-                    border-radius: 10px;
-                    
-                }
-
-                .chart-container {
-                    padding: 20px;
-                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
-                    border-radius: 10px;
-                    background-color: #fff;
-                }
-
-                .legend-container {
-                    display: 'flex'
-                    margin-top: 10px;
-                    font-size: 14px;
-                    color: #333;
-                }
-                .container-fluid {
-                background-color:#808080;
-                }
-            `}</style>
         </div>
-        // </Sidebar>
     );
 };
+
+const styles = {
+    fullContainer: {
+        padding: '20px',
+        backgroundImage: `url(${backgroundImage})`, // Set the background image
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed', // Prevent background from scrolling with content
+        minHeight: '100vh', // Ensures full height
+        height: '100%', // Ensures it covers the viewport height
+        boxSizing: 'border-box',
+        overflow: 'hidden',
+        color: '#333',
+    },
+    header: {
+        textAlign: 'left',
+        marginTop: '15px',
+        marginBottom: '50px',
+        marginLeft: '70px',
+    },
+    title: {
+        margin: '0',
+        fontSize: '2rem',
+        color: 'white',
+        
+    },
+
+    divGrid: {
+        marginLeft: '70px',
+        display: 'grid',
+        gridTemplateColumns: 'repeat(3, 1fr)', // Default for larger screens
+        gap: '20px',
+        maxWidth: '1600px',
+        margin: '0 auto',
+        overflow: 'hidden',
+        // backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        paddingLeft: '70px',
+    },
+
+    // DIV 1CALENDAR CONTAINER CONTENT
+    div1: {
+        backgroundColor: 'rgba(98, 103, 108, 0.3)',
+        borderRadius: '20px',
+        fontSize: '1rem',
+        fontWeight: 'bold',
+        boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+        transition: 'transform 0.2s',
+        overflowWrap: 'break-word',
+        padding: '20px', 
+        display: 'flex',
+        flexDirection: 'column', // Stack the header and calendar vertically
+    },
+    calendarHeader: {
+        display: 'flex',
+        justifyContent: 'space-between', // Spread the title and subtitle apart
+        alignItems: 'center', // Vertically align the title and subtitle
+        width: '100%', // Ensures the header takes the full width
+    },
+    selectDateTitle: {
+        color: "#fff",
+        fontSize: "1.8rem",
+        marginBottom: "10px", // Space between title and subtitle
+        textAlign: "left", // Align title to the left
+    },
+    selectRangeSubtitle: {
+        color: "#ddd",
+        fontSize: "1rem",
+        textAlign: "right", // Align subtitle to the right
+        // marginTop: "15px",
+    },
+    calendarContainer: {
+        marginTop: '20px', // Adds spacing between the subtitle and calendar
+        width: '100%', // Ensures the calendar takes up the full width available
+        display: 'flex',
+        justifyContent: 'center', // Centers the calendar horizontally
+    },
+    controlsContainer: {
+        marginTop: "20px",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: "15px",
+      },
+      controlButton: {
+        backgroundColor: "rgba(0, 123, 255, 0.7)",
+        color: "#fff",
+        border: "none",
+        padding: "10px 20px",
+        borderRadius: "5px",
+        cursor: "pointer",
+        fontWeight: "bold",
+        transition: "background-color 0.3s",
+      },
+      controlButtonHover: {
+        backgroundColor: "rgba(5, 218, 255, 0.8)",
+      },
+      dropdownContainer: {
+        display: "flex",
+        gap: "20px",
+        flexWrap: "wrap",
+        justifyContent: "center",
+      },
+      dropdownGroup: {
+        display: "flex",
+        flexDirection: "column",
+        gap: "5px",
+      },
+      selectButtonLabel: {
+        color: "#fff",
+        fontSize: "1rem",
+      },
+      calendarSelect: {
+        padding: '8px',
+        borderRadius: '5px',
+        backgroundColor: 'rgba(27, 119, 211, 0.46)',
+        color: '#fff',
+        border: 'none',
+        outline: 'none',
+      },
+
+      // DIV 2
+      div2: {
+        backgroundColor: 'rgba(98, 103, 108, 0.3)',
+        // border: '1px solid #ccc',
+        borderRadius: '20px',
+        textAlign: 'center',
+        padding: '20px',
+        fontSize: '1rem',
+        fontWeight: 'bold',
+        color: 'white',
+        boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+        transition: 'transform 0.2s',
+        overflowWrap: 'break-word',
+    },
+
+    // DIV 3
+    div3: {
+        backgroundColor: 'rgba(98, 103, 108, 0.3)',
+        // border: '1px solid #ccc',
+        borderRadius: '20px',
+        textAlign: 'center',
+        padding: '20px',
+        fontSize: '1rem',
+        fontWeight: 'bold',
+        color: 'white',
+        boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+        transition: 'transform 0.2s',
+        overflowWrap: 'break-word',
+    },
+
+    // DIV 4
+    div4: {
+        backgroundColor: 'rgba(98, 103, 108, 0.3)',
+        // border: '1px solid #ccc',
+        borderRadius: '20px',
+        textAlign: 'center',
+        padding: '20px',
+        fontSize: '1rem',
+        fontWeight: 'bold',
+        color: 'white',
+        boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+        transition: 'transform 0.2s',
+        overflowWrap: 'break-word',
+    },
+
+    // DIV 5
+    div5: {
+        backgroundColor: 'rgba(98, 103, 108, 0.3)',
+        // border: '1px solid #ccc',
+        borderRadius: '20px',
+        textAlign: 'center',
+        padding: '20px',
+        fontSize: '1rem',
+        fontWeight: 'bold',
+        color: 'white',
+        boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+        transition: 'transform 0.2s',
+        overflowWrap: 'break-word',
+    },
+
+    // DIV 6
+    div6: {
+        backgroundColor: 'rgba(98, 103, 108, 0.3)',
+        // border: '1px solid #ccc',
+        borderRadius: '20px',
+        textAlign: 'center',
+        padding: '20px',
+        fontSize: '1rem',
+        fontWeight: 'bold',
+        color: 'white',
+        boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+        transition: 'transform 0.2s',
+        overflowWrap: 'break-word',
+    },
+
+
+
+    // box: {
+    //     backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    //     border: '1px solid #ccc',
+    //     borderRadius: '5px',
+    //     textAlign: 'center',
+    //     padding: '20px',
+    //     fontSize: '1rem',
+    //     fontWeight: 'bold',
+    //     boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+    //     transition: 'transform 0.2s',
+    //     overflowWrap: 'break-word',
+    // },
+
+    // Responsive styles
+    '@media (max-width: 1600px)': { // For smaller laptops
+        grid: {
+            gridTemplateColumns: 'repeat(2, 1fr)', // Two columns
+        },
+    },
+    '@media (max-width: 1024px)': { // For tablets or small laptops
+        grid: {
+            gridTemplateColumns: 'repeat(1, 1fr)', // Single column
+        },
+        header: {
+            marginLeft: '0', // Align header to center
+        },
+        fullContainer: {
+            padding: '20px', // Adjust padding for smaller screens
+        },
+    },
+};
+
+
 
 export default AirQualityByDate;

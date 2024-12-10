@@ -5,6 +5,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { supabase } from './supabaseClient';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
+import backgroundImage from '../../../assets/airdash.png';
+import { useNavigate } from 'react-router-dom';
 // import Sidebar from '../../Sidebar';
 
 // Function to fetch air quality data by ID
@@ -22,6 +24,7 @@ const getAirQualityById = async (id) => {
     }
     return data;
 };
+
 
 const locations = [
     { id: 1, name: 'Lapasan' },
@@ -137,6 +140,8 @@ const AirQualityInstance = () => {
     const [hoveredMetric, setHoveredMetric] = useState(null);
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
+    const navigate = useNavigate();
+
     useEffect(() => {
         let mounted = true;
         getAirQualityById(id)
@@ -153,6 +158,11 @@ const AirQualityInstance = () => {
         return () => mounted = false;
     }, [id]);
 
+    const handleButtonClick = () => {
+        // Navigate to the desired route when the button is clicked
+        navigate('/air-quality'); // Change '/detailed-data' to the route you want
+    };
+
     const handleMouseMove = (e) => {
         setMousePosition({ x: e.clientX, y: e.clientY });
     };
@@ -168,13 +178,13 @@ const AirQualityInstance = () => {
                 onMouseLeave={() => setHoveredMetric(null)}
                 onMouseMove={handleMouseMove} // Track mouse movement over the progress bar
             >
-                <CircularProgressbar
+                <CircularProgressbar 
                     value={value}
                     text={`${value}`}
                     styles={buildStyles({
                         pathColor: color,
                         textColor: color,
-                        trailColor: '#ababab',
+                        trailColor: '#fff',
                         backgroundColor: '#3e98c7',
                     })}
                 />
@@ -229,11 +239,11 @@ const AirQualityInstance = () => {
     return (
         <div style={styles.airQualityInstance}>
             {/* <Sidebar /> */}
-            <div style={styles.mainContent}>
-                <h1>Air Quality Data (ID: {id})</h1>
-                <h2><strong>Recorded at:</strong>{' '}{getLocationName(airData.locationId)}</h2>
-                <h2>
-                    <strong>Recorded on:</strong>{' '}
+            <div>
+                <h2 style={styles.h2}>Air Quality Data (ID: {id})</h2>
+                <h2 style={styles.h2}>Recorded at:{' '}{getLocationName(airData.locationId)}</h2>
+                <h2 style={styles.h2}>Recorded on:{' '}
+                    
                     {new Date(airData.date).toLocaleString("en-US", {
                         year: "numeric",
                         month: "2-digit",
@@ -253,6 +263,11 @@ const AirQualityInstance = () => {
                 </div>
                 {renderHoverMiniWindow()}
             </div>
+            <button style={styles.button}
+                    onClick={handleButtonClick}
+                    >
+                        Detailed Data
+                    </button>
             <ToastContainer />
         </div>
     );
@@ -260,43 +275,86 @@ const AirQualityInstance = () => {
 
 const styles = {
     airQualityInstance: {
+        backgroundColor: '#000000',
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
+        // minHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
         minHeight: '100vh',
-        fontFamily: "'Arial', sans-serif",
-        backgroundColor: '#f5f5f5',
     },
-    mainContent: {
-        padding: '20px',
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    h1: {
-        fontSize: '24px',
-        fontWeight: 600,
-        color: '#333',
+    // mainContent: {
+    //     padding: '20px',
+    //     flex: 1,
+    //     display: 'flex',
+    //     flexDirection: 'column',
+    //     alignItems: 'center',
+    //     justifyContent: 'center',
+    // },
+    // h1: {
+    //     fontSize: '24px',
+    //     fontWeight: 600,
+    //     color: '#333',
+    //     marginBottom: '20px',
+    // },
+    h2: {
+        fontSize: '1.5rem',
+        fontWeight: 200,
+        color: '#fff',
         marginBottom: '20px',
+        justifyContent: 'center', 
+        marginTop: '20px',
+        textAlign: 'center',
+        lineHeight: '20px',
     },
     metrics: {
         display: 'flex',
-        flexWrap: 'wrap',
+        flexWrap: 'nowwrap',
         justifyContent: 'center',
-        gap: '20px',
+        width: '1300px', // Adjust width as needed
+        height: 'auto', // Automatically adjust based on content
+        paddingLeft: '10px', // Add some padding for better spacing
+        backgroundColor: 'rgba(255, 255, 255, 0.1)', // Transparent white background
+        borderRadius: '8px', // Optional: add rounded corners
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // Optional: subtle shadow for better visuals
+        margin: '30px',
+        marginLeft: '160px', //NARA TAN MARGIN
+        padding: '35px',
+        paddingTop: '10px',
+        paddingBottom: '10px',
+        marginTop: '-5px'
     },
     progressContainer: {
-        width: '150px',
-        height: 'auto',
+        width: '200px',
+        height: '430px',
         textAlign: 'center',
         transition: 'transform 0.3s ease',
-        margin: '20px',
-        padding: '15px',
+        backgroundColor: 'rgba(255, 255, 255, 0.3)',
+        margin: '13px',
+        paddingTop: '50px',
+        padding: '20px',
         borderRadius: '10px',
-        backgroundColor: '#f0f0f0', // Light gray background
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Subtle shadow for depth    
-
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Subtle shadow for depth   
+        color: 'white'
+    },
+    button: {
+        display: 'flex', 
+        flexDirection: 'row',
+        padding: '10px 10px',
+        background: 'linear-gradient(50deg, #00CCDD, #006E77)', // Gradient background
+        color: '#fff',
+        border: 'none',
+        borderRadius: '15px',
+        cursor: 'pointer',
+        fontSize: '1rem',
+        width: 'auto',
+        justifyContent: 'center', // Center the content horizontally
+        alignItems: 'center',     // Center the content vertically
+        textAlign: 'center',      // Make sure the text is centered
+        margin: '0px 500px 0px 500px'
     },
     progressContainerHover: {
         transform: 'scale(1.05)',
@@ -323,7 +381,8 @@ const styles = {
         borderRadius: '50%',
     },
     circularBar: {
-        margin: '0 auto',
+        // margin: '0 auto',
+        marginTop: '20px'
     },
     tooltip: {
         position: 'absolute',

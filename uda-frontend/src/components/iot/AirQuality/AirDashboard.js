@@ -529,25 +529,29 @@ const AirDashboard = () => {
     );
 
     const renderComparisonChart = (comparisonData) => {
-        if (!comparisonData) {
-            return null;
-        }
-
-        const { first, second } = comparisonData;
         const metrics = ["pm25", "pm10", "humidity", "temperature", "oxygen"];
-
+    
+        // Default values when comparisonData is null or undefined
+        const defaultData = {
+            first: metrics.reduce((acc, metric) => ({ ...acc, [metric]: { avg: 0 } }), {}),
+            second: metrics.reduce((acc, metric) => ({ ...acc, [metric]: { avg: 0 } }), {}),
+        };
+    
+        const dataToUse = comparisonData || defaultData;
+        const { first, second } = dataToUse;
+    
         const getStatus = (value, metric) => {
-            const threshold = thresholds1[metric].find((t) => value <= t.max);
+            const threshold = thresholds1[metric]?.find((t) => value <= t.max);
             return threshold ? threshold.label : "Unknown";
         };
-
+    
         const labels = metrics.map((metric) => metric.toUpperCase());
         const firstAverages = metrics.map((metric) => first[metric]?.avg || 0);
         const secondAverages = metrics.map((metric) => second[metric]?.avg || 0);
-
-        const firstDateLabel = formatDateLabel(filters.first);
-        const secondDateLabel = formatDateLabel(filters.second);
-
+    
+        const firstDateLabel = comparisonData ? formatDateLabel(filters.first) : "No Range Selected";
+        const secondDateLabel = comparisonData ? formatDateLabel(filters.second) : "No Range Selected";
+    
         const data = {
             labels,
             datasets: [
@@ -555,23 +559,23 @@ const AirDashboard = () => {
                     label: `First Range: (${firstDateLabel})`,
                     data: firstAverages,
                     backgroundColor: firstAverages.map((value, index) =>
-                        thresholds1[metrics[index]].find((t) => value <= t.max)?.color
+                        thresholds1[metrics[index]]?.find((t) => value <= t.max)?.color || "rgba(128, 128, 128, 0.5)"
                     ),
-                    borderColor: "rgb(25, 25, 112)",
+                    borderColor: "rgb(0, 255, 156)",
                     borderWidth: 3,
                 },
                 {
                     label: `Second Range: (${secondDateLabel})`,
                     data: secondAverages,
                     backgroundColor: secondAverages.map((value, index) =>
-                        thresholds1[metrics[index]].find((t) => value <= t.max)?.color
+                        thresholds1[metrics[index]]?.find((t) => value <= t.max)?.color || "rgba(192, 192, 192, 0.5)"
                     ),
-                    borderColor: "rgb(220, 20, 60)",
+                    borderColor: "rgb(255, 227, 26)",
                     borderWidth: 3,
                 },
             ],
         };
-
+    
         const options = {
             maintainAspectRatio: false,
             responsive: true,
@@ -590,10 +594,10 @@ const AirDashboard = () => {
                     display: true,
                     position: "top",
                     labels: {
-                        color: "#fff", // Set legend text color
+                        color: "#fff",
                         font: {
-                            size: 14, // Adjust legend font size
-                            family: "Arial", // Optional: Change font family
+                            size: 14,
+                            family: "Arial",
                         },
                     },
                 },
@@ -601,46 +605,76 @@ const AirDashboard = () => {
             scales: {
                 x: {
                     grid: {
-                        display: false, // Hide grid lines on the x-axis
+                        display: false,
                     },
                     ticks: {
-                        color: "#fff", // Set x-axis tick label color
+                        color: "#fff",
                         font: {
-                            size: 20, // Adjust x-axis tick label size
-                            family: "Verdana", // Optional: Change font family
+                            size: 14,
+                            family: "Verdana",
                         },
                     },
                 },
                 y: {
                     grid: {
-                        display: false, // Hide grid lines on the y-axis
+                        display: false,
                     },
                     ticks: {
-                        color: "#fff", // Set y-axis tick label color
+                        color: "#fff",
                         font: {
-                            size: 20, // Adjust y-axis tick label size
-                            family: "Verdana", // Optional: Change font family
+                            size: 14,
+                            family: "Verdana",
                         },
-                        beginAtZero: true, // Ensure the y-axis starts at zero
+                        beginAtZero: true,
                     },
                 },
             },
             elements: {
                 bar: {
-                    borderRadius: 10, // Add border radius to the bars
-                    borderWidth: 2, // Optional: Add a border to the bars
+                    borderRadius: 15,
+                    borderWidth: 2,
                 },
             },
         };
-
+    
+        const generateInsight = () => {
+            if (!comparisonData) {
+                return "No data available for comparison.";
+            }
+    
+            return metrics.map((metric, index) => {
+                const firstValue = firstAverages[index];
+                const secondValue = secondAverages[index];
+                const firstStatus = getStatus(firstValue, metric);
+                const secondStatus = getStatus(secondValue, metric);
+    
+                return `${metric.toUpperCase()} - First Range (${firstStatus}): ${firstValue.toFixed(
+                    2
+                )}, Second Range (${secondStatus}): ${secondValue.toFixed(
+                    2
+                )}. ${firstValue > secondValue ? "Decreased" : "Increased"} between ranges.`;
+            }).join("\n");
+        };
+    
+        const narrativeInsight = generateInsight();
+    
         return (
-            <div style={{ display: 'flex', flexDirection: 'column', height: '45vh' }}>
-                <div style={{ flex: 1, height: '100%' }}>
-                    <Bar data={data} options={options} height={null} />
+            <div style={{ display: "flex", flexDirection: "column", height: "70%" }}>
+                <div style={{ flex: 1 }}>
+                    <Bar data={data} options={options} height="100%" />
+                </div>
+                <div style={{ marginTop: "20px", color: "#fff", fontSize: "1rem", textAlign: "justify" }}>
+                    <strong>Narrative Insight:</strong>
+                    {comparisonData ? (
+                        <pre style={{ textAlign: "justify", whiteSpace: "pre-wrap" }}>{narrativeInsight}</pre>
+                    ) : (
+                        " No data available for comparison."
+                    )}
                 </div>
             </div>
         );
     };
+    
 
     const renderLegend = () => {
         const metrics = ["pm25", "pm10", "humidity", "temperature", "oxygen"];
@@ -1659,38 +1693,35 @@ const styles = {
 
     // COMPARISON RENDERED CHART 
     renderComparisonBox: {
-        flex: '1 1 calc(70% - 20px)', // Larger width
-        padding: '15px',
-        backgroundColor: 'rgba(242, 242, 242, 0.1)',
-        borderRadius: '20px',
-        boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
-        display: 'flex',
-        height: '740px',
-        flexDirection: 'column',
-        // justifyContent: 'space-between',
-        marginTop: '-30px',
+        flex: "1 1 calc(70% - 20px)", // Larger width
+        padding: "15px",
+        backgroundColor: "rgba(242, 242, 242, 0.1)",
+        borderRadius: "20px",
+        boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+        display: "flex",
+        height: "740px",
+        flexDirection: "column",
+        marginTop: "-30px",
     },
     comparisonChartHeader: {
-        display: 'flex',
-        justifyContent: 'space-between', // Ensures title is on the left and subtitle on the right
-        alignItems: 'center',
-        // marginBottom: '20px',
+        display: "flex",
+        justifyContent: "space-between", // Ensures title is on the left and subtitle on the right
+        alignItems: "center",
     },
     comparisonChartTitle: {
-        color: '#fff',
-        fontSize: '1.8rem',
-        // fontWeight: 'bold',
-        marginBottom: '20px',
-        marginLeft: '15px',
-        textAlign: 'left', // Align title to the left
+        color: "#fff",
+        fontSize: "1.8rem",
+        marginBottom: "20px",
+        marginLeft: "15px",
+        textAlign: "left", // Align title to the left
         flex: 1,
     },
     comparisonChartSubtitle: {
-        color: '#ddd',
-        fontSize: '1rem',
-        marginTop: '20px',
-        marginRight: '15px',
-        textAlign: 'right', // Align subtitle to the right
+        color: "#ddd",
+        fontSize: "1rem",
+        marginTop: "20px",
+        marginRight: "15px",
+        textAlign: "right", // Align subtitle to the right
         flex: 1,
     },
 
@@ -1729,6 +1760,7 @@ const styles = {
     // RENDERED ALERT LOG WITH TIME LOG
     alertLogsContainer: {
         marginTop: '20px', // Add space above the container
+        marginBottom: '20px',
         padding: '15px', // Internal spacing
         backgroundColor: 'rgba(242, 242, 242, 0.1)', // Semi-transparent light background
         borderRadius: '20px', // Rounded corners for aesthetics
