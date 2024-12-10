@@ -51,7 +51,7 @@ const AirQualityByDate = () => {
     const [highlightedDates, setHighlightedDates] = useState([]);
     // const navigate = useNavigate(); 
     const [viewMode, setViewMode] = useState("average"); // 'hourly' or 'average'
-    
+
 
     useEffect(() => {
     }, [viewMode]);
@@ -289,7 +289,7 @@ const AirQualityByDate = () => {
             datasets: [
                 {
                     label: label + " Average Level",
-                    data: data.map((item) => item.value.toFixed(2)),
+                    data: data.map((item) => Number(item.value.toFixed(2))),
                     borderColor: "white",
                     borderWidth: 2,
                     backgroundColor: averageColor, // Use the average color for the background
@@ -323,7 +323,7 @@ const AirQualityByDate = () => {
             datasets: [
                 {
                     label: `${label} Hourly Average Level`,
-                    data: data.map((item) => item.average.toFixed(2)), // Use the average values
+                    data: data.map((item) => Number(item.average.toFixed(2))), // Use the average values
                     borderColor: "white",
                     borderWidth: 2,
                     backgroundColor: averageColor, // Use the average color for the background
@@ -505,7 +505,7 @@ const AirQualityByDate = () => {
 
         return getColor(averageValue, metric);
     };
-    
+
 
     return (
         <div style={styles.fullContainer}>
@@ -608,72 +608,72 @@ const AirQualityByDate = () => {
                         background: rgba(5, 218, 255, 0.8); /* Darker blue when hovering */
                     }
                 `}</style>
-                        
+
                     {/* Added Button and Dropdowns Below */}
-                        <div style={styles.controlsContainer}>
-                            <div className="view-toggle">
+                    <div style={styles.controlsContainer}>
+                        <div className="view-toggle">
                             <button
                                 style={styles.controlButton}
                                 onClick={() =>
-                                setViewMode(viewMode === "hourly" ? "average" : "hourly")
+                                    setViewMode(viewMode === "hourly" ? "average" : "hourly")
                                 }
                             >
                                 {viewMode === "hourly"
-                                ? "Show Hourly Averages"
-                                : "Show Hourly Data"}
+                                    ? "Show Hourly Averages"
+                                    : "Show Hourly Data"}
                             </button>
-                            </div>
-                            <div className="dropdowns-container" style={styles.dropdownContainer}>
+                        </div>
+                        <div className="dropdowns-container" style={styles.dropdownContainer}>
                             {/* Location Dropdown */}
                             <div className="form-group" style={styles.dropdownGroup}>
                                 <label htmlFor="locationSelect" style={styles.selectButtonLabel}>
-                                Select Location:
+                                    Select Location:
                                 </label>
                                 <select
-                                id="locationSelect"
-                                className="form-control"
-                                value={selectedLocation}
-                                onChange={(e) => setSelectedLocation(e.target.value)}
-                                style={styles.calendarSelect}
+                                    id="locationSelect"
+                                    className="form-control"
+                                    value={selectedLocation}
+                                    onChange={(e) => setSelectedLocation(e.target.value)}
+                                    style={styles.calendarSelect}
                                 >
-                                {locations.map((location) => (
-                                    <option key={location.id} value={location.id}>
-                                    {location.name}
-                                    </option>
-                                ))}
+                                    {locations.map((location) => (
+                                        <option key={location.id} value={location.id}>
+                                            {location.name}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
                             {/* Hour Dropdown */}
                             {viewMode === "hourly" && (
                                 <div className="form-group" style={styles.dropdownGroup}>
-                                <label htmlFor="hourSelect" style={styles.selectButtonLabel}>
-                                    Select Hour:
-                                </label>
-                                <select
-                                    id="hourSelect"
-                                    className="form-control"
-                                    value={selectedHour}
-                                    onChange={(e) => setSelectedHour(e.target.value)}
-                                    style={styles.calendarSelect}
-                                >
-                                    {Array.from({ length: 24 }, (_, i) => {
-                                    const date = new Date();
-                                    date.setHours(i, 0, 0, 0);
-                                    return (
-                                        <option key={i} value={i.toString().padStart(2, "0")}>
-                                        {date.toLocaleString("en-US", {
-                                            hour: "2-digit",
-                                            minute: "2-digit",
-                                            hour12: true,
+                                    <label htmlFor="hourSelect" style={styles.selectButtonLabel}>
+                                        Select Hour:
+                                    </label>
+                                    <select
+                                        id="hourSelect"
+                                        className="form-control"
+                                        value={selectedHour}
+                                        onChange={(e) => setSelectedHour(e.target.value)}
+                                        style={styles.calendarSelect}
+                                    >
+                                        {Array.from({ length: 24 }, (_, i) => {
+                                            const date = new Date();
+                                            date.setHours(i, 0, 0, 0);
+                                            return (
+                                                <option key={i} value={i.toString().padStart(2, "0")}>
+                                                    {date.toLocaleString("en-US", {
+                                                        hour: "2-digit",
+                                                        minute: "2-digit",
+                                                        hour12: true,
+                                                    })}
+                                                </option>
+                                            );
                                         })}
-                                        </option>
-                                    );
-                                    })}
-                                </select>
+                                    </select>
                                 </div>
                             )}
-                            </div>
                         </div>
+                    </div>
                 </div>
 
                 {/* Div 2 - PM2.5 */}
@@ -813,10 +813,10 @@ const AirQualityByDate = () => {
                         ) : null}
 
                         {/* Legend Component */}
-                        <Legend 
-                            thresholds={thresholds.pm25} 
-                            filteredData={filteredData} 
-                            metric="pm25" 
+                        <Legend
+                            thresholds={thresholds.pm25}
+                            filteredData={filteredData}
+                            metric="pm25"
                             data={airData}
                         />
                     </div>
@@ -956,10 +956,10 @@ const AirQualityByDate = () => {
                         ) : null}
 
                         {/* Legend Component */}
-                        <Legend 
-                            thresholds={thresholds.pm10} 
-                            filteredData={filteredData} 
-                            metric="pm10" 
+                        <Legend
+                            thresholds={thresholds.pm10}
+                            filteredData={filteredData}
+                            metric="pm10"
                             data={airData}
                         />
                     </div>
@@ -1099,10 +1099,10 @@ const AirQualityByDate = () => {
                         ) : null}
 
                         {/* Legend Component */}
-                        <Legend 
-                            thresholds={thresholds.humidity} 
-                            filteredData={filteredData} 
-                            metric="humidity" 
+                        <Legend
+                            thresholds={thresholds.humidity}
+                            filteredData={filteredData}
+                            metric="humidity"
                             data={airData}
                         />
                     </div>
@@ -1242,10 +1242,10 @@ const AirQualityByDate = () => {
                         ) : null}
 
                         {/* Legend Component */}
-                        <Legend 
-                            thresholds={thresholds.temperature} 
-                            filteredData={filteredData} 
-                            metric="temperature" 
+                        <Legend
+                            thresholds={thresholds.temperature}
+                            filteredData={filteredData}
+                            metric="temperature"
                             data={airData}
                         />
                     </div>
@@ -1385,10 +1385,10 @@ const AirQualityByDate = () => {
                         ) : null}
 
                         {/* Legend Component */}
-                        <Legend 
-                            thresholds={thresholds.oxygen} 
-                            filteredData={filteredData} 
-                            metric="oxygen" 
+                        <Legend
+                            thresholds={thresholds.oxygen}
+                            filteredData={filteredData}
+                            metric="oxygen"
                             data={airData}
                         />
                     </div>
@@ -1423,7 +1423,7 @@ const styles = {
         margin: '0',
         fontSize: '2rem',
         color: 'white',
-        
+
     },
 
     divGrid: {
@@ -1447,7 +1447,7 @@ const styles = {
         boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
         transition: 'transform 0.2s',
         overflowWrap: 'break-word',
-        padding: '20px', 
+        padding: '20px',
         display: 'flex',
         flexDirection: 'column', // Stack the header and calendar vertically
     },
@@ -1481,8 +1481,8 @@ const styles = {
         flexDirection: "column",
         alignItems: "center",
         gap: "15px",
-      },
-      controlButton: {
+    },
+    controlButton: {
         backgroundColor: "rgba(0, 123, 255, 0.7)",
         color: "#fff",
         border: "none",
@@ -1491,36 +1491,36 @@ const styles = {
         cursor: "pointer",
         fontWeight: "bold",
         transition: "background-color 0.3s",
-      },
-      controlButtonHover: {
+    },
+    controlButtonHover: {
         backgroundColor: "rgba(5, 218, 255, 0.8)",
-      },
-      dropdownContainer: {
+    },
+    dropdownContainer: {
         display: "flex",
         gap: "20px",
         flexWrap: "wrap",
         justifyContent: "center",
-      },
-      dropdownGroup: {
+    },
+    dropdownGroup: {
         display: "flex",
         flexDirection: "column",
         gap: "5px",
-      },
-      selectButtonLabel: {
+    },
+    selectButtonLabel: {
         color: "#fff",
         fontSize: "1rem",
-      },
-      calendarSelect: {
+    },
+    calendarSelect: {
         padding: '8px',
         borderRadius: '5px',
         backgroundColor: 'rgba(27, 119, 211, 0.46)',
         color: '#fff',
         border: 'none',
         outline: 'none',
-      },
+    },
 
-      // DIV 2
-      div2: {
+    // DIV 2
+    div2: {
         backgroundColor: 'rgba(98, 103, 108, 0.3)',
         // border: '1px solid #ccc',
         borderRadius: '20px',
