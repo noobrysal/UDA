@@ -15,6 +15,7 @@ import {
     Tooltip,
     Legend,
 } from 'chart.js';
+import { color, height, width } from '@mui/system';
 
 // Register chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -529,29 +530,25 @@ const AirDashboard = () => {
     );
 
     const renderComparisonChart = (comparisonData) => {
+        if (!comparisonData) {
+            return null;
+        }
+
+        const { first, second } = comparisonData;
         const metrics = ["pm25", "pm10", "humidity", "temperature", "oxygen"];
-    
-        // Default values when comparisonData is null or undefined
-        const defaultData = {
-            first: metrics.reduce((acc, metric) => ({ ...acc, [metric]: { avg: 0 } }), {}),
-            second: metrics.reduce((acc, metric) => ({ ...acc, [metric]: { avg: 0 } }), {}),
-        };
-    
-        const dataToUse = comparisonData || defaultData;
-        const { first, second } = dataToUse;
-    
+
         const getStatus = (value, metric) => {
-            const threshold = thresholds1[metric]?.find((t) => value <= t.max);
+            const threshold = thresholds1[metric].find((t) => value <= t.max);
             return threshold ? threshold.label : "Unknown";
         };
-    
+
         const labels = metrics.map((metric) => metric.toUpperCase());
         const firstAverages = metrics.map((metric) => first[metric]?.avg || 0);
         const secondAverages = metrics.map((metric) => second[metric]?.avg || 0);
-    
-        const firstDateLabel = comparisonData ? formatDateLabel(filters.first) : "No Range Selected";
-        const secondDateLabel = comparisonData ? formatDateLabel(filters.second) : "No Range Selected";
-    
+
+        const firstDateLabel = formatDateLabel(filters.first);
+        const secondDateLabel = formatDateLabel(filters.second);
+
         const data = {
             labels,
             datasets: [
@@ -559,23 +556,23 @@ const AirDashboard = () => {
                     label: `First Range: (${firstDateLabel})`,
                     data: firstAverages,
                     backgroundColor: firstAverages.map((value, index) =>
-                        thresholds1[metrics[index]]?.find((t) => value <= t.max)?.color || "rgba(128, 128, 128, 0.5)"
+                        thresholds1[metrics[index]].find((t) => value <= t.max)?.color
                     ),
-                    borderColor: "rgb(0, 255, 156)",
+                    borderColor: "rgb(25, 25, 112)",
                     borderWidth: 3,
                 },
                 {
                     label: `Second Range: (${secondDateLabel})`,
                     data: secondAverages,
                     backgroundColor: secondAverages.map((value, index) =>
-                        thresholds1[metrics[index]]?.find((t) => value <= t.max)?.color || "rgba(192, 192, 192, 0.5)"
+                        thresholds1[metrics[index]].find((t) => value <= t.max)?.color
                     ),
-                    borderColor: "rgb(255, 227, 26)",
+                    borderColor: "rgb(220, 20, 60)",
                     borderWidth: 3,
                 },
             ],
         };
-    
+
         const options = {
             maintainAspectRatio: false,
             responsive: true,
@@ -594,10 +591,10 @@ const AirDashboard = () => {
                     display: true,
                     position: "top",
                     labels: {
-                        color: "#fff",
+                        color: "#fff", // Set legend text color
                         font: {
-                            size: 14,
-                            family: "Arial",
+                            size: 14, // Adjust legend font size
+                            family: "Arial", // Optional: Change font family
                         },
                     },
                 },
@@ -605,76 +602,46 @@ const AirDashboard = () => {
             scales: {
                 x: {
                     grid: {
-                        display: false,
+                        display: false, // Hide grid lines on the x-axis
                     },
                     ticks: {
-                        color: "#fff",
+                        color: "#fff", // Set x-axis tick label color
                         font: {
-                            size: 14,
-                            family: "Verdana",
+                            size: 20, // Adjust x-axis tick label size
+                            family: "Verdana", // Optional: Change font family
                         },
                     },
                 },
                 y: {
                     grid: {
-                        display: false,
+                        display: false, // Hide grid lines on the y-axis
                     },
                     ticks: {
-                        color: "#fff",
+                        color: "#fff", // Set y-axis tick label color
                         font: {
-                            size: 14,
-                            family: "Verdana",
+                            size: 20, // Adjust y-axis tick label size
+                            family: "Verdana", // Optional: Change font family
                         },
-                        beginAtZero: true,
+                        beginAtZero: true, // Ensure the y-axis starts at zero
                     },
                 },
             },
             elements: {
                 bar: {
-                    borderRadius: 15,
-                    borderWidth: 2,
+                    borderRadius: 10, // Add border radius to the bars
+                    borderWidth: 2, // Optional: Add a border to the bars
                 },
             },
         };
-    
-        const generateInsight = () => {
-            if (!comparisonData) {
-                return "No data available for comparison.";
-            }
-    
-            return metrics.map((metric, index) => {
-                const firstValue = firstAverages[index];
-                const secondValue = secondAverages[index];
-                const firstStatus = getStatus(firstValue, metric);
-                const secondStatus = getStatus(secondValue, metric);
-    
-                return `${metric.toUpperCase()} - First Range (${firstStatus}): ${firstValue.toFixed(
-                    2
-                )}, Second Range (${secondStatus}): ${secondValue.toFixed(
-                    2
-                )}. ${firstValue > secondValue ? "Decreased" : "Increased"} between ranges.`;
-            }).join("\n");
-        };
-    
-        const narrativeInsight = generateInsight();
-    
+
         return (
-            <div style={{ display: "flex", flexDirection: "column", height: "70%" }}>
-                <div style={{ flex: 1 }}>
-                    <Bar data={data} options={options} height="100%" />
-                </div>
-                <div style={{ marginTop: "20px", color: "#fff", fontSize: "1rem", textAlign: "justify" }}>
-                    <strong>Narrative Insight:</strong>
-                    {comparisonData ? (
-                        <pre style={{ textAlign: "justify", whiteSpace: "pre-wrap" }}>{narrativeInsight}</pre>
-                    ) : (
-                        " No data available for comparison."
-                    )}
+            <div style={{ display: 'flex', flexDirection: 'column', height: '45vh' }}>
+                <div style={{ flex: 1, height: '100%' }}>
+                    <Bar data={data} options={options} height={null} />
                 </div>
             </div>
         );
     };
-    
 
     const renderLegend = () => {
         const metrics = ["pm25", "pm10", "humidity", "temperature", "oxygen"];
@@ -880,7 +847,7 @@ const AirDashboard = () => {
                                         name="range"
                                         value={summaryFilters.range}
                                         onChange={handleSummaryFiltersChange}
-                                        style={styles.summaryRangeSelect}
+                                        style={styles.summaryRangeSelect2}
                                     >
                                         <option value="day">Days</option>
                                         <option value="week">Week</option>
@@ -891,7 +858,7 @@ const AirDashboard = () => {
                                 {(summaryFilters.range === 'day') && (
                                     <>
                                         <label style={styles.summaryRangeText}>
-                                            Date:
+                                            1st Date:
                                             <input
                                                 type="date"
                                                 name="date"
@@ -901,7 +868,7 @@ const AirDashboard = () => {
                                             />
                                         </label>
                                         <label style={styles.summaryRangeText}>
-                                            Comparison Date:
+                                            2nd Date:
                                             <input
                                                 type="date"
                                                 name="comparisonDate"
@@ -916,7 +883,7 @@ const AirDashboard = () => {
                                 {(summaryFilters.range === 'week') && (
                                     <>
                                         <label style={styles.summaryRangeText}>
-                                            Week:
+                                            1st Date:
                                             <input
                                                 type="date"
                                                 name="date"
@@ -926,7 +893,7 @@ const AirDashboard = () => {
                                             />
                                         </label>
                                         <label style={styles.summaryRangeText}>
-                                            Comparison Week:
+                                            2nd Date:
                                             <input
                                                 type="date"
                                                 name="comparisonDate"
@@ -941,7 +908,7 @@ const AirDashboard = () => {
                                 {summaryFilters.range === 'month' && (
                                     <>
                                         <label style={styles.summaryRangeText}>
-                                            Month:
+                                            1st Date:
                                             <select
                                                 name="month"
                                                 value={summaryFilters.month}
@@ -956,7 +923,7 @@ const AirDashboard = () => {
                                             </select>
                                         </label>
                                         <label style={styles.summaryRangeText}>
-                                            Comparison Month:
+                                            2nd Date:
                                             <select
                                                 name="comparisonMonth"
                                                 value={summaryFilters.comparisonMonth}
@@ -1012,9 +979,9 @@ const AirDashboard = () => {
                                         name="range"
                                         value={logFilters.range}
                                         onChange={handleLogFiltersChange}
-                                        style={styles.alertRangeSelect}
+                                        style={styles.alertRangeSelect2}
                                     >
-                                        <option value="day">Day</option>
+                                        <option value="day">Days</option>
                                         <option value="week">Week</option>
                                         <option value="month">Month</option>
                                     </select>
@@ -1038,7 +1005,7 @@ const AirDashboard = () => {
                                         style={styles.alertRangeSelect}
                                     >
                                         <option value="" disabled>
-                                            Select a location
+                                            Select area
                                         </option>
                                         {locations.map((location) => (
                                             <option key={location.id} value={location.id}>
@@ -1324,9 +1291,11 @@ const AirDashboard = () => {
                                 const metricLogs = logs[metric];
                                 return (
                                     <div
+                                        style={styles.metricBlock} 
                                         key={metric}
-                                        style={styles.metricBlock}
+                                       
                                     >
+                                        <div style={styles.metricTitle}></div>
                                         <h3>{metric.toUpperCase()}</h3>
                                         {metricLogs?.length > 0 ? (
                                             <div
@@ -1336,7 +1305,7 @@ const AirDashboard = () => {
                                                     overflowY: "auto",
                                                 }}
                                             >
-                                                <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
+                                                <ul style={{ margin: 0, padding: 0, listStyle: 'none', textAlign: 'left' }}>
                                                     {/* Render each log for the metric */}
                                                     {metricLogs.map((log, index) => (
                                                         <li
@@ -1376,6 +1345,7 @@ const AirDashboard = () => {
                                             <p>No critical levels detected for {metric.toUpperCase()}.</p>
                                         )}
                                     </div >
+                                    // </div>
                                 );
                             })}
                         </div >
@@ -1502,8 +1472,9 @@ const styles = {
     },
     filtersRow: {
         display: 'flex',
-        justifyContent: 'center',
+        justifyContent: 'left',
         alignItems: 'center',
+        justifyContent: 'center',
         gap: '5px',
         flexWrap: 'wrap', // Wrap content on smaller screens
     },
@@ -1511,15 +1482,36 @@ const styles = {
         color: '#fff',
         fontSize: '1rem',
         marginRight: '5px',
+        // margin: '0 5px',
+        // justifyContent: 'left',
     },
     summaryRangeSelect: {
-        marginLeft: '7px',
-        padding: '8px',
+        marginLeft: '5px',
+        padding: '10px 5px',
         borderRadius: '5px',
-        backgroundColor: 'rgba(27, 119, 211, 0.46)',
+        backgroundColor: 'rgba(0, 204, 221, 0.46)',
         color: '#fff',
         border: 'none',
         outline: 'none',
+        textAlign: 'left',
+        justifyContent: 'center',
+        width: '110px',
+        fontSize: '14px',
+        // marginRight: '1px',
+    },
+    summaryRangeSelect2: {
+        marginLeft: '5px',
+        marginBottom: '1px',
+        fontSize: '14px',
+        padding: '10px 0px',
+        borderRadius: '5px',
+        backgroundColor: 'rgb(0, 204, 221, 0.46)',
+        color: '#fff',
+        border: 'none',
+        outline: 'none',
+        textAlign: 'left',
+        justifyContent: 'center',
+        width: '65px',
     },
     summaryMessage: {
         marginTop: '20px',
@@ -1623,16 +1615,30 @@ const styles = {
     },
     alertRangeSelect: {
         marginLeft: '7px',
-        padding: '8px',
+        padding: '10px 5px',
         borderRadius: '5px',
-        backgroundColor: 'rgba(27, 119, 211, 0.46)',
+        backgroundColor: 'rgb(0, 204, 221, 0.46)',
         color: '#fff',
         border: 'none',
         outline: 'none',
+        width: '110px',
+        fontSize: '14px',
+    },
+    alertRangeSelect2: {
+        marginLeft: '7px',
+        padding: '10px 5px',
+        borderRadius: '5px',
+        backgroundColor: 'rgb(0, 204, 221, 0.46)',
+        color: '#fff',
+        border: 'none',
+        outline: 'none',
+        width: '75px',
+        fontSize: '14px',
     },
     fetchButton: {
         padding: '10px 20px',
-        backgroundColor: '#1b77d3',
+        marginLeft: '13px',
+        backgroundColor: '#00CCDD',
         color: '#fff',
         border: 'none',
         borderRadius: '5px',
@@ -1693,35 +1699,38 @@ const styles = {
 
     // COMPARISON RENDERED CHART 
     renderComparisonBox: {
-        flex: "1 1 calc(70% - 20px)", // Larger width
-        padding: "15px",
-        backgroundColor: "rgba(242, 242, 242, 0.1)",
-        borderRadius: "20px",
-        boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-        display: "flex",
-        height: "740px",
-        flexDirection: "column",
-        marginTop: "-30px",
+        flex: '1 1 calc(70% - 20px)', // Larger width
+        padding: '15px',
+        backgroundColor: 'rgba(242, 242, 242, 0.1)',
+        borderRadius: '20px',
+        boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+        display: 'flex',
+        height: '740px',
+        flexDirection: 'column',
+        // justifyContent: 'space-between',
+        marginTop: '-30px',
     },
     comparisonChartHeader: {
-        display: "flex",
-        justifyContent: "space-between", // Ensures title is on the left and subtitle on the right
-        alignItems: "center",
+        display: 'flex',
+        justifyContent: 'space-between', // Ensures title is on the left and subtitle on the right
+        alignItems: 'center',
+        // marginBottom: '20px',
     },
     comparisonChartTitle: {
-        color: "#fff",
-        fontSize: "1.8rem",
-        marginBottom: "20px",
-        marginLeft: "15px",
-        textAlign: "left", // Align title to the left
+        color: '#fff',
+        fontSize: '1.8rem',
+        // fontWeight: 'bold',
+        marginBottom: '20px',
+        marginLeft: '15px',
+        textAlign: 'left', // Align title to the left
         flex: 1,
     },
     comparisonChartSubtitle: {
-        color: "#ddd",
-        fontSize: "1rem",
-        marginTop: "20px",
-        marginRight: "15px",
-        textAlign: "right", // Align subtitle to the right
+        color: '#ddd',
+        fontSize: '1rem',
+        marginTop: '20px',
+        marginRight: '15px',
+        textAlign: 'right', // Align subtitle to the right
         flex: 1,
     },
 
@@ -1760,7 +1769,6 @@ const styles = {
     // RENDERED ALERT LOG WITH TIME LOG
     alertLogsContainer: {
         marginTop: '20px', // Add space above the container
-        marginBottom: '20px',
         padding: '15px', // Internal spacing
         backgroundColor: 'rgba(242, 242, 242, 0.1)', // Semi-transparent light background
         borderRadius: '20px', // Rounded corners for aesthetics
@@ -1792,17 +1800,27 @@ const styles = {
         display: 'grid', // Use grid to arrange metrics in rows
         gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', // Responsive grid with min width for each metric block
         gap: '20px', // Add space between the grid items
+        color: '#000',
+        // backgroundColor: 'rgba(, 0.1)',
+        textAlign: 'center',
     },
     metricBlock: {
         // border: "1px solid #ccc", 
         padding: "10px",
-        borderRadius: '10px',
-        backgroundColor: "rgba(79, 117, 255, 0.46)",
+        borderRadius: '20px',
+        backgroundColor: "rgb(29, 144, 154)",
         color: "#fff",
         height: "500px", // Set fixed height for each metric block
         overflowY: "auto", // Enable vertical scrolling if content overflows
-
-
+        textAlign: "center",
+    },
+    metricTitle: {
+        backgroundColor: 'rgb(0, 235, 255)',
+        height: '40px',
+        width: '235px',
+        marginBottom: '-38px',
+        marginLeft: '38px',
+        borderRadius: '20px',
     },
 
 
