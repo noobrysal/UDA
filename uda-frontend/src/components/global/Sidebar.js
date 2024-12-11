@@ -141,7 +141,7 @@ const SidebarComponent = () => {
                     <Box paddingLeft={isCollapsed ? undefined : "2%"} display="flex" flexDirection="column" gap="8px">
                         <Item
                             title="Dashboard"
-                            to="/home"
+                            to="/air"
                             icon={<DashboardIcon />}
                             selected={selected}
                             setSelected={setSelected}
