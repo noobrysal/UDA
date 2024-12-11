@@ -3,7 +3,6 @@ import { supabase } from './supabaseClient';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Line, Bar } from 'react-chartjs-2'; // Add Bar import
-import { Line, Bar } from 'react-chartjs-2'; // Add Bar import
 import backgroundImage from '../../../assets/airdash.png';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
@@ -45,7 +44,6 @@ const AirView = () => {
     const [hoveredData, setHoveredData] = useState(null);
     const [showAdditionalMetrics, setShowAdditionalMetrics] = useState(false);
     const [selectedHourForNarrative, setSelectedHourForNarrative] = useState(new Date().getHours());
-    const [visibleHourRange, setVisibleHourRange] = useState([1, 2, 3, 4, 5, 6]); // Start from 1AM
     const [visibleHourRange, setVisibleHourRange] = useState([1, 2, 3, 4, 5, 6]); // Start from 1AM
 
     const locations = [
@@ -337,9 +335,6 @@ const AirView = () => {
         if (hour === 0) return '12AM'; // Midnight
         if (hour === 12) return '12PM'; // Noon
         return `${hour > 12 ? hour - 12 : hour}${hour >= 12 ? 'PM' : 'AM'}`;
-        if (hour === 0) return '12AM'; // Midnight
-        if (hour === 12) return '12PM'; // Noon
-        return `${hour > 12 ? hour - 12 : hour}${hour >= 12 ? 'PM' : 'AM'}`;
     };
 
     const handleScroll = (direction) => {
@@ -599,7 +594,6 @@ const AirView = () => {
             backgroundColor: "rgba(0, 204, 221, 0.46)", // Semi-transparent white
         },
 
-
         // Main Content Section Styles
         content: {
             flex: 1,
@@ -609,7 +603,6 @@ const AirView = () => {
             gap: "20px",
             marginLeft: '70px',
         },
-
 
         // Left Container
         leftContainer: {
@@ -743,10 +736,6 @@ const AirView = () => {
             cursor: "pointer",
             fontSize: "12px", // Adjust font size for buttons
         },
-
-
-
-
 
 
 
@@ -915,7 +904,6 @@ const AirView = () => {
             height: "35%", // Adjust height for smaller boxes
             width: "95%",
         },
-        },
         // NARRATIVE REPORT
         narrativeReportContainer: {
             borderRadius: "8px",
@@ -999,7 +987,6 @@ const AirView = () => {
                     <p>Trend: {trend}</p>
                 </div>
             </div>
-
 
         );
     };
@@ -1189,15 +1176,11 @@ const AirView = () => {
                 </header>
             </div>
 
-
             {/* Main Content Section */}
             <div style={styles.content}>
                 {/* Left Container Section */}
                 <div style={styles.leftContainer}>
                     <div style={styles.upperLeftBox}>
-                        <div style={styles.chartContainer}>
-                            <Bar data={getBarChartData()} options={barChartOptions} />
-                        </div>
                         <div style={styles.chartContainer}>
                             <Bar data={getBarChartData()} options={barChartOptions} />
                         </div>
@@ -1244,7 +1227,6 @@ const AirView = () => {
                         </div>
                     </div>
                 </div>
-
 
                 {/* Right Container Section */}
                 <div style={styles.rightContainer}>
@@ -1384,10 +1366,7 @@ const AirView = () => {
             <ToastContainer />
         </div>
     );
-    );
 };
 
 
-
-export default AirView;
 export default AirView;
