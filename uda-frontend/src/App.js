@@ -11,6 +11,7 @@ import AirQualityByDate from './components/iot/AirQuality/AirQualityByDate';
 import LandingPage from './components/LandingPage';
 import SidebarComponent from './components/global/Sidebar'; // Adjust the import path as needed
 import AirView from './components/iot/AirQuality/AirView';
+import AirView from './components/iot/AirQuality/AirView';
 
 // Define global styles for scrollbar
 const GlobalStyle = createGlobalStyle`
