@@ -47,10 +47,10 @@ const AppContent = () => {
   const sidebarPaths = [
     '/air-dashboard',
     '/air-quality',
-    '/airview',
+    // '/airview',
     '/air-quality/date/:date/location/:locationId',
     '/air-quality/id/:id',
-    // '/air',
+    '/air',
   ];
 
   // Check if the current route is in the sidebarPaths array
@@ -71,7 +71,7 @@ const AppContent = () => {
           <Route path="/air-dashboard" element={<AirDashboard />} />
           <Route path="/air-quality" element={<AirQualityByDate />} />
           <Route path="/air-quality/id/:id" element={<AirQualityInstance />} />
-          <Route path="/airview" element={<AirView />} />
+          {/* <Route path="/airview" element={<AirView />} /> */}
         </Routes>
       </div>
     </div>

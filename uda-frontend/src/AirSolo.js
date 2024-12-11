@@ -2,7 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '../src/components/iot/AirQuality/supabaseClient';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Line } from 'react-chartjs-2';
+import { Line, Bar } from 'react-chartjs-2'; // Add Bar import
+import backgroundImage from '../src/assets/airdash.png';
+import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -28,26 +31,27 @@ ChartJS.register(
     Legend
 );
 
-const Air = () => {
+const AirView = () => {
     const [hourlyData, setHourlyData] = useState([]);
     const [selectedLocation, setSelectedLocation] = useState(3); // Default to USTP-CDO
     const [loading, setLoading] = useState(true);
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
     const [scrollPosition, setScrollPosition] = useState(0);
-    const [visibleHours, setVisibleHours] = useState([0, 1, 2, 3, 4, 5, 6, 7, 8]); // Show 9 hours
+    const [visibleHours, setVisibleHours] = useState([0]); // Show 9 hours
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [slideDirection, setSlideDirection] = useState('left');
     const [currentSlide, setCurrentSlide] = useState(0);
     const [hoveredData, setHoveredData] = useState(null);
     const [showAdditionalMetrics, setShowAdditionalMetrics] = useState(false);
     const [selectedHourForNarrative, setSelectedHourForNarrative] = useState(new Date().getHours());
+    const [visibleHourRange, setVisibleHourRange] = useState([1, 2, 3, 4, 5, 6]); // Start from 1AM
 
     const locations = [
-        { id: 1, name: 'Lapasan' },
-        { id: 2, name: 'Agusan' },
+        { id: 1, name: 'LAPASAN' },
+        { id: 2, name: 'AGUSAN' },
         { id: 3, name: 'USTP-CDO' },
-        { id: 4, name: 'El Salvador' },
-        { id: 5, name: 'Sports Complex' },
+        { id: 4, name: 'EL SALVADOR' },
+        { id: 5, name: 'SPORTS COMPLEX' },
     ];
 
     // Update thresholds 
@@ -77,7 +81,7 @@ const Air = () => {
         ],
         temperature: [
             { min: 0, max: 33, label: "Good", color: "rgba(75, 192, 192, 1)" },
-            { min: 33, max: 41, label: "Caution", color: "rgba(255, 206, 86, 1)" },
+            { min: 33, max: 41, label: "Caution", color: "rgba(0, 206, 86, 1)" },
             { min: 41, max: 54, label: "Danger", color: "rgba(255, 140, 0, 1)" },
             { min: 54, max: Infinity, label: "Extreme Danger", color: "rgba(139, 0, 0, 1)" }
         ],
@@ -90,7 +94,7 @@ const Air = () => {
     const thresholdInfo = [
         {
             level: "Good",
-            color: "rgba(75, 192, 192, 1)",
+            color: "rgb(0, 176, 79)",
             description: "Air quality is satisfactory, and air pollution poses little or no risk.",
             icon: "😊",
             recommendations: [
@@ -101,7 +105,7 @@ const Air = () => {
         },
         {
             level: "Fair",
-            color: "rgba(154, 205, 50, 1)",
+            color: "rgb(181, 181, 2)",
             description: "Air quality is acceptable but may pose a risk to unusually sensitive individuals.",
             icon: "🙂",
             recommendations: [
@@ -112,7 +116,7 @@ const Air = () => {
         },
         {
             level: "Unhealthy",
-            color: "rgba(255, 206, 86, 1)",
+            color: "rgb(236, 125, 49)",
             description: "Sensitive groups may face health effects. General public is unlikely to be affected.",
             icon: "😷",
             recommendations: [
@@ -123,7 +127,7 @@ const Air = () => {
         },
         {
             level: "Very Unhealthy",
-            color: "rgba(255, 140, 0, 1)",
+            color: "rgb(255, 0, 0)",
             description: "Health alert: The risk of health effects is increased for everyone.",
             icon: "⚠️",
             recommendations: [
@@ -134,7 +138,7 @@ const Air = () => {
         },
         {
             level: "Severely Unhealthy",
-            color: "rgba(255, 99, 132, 1)",
+            color: "rgb(111, 47, 160)",
             description: "Health warning of emergency conditions: everyone is more likely to be affected.",
             icon: "🚫",
             recommendations: [
@@ -145,7 +149,7 @@ const Air = () => {
         },
         {
             level: "Emergency",
-            color: "rgba(139, 0, 0, 1)",
+            color: "rgb(125, 0, 35)",
             description: "Health alert: everyone may experience serious health effects.",
             icon: "☠️",
             recommendations: [
@@ -190,9 +194,9 @@ const Air = () => {
                 }
             }
         },
-        { id: 'temperature', name: 'Temperature' },
-        { id: 'humidity', name: 'Humidity' },
-        { id: 'oxygen', name: 'Oxygen' }
+        { id: 'temperature', name: 'TEMPERATURE' },
+        { id: 'humidity', name: 'HUMIDITY' },
+        { id: 'oxygen', name: 'OXYGEN' }
     ];
 
 
@@ -328,7 +332,9 @@ const Air = () => {
     };
 
     const formatHour = (hour) => {
-        return `${hour === 0 ? '12' : hour > 12 ? hour - 12 : hour}${hour >= 12 ? 'PM' : 'AM'}`;
+        if (hour === 0) return '12AM'; // Midnight
+        if (hour === 12) return '12PM'; // Noon
+        return `${hour > 12 ? hour - 12 : hour}${hour >= 12 ? 'PM' : 'AM'}`;
     };
 
     const handleScroll = (direction) => {
@@ -345,7 +351,7 @@ const Air = () => {
 
         setTimeout(() => {
             setVisibleHours(prev => {
-                const nextHours = prev.map(hour => (hour + 3) % 24);
+                const nextHours = prev.map(hour => (hour + 1) % 24);
                 return nextHours;
             });
             setIsTransitioning(false);
@@ -376,154 +382,112 @@ const Air = () => {
         setCurrentSlide((prev) => (prev - 1 + thresholdInfo.length) % thresholdInfo.length);
     };
 
-    const renderInfoSlideshow = () => (
-        <div style={styles.slideshowWrapper}>
-            <div style={styles.slideshowContainer}>
-                <button onClick={prevSlide} style={styles.slideButton}>←</button>
-                <div style={styles.slide}>
-                    <div style={{
-                        ...styles.slideContent,
-                        backgroundColor: thresholdInfo[currentSlide].color
-                    }}>
-                        <div style={styles.slideHeader}>
-                            <span style={styles.slideIcon}>{thresholdInfo[currentSlide].icon}</span>
-                            <h2 style={styles.slideTitle}>{thresholdInfo[currentSlide].level}</h2>
-                        </div>
-                        <div style={styles.slideBody}>
-                            <p style={styles.slideDescription}>{thresholdInfo[currentSlide].description}</p>
-                            <div style={styles.rangeInfo}>
-                            </div>
-                            <div style={styles.recommendations}>
-                                <h5>Recommendations:</h5>
-                                <ul>
-                                    {thresholdInfo[currentSlide].recommendations.map((rec, index) => (
-                                        <li key={index}>{rec}</li>
-                                    ))}
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <button onClick={nextSlide} style={styles.slideButton}>→</button>
-            </div>
-        </div>
-    );
 
-    const calculateTrend = (currentValue, previousValue) => {
-        if (!currentValue || !previousValue) return null;
-        const difference = currentValue - previousValue;
-        const percentageChange = (difference / previousValue) * 100;
-        return {
-            direction: difference > 0 ? 'increase' : difference < 0 ? 'decrease' : 'steady',
-            percentage: Math.abs(percentageChange).toFixed(1)
-        };
-    };
+    // const responsiveStyles = {
+    //     // Mobile styles (default)
+    //     container: {
+    //         padding: '10px',
+    //         width: '100%',
+    //         maxWidth: '100vw',
+    //         overflowX: 'hidden',
+    //     },
+    //     header: {
+    //         flexDirection: 'column',
+    //         gap: '15px',
+    //     },
+    //     controls: {
+    //         flexDirection: 'column',
+    //         width: '100%',
+    //     },
+    //     datePicker: {
+    //         width: '100%',
+    //         maxWidth: '300px',
+    //     },
+    //     locationSelect: {
+    //         width: '100%',
+    //         maxWidth: '300px',
+    //     },
+    //     scrollContainer: {
+    //         width: 'calc(100vw - 100px)', // Account for buttons and padding
+    //         maxWidth: '1000px',
+    //     },
+    //     hourCard: {
+    //         maxHeight: '10px', // Smaller cards on mobile
+    //         padding: '10px',
+    //         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)',
 
-    const responsiveStyles = {
-        // Mobile styles (default)
-        container: {
-            padding: '10px',
-            width: '100%',
-            maxWidth: '100vw',
-            overflowX: 'hidden',
-        },
-        header: {
-            flexDirection: 'column',
-            gap: '15px',
-        },
-        controls: {
-            flexDirection: 'column',
-            width: '100%',
-        },
-        datePicker: {
-            width: '100%',
-            maxWidth: '300px',
-        },
-        locationSelect: {
-            width: '100%',
-            maxWidth: '300px',
-        },
-        scrollContainer: {
-            width: 'calc(100vw - 100px)', // Account for buttons and padding
-            maxWidth: '1000px',
-        },
-        hourCard: {
-            minWidth: '80px', // Smaller cards on mobile
-            padding: '10px',
-            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)',
+    //     },
+    //     levelIndicator: {
+    //         height: '80px', // Smaller height on mobile
+    //         fontSize: '14px',
+    //     },
+    //     slideshowContainer: {
+    //         flexDirection: 'column',
+    //         gap: '10px',
+    //     },
+    //     slide: {
+    //         width: '100%',
+    //         maxWidth: '400px',
+    //         height: 'auto',
+    //         minHeight: '330px',
+    //     },
+    // };
 
-        },
-        levelIndicator: {
-            height: '80px', // Smaller height on mobile
-            fontSize: '14px',
-        },
-        slideshowContainer: {
-            flexDirection: 'column',
-            gap: '10px',
-        },
-        slide: {
-            width: '100%',
-            maxWidth: '400px',
-            height: 'auto',
-            minHeight: '330px',
-        },
-    };
+    // // Tablet styles
+    // const tabletStyles = {
+    //     '@media (min-width: 768px)': {
+    //         container: {
+    //             padding: '15px',
+    //         },
+    //         header: {
+    //             flexDirection: 'row',
+    //         },
+    //         controls: {
+    //             flexDirection: 'row',
+    //             width: 'auto',
+    //         },
+    //         scrollContainer: {
+    //             width: 'calc(100vw - 150px)',
+    //         },
+    //         hourCard: {
+    //             minWidth: '100px',
+    //         },
+    //         levelIndicator: {
+    //             height: '90px',
+    //             fontSize: '15px',
+    //         },
+    //         slideshowContainer: {
+    //             flexDirection: 'row',
+    //         },
+    //         slide: {
+    //             width: '600px',
+    //             height: '350px',
+    //         },
+    //     },
+    // };
 
-    // Tablet styles
-    const tabletStyles = {
-        '@media (min-width: 768px)': {
-            container: {
-                padding: '15px',
-            },
-            header: {
-                flexDirection: 'row',
-            },
-            controls: {
-                flexDirection: 'row',
-                width: 'auto',
-            },
-            scrollContainer: {
-                width: 'calc(100vw - 150px)',
-            },
-            hourCard: {
-                minWidth: '100px',
-            },
-            levelIndicator: {
-                height: '90px',
-                fontSize: '15px',
-            },
-            slideshowContainer: {
-                flexDirection: 'row',
-            },
-            slide: {
-                width: '600px',
-                height: '350px',
-            },
-        },
-    };
-
-    // Desktop styles
-    const desktopStyles = {
-        '@media (min-width: 1024px)': {
-            container: {
-                padding: '20px',
-            },
-            scrollContainer: {
-                width: '1000px',
-            },
-            hourCard: {
-                minWidth: '120px',
-            },
-            levelIndicator: {
-                height: '100px',
-                fontSize: '16px',
-            },
-            slide: {
-                width: '800px',
-                height: '400px',
-            },
-        },
-    };
+    // // Desktop styles
+    // const desktopStyles = {
+    //     '@media (min-width: 1024px)': {
+    //         container: {
+    //             padding: '20px',
+    //         },
+    //         scrollContainer: {
+    //             width: '1000px',
+    //         },
+    //         hourCard: {
+    //             minWidth: '120px',
+    //         },
+    //         levelIndicator: {
+    //             height: '100px',
+    //             fontSize: '16px',
+    //         },
+    //         slide: {
+    //             width: '800px',
+    //             height: '400px',
+    //         },
+    //     },
+    // };
 
     const additionalStyles = {
         // ...existing styles...
@@ -561,323 +525,409 @@ const Air = () => {
     };
 
     const styles = {
-        // ...existing styles,
-        ...responsiveStyles,
-        ...tabletStyles['@media (min-width: 768px)'],
-        ...desktopStyles['@media (min-width: 1024px)'],
-        mainContainer: {
-            position: 'relative',
-            minHeight: '100vh',
-            paddingBottom: '400px', // Increased from 300px to accommodate taller slideshow
+        fullcontainer: {
+            height: "100vh",
+            width: "100vw",
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundSize: "cover",
+            backgroundRepeat: "no-repeat",
+            backgroundPosition: "center",
+            display: "flex",
+            flexDirection: "column",
+            padding: "20px",
+            overflowX: 'hidden', // Prevent horizontal scroll
         },
-        contentContainer: {
-            padding: '20px',
-            backgroundColor: '#f5f5f5',
-            borderRadius: '10px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+
+        // Header Section Styles
+        headerContainer: {
+            display: "flex",
+            justifyContent: "center", // Centers the entire header container
+            marginBottom: "20px",
+            marginTop: "5px",
+            marginLeft: "70px",
+            // marginRight: "70px",
         },
         header: {
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '20px',
+            display: "flex",
+            justifyContent: "space-between", // Separates the text and input containers
+            alignItems: "center", // Ensures both sections are aligned vertically
+            width: "100%", // Ensures the header takes up full width
+            textAlign: "left",
+            color: "#fff",
         },
-        locationSelect: {
-            padding: '8px',
-            borderRadius: '5px',
-            border: '1px solid #ddd',
-            fontSize: '16px',
+        title: {
+            fontSize: "28px",
+            fontWeight: "bold",
+            margin: 0,
+            color: "#fff",
         },
-        hourLabel: {
-            fontSize: '16px',
-            fontWeight: 'bold',
-            color: '#666',
-            marginBottom: '10px',
+        subtitle: {
+            fontSize: "15px",
+            margin: 0,
+            color: "#fff",
         },
-        qualityIndicator: {
-            width: '80px',
-            height: '80px',
-            borderRadius: '10px',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'white',
-            fontWeight: 'bold',
-            fontSize: '12px',
-            marginBottom: '8px',
-            padding: '5px',
-        },
-        statusLabel: {
-            fontSize: '12px',
-            color: '#666',
-            textAlign: 'center',
-        },
-        loading: {
-            textAlign: 'center',
-            padding: '20px',
-            color: '#666',
-        },
-        controls: {
-            display: 'flex',
-            gap: '10px',
-            alignItems: 'center',
+        inputContainer: {
+            display: "flex",
+            gap: "10px",
+            padding: "10px",
+            borderRadius: "8px",
+            backgroundColor: 'rgba(242, 242, 242, 0.1)', // Semi-transparent white
         },
         datePicker: {
-            padding: '8px',
-            borderRadius: '5px',
-            border: '1px solid #ddd',
-            fontSize: '16px',
+            borderRadius: "8px",
+            border: "none",
+            color: '#fff',
+            margin: 0,
+            padding: "5px", // Controls inner spacing (top-bottom and left-right)
+            textAlign: "center", // Aligns the text inside the input
+            width: "130px", // Adjusts the width if needed
+            backgroundColor: "rgba(0, 204, 221, 0.46)", // Semi-transparent white
         },
-        timelineWrapper: {
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center', // Center the timeline
-            gap: '10px',
-            margin: '20px 0',
+        locationSelect: {
+            borderRadius: "8px",
+            border: "none",
+            color: '#fff',
+            margin: 0,
+            padding: "5px", // Controls inner spacing (top-bottom and left-right)
+            textAlign: "center", // Aligns the text inside the input
+            width: "160px", // Adjusts the width if needed
+            backgroundColor: "rgba(0, 204, 221, 0.46)", // Semi-transparent white
         },
-        scrollButton: {
-            padding: '10px 15px',
-            fontSize: '20px',
-            backgroundColor: '#007bff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: 'pointer',
-            transition: 'background-color 0.3s',
-            '&:hover': {
-                backgroundColor: '#0056b3',
-            },
+
+        // Main Content Section Styles
+        content: {
+            flex: 1,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "stretch",
+            gap: "20px",
+            marginLeft: '70px',
         },
-        slideshowWrapper: {
-            position: 'relative', // Change from fixed to relative
-            bottom: 'auto',
-            height: 'auto',
-            backgroundColor: 'transparent',
-            borderTop: 'none',
+
+        // Left Container
+        leftContainer: {
+            flex: 0.4, // Slightly smaller than the right container
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            gap: "10px",
         },
-        slideshowContainer: {
-            // Update existing slideshowContainer styles
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '20px',
-            padding: '10px',
-            maxWidth: '1200px',
-            margin: '0 auto',
-            height: '100%',
+
+        // UPPER LEFT BOX BAR CHART MERGED METRICS
+        upperLeftBox: {
+            flex: 0.62, // Reduce flex value to make the upper box smaller
+            backgroundColor: 'rgba(242, 242, 242, 0.1)',
+            borderRadius: "20px",
+            width: "100%",
+            height: "150px",  // Keep the height as needed
+            padding: "15px",
+            display: "flex",
+            flexDirection: "column"
         },
-        slide: {
-            width: '600px',
-            height: '270px', // Increased from 160px
-            borderRadius: '10px',
-            overflow: 'hidden',
+        chartContainer: {
+            flex: 1,
+            width: '100%',
+            height: '50%', // Set height as a percentage of the parent container's height
         },
-        slideContent: {
-            height: '100%',
-            padding: '10px', // Reduced padding
-            color: 'white',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'flex-start', // Changed from space-between
+
+        //LOWER LEFT THRESHOLD INFO SLIDER BOX
+        lowerLeftBox: {
+            flex: 0.38, // Increase flex value to make the lower box taller
+            width: "100%",
+            minHeight: "250px",  // Set a minimum height to ensure it has enough space even if text grows
+            borderRadius: "15px",
+            padding: "15px",
+            transition: "background-color 0.3s ease",
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+            backgroundColor: 'rgba(242, 242, 242, 0.1)',
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+        },
+        thresholdWrapper: {
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: "0 30px 0 10px", // Padding for the surfboard effect
+            borderRadius: "30px", // Elongated oval shape
+            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)", // Subtle shadow
+            maxWidth: "fit-content", // Prevent it from taking up unnecessary space
+        },
+        wrapperContent: {
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            textAlign: "center",
+            color: "#fff", // Text color
         },
         slideHeader: {
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-            marginBottom: '5px', // Reduced margin
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "8px",
+        },
+        slideHeaderLeft: {
+            display: "flex",
+            alignItems: "center",
+        },
+        slideHeaderRight: {
+            display: "flex",
+            alignItems: "center",
+            gap: "8px", // Space between elements
+        },
+        thresholdCircle: {
+            marginRight: "8px",
+            width: "40px", // Adjust the size of the circle
+            height: "40px",
+            borderRadius: "50%",
+            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)", // Optional shadow for better visual appeal
         },
         slideIcon: {
-            fontSize: '24px', // Reduced size
+            fontSize: "30px", // Reduce icon size
+            marginLeft: "8px",
         },
         slideTitle: {
-            fontSize: '20px', // Reduced size
-            margin: 0,
-            textShadow: '1px 1px 2px rgba(0,0,0,0.2)',
+            fontSize: "20px", // Adjust font size for title
+            fontWeight: "bold",
+            color: "#fff",
+            marginTop: "10px",
+        },
+        slideshowBody: {
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "flex-start",
+            alignItems: "flex-start",
+            height: "100%",
+        },
+        slide: {
+            flex: 1,
+            display: "flex",
+        },
+        slideContent: {
+            width: "100%",
+            marginLeft: "10px",
+            // padding: "15px", // Reduce padding
+            color: "#fff",
+            textAlign: "left",
         },
         slideBody: {
-            backgroundColor: 'rgba(255,255,255,0.15)',
-            padding: '10px', // Reduced padding
-            borderRadius: '8px',
-            maxHeight: '220px', // Increased from 100px
-            overflowY: 'auto', // Changed from 'hidden' to 'auto'
-            '&::-webkit-scrollbar': {
-                width: '8px',
-            },
-            '&::-webkit-scrollbar-track': {
-                background: 'rgba(255,255,255,0.1)',
-                borderRadius: '4px',
-            },
-            '&::-webkit-scrollbar-thumb': {
-                background: 'rgba(255,255,255,0.3)',
-                borderRadius: '4px',
-                '&:hover': {
-                    background: 'rgba(255,255,255,0.5)',
-                },
-            },
+            // marginTop: "8px", // Reduce margin
+            textAlign: "left",
         },
         slideDescription: {
-            fontSize: '16px', // Reduced size
-            marginBottom: '5px',
+            marginBottom: "10px", // Reduce margin
+            fontSize: "16px", // Adjust font size for text
+            lineHeight: "1.4", // Slightly tighter line spacing
         },
         rangeInfo: {
-            display: 'flex',
-            justifyContent: 'space-around',
-            marginBottom: '5px', // Reduced margin
-            fontSize: '12px', // Reduced size
-            fontWeight: 'bold',
+            marginBottom: "8px", // Reduce margin
         },
         recommendations: {
-            '& h5': {
-                marginBottom: '3px',
-                fontSize: '12px',
-            },
-            '& ul': {
-                margin: '0',
-                paddingLeft: '15px',
-                fontSize: '11px',
-                listStyle: 'none',
-            },
-            '& li': {
-                marginBottom: '2px',
-                '&:before': {
-                    content: '"•"',
-                    marginRight: '5px',
-                },
-            },
+            marginTop: "8px", // Reduce margin
+            textAlign: "left",
         },
         slideButton: {
-            padding: '10px 20px',
+            backgroundColor: "rgba(0, 204, 221, 0.46)",
+            color: "#fff",
+            border: "none",
+            borderRadius: "5px",
+            padding: "6px 10px", // Adjust button size
+            cursor: "pointer",
+            fontSize: "12px", // Adjust font size for buttons
+        },
+
+
+
+
+        // Right Container
+        rightContainer: {
+            flex: 0.6, // Slightly larger than the left container
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "20px",  // Increased gap between boxes
+            backgroundColor: 'rgba(242, 242, 242, 0.1)',
+            borderRadius: "20px",
+            padding: "20px 20px 5px 20px",  // Adjusted padding for better alignment
+        },
+
+        // UPPER RIGHT BOX
+        upperRightBox: {
+            backgroundColor: 'rgba(242, 242, 242, 0)',
+            borderRadius: "10px",
+            height: "25%",
+            width: "95%",
+        },
+        // Add new styles for hour selector
+        upperRightHeader: {
             fontSize: '24px',
-            backgroundColor: '#007bff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: 'pointer',
-            transition: 'background-color 0.3s',
-            '&:hover': {
-                backgroundColor: '#0056b3',
-            },
+            fontWeight: 'bold',
+            color: '#fff',
+            textAlign: 'center',
+            marginBottom: '15px',
         },
-        metricsWrapper: {
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '20px',
-            marginBottom: '30px',
+        hourSelector: {
+            display: "flex",
+            justifyContent: "space-between",
+            // alignItems: "center",
+            height: "100%",
+            gap: "10px",
         },
-        metricContainer: {
-            minHeight: '350px', // Added minimum height
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '15px',
-            // Remove backgroundColor, borderRadius, and boxShadow as they're handled by the Box component
+        hoursContainer: {
+            display: "flex",
+            justifyContent: "space-between",
+            flex: 1,
+            gap: "10px",
+            transition: "all 0.3s ease",
+        },
+        selectedHourCard: {
+            backgroundColor: "rgba(0, 204, 221, 0.46)",
+            transform: "scale(1.05)",
+        },
+        upperHourCard: {
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            borderRadius: "8px",
+            width: "100%",
+            height: "130px", // Slightly bigger than the current 170px
+            cursor: "pointer",
+            transition: "0.3s ease",
+            backgroundColor: "rgba(255, 255, 255, 0.1)",
+        },
+        hourText: {
+            fontSize: "20px",
+            fontWeight: "bold",
+            color: "#fff",
+            marginBottom: "5px",
+        },
+        hourButton: {
+            backgroundColor: "rgba(255, 255, 255, 0)",
+            color: "#fff",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer",
+            height: "100%",
+            display: "flex",
+            // alignItems: "center",
+            // justifyContent: "center",
+            marginTop: "25px",
+        },
+        
+        // MIDDLE RIGHT BOX
+        middleRightBox: {
+            backgroundColor: "rgba(255, 255, 255, 0)",
+            borderRadius: "10px",
+            width: "95%",
+            height: "31%",
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            flexWrap: "wrap",
+            justifyContent: "space-between",
+            marginBottom: "8px",
+        },
+        metricBoxWrapper: {
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            width: "19%",
+            marginBottom: "10px",
+        },
+        metricBox: {
+            backgroundColor: 'rgba(242, 242, 242, 0.1)',
+            paddingTop: "15px",
+            borderRadius: "8px",
+            boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+            width: "100%",
+            textAlign: "center",
+            fontSize: "12px",
+            overflow: "hidden",
+            position: "relative",
+            height: "180px", // Set a fixed height for the metric box to allow room for both progress bar and trend indicator
         },
         metricTitle: {
-            fontSize: '28px',
-            fontWeight: 'bold',
-            marginBottom: '20px',
-            textAlign: 'center',
-            color: '#333',
+            fontSize: "14px",
+            fontWeight: "bold",
+            color: "#fff",
+            marginBottom: "8px",
         },
-        thresholdLegend: {
-            display: 'flex',
-            justifyContent: 'center',
-            flexWrap: 'wrap',
-            gap: '10px',
-            marginTop: '20px',
-            padding: '10px',
-            backgroundColor: '#f8f9fa',
-            borderRadius: '8px',
+        progressWrapper: {
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
         },
-        legendItem: {
-            display: 'flex',
-            alignItems: 'center',
-            gap: '5px',
-            padding: '5px 10px',
-            borderRadius: '5px',
-            backgroundColor: 'white',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-        },
-        legendColor: {
-            width: '15px',
-            height: '15px',
-            borderRadius: '3px',
-        },
-        timelineContainer: {
-            display: 'flex',
-            gap: '15px',
-            padding: '10px 0',
-            justifyContent: 'flex-start',
-            minWidth: 'fit-content',
-        },
-        scrollContainer: {
-            width: '1000px', // Increased width
-            overflow: 'hidden',
-            position: 'relative',
-        },
-        levelIndicator: {
-            width: '100%',
-            height: '100px', // Increased height
-            borderRadius: '8px',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'white',
-            fontWeight: 'bold',
-            fontSize: '16px',
-            padding: '10px',
-            textAlign: 'center',
-        },
-        trendIndicator: {
-            fontSize: '24px',
-            fontWeight: 'bold',
-            backgroundColor: '#F5F5DC',
-            borderRadius: '4px',
+        circularProgressContainer: {
+            width: "100px",
+            height: "100px",
+            fontWeight: "bold",
         },
         noDataLabel: {
-            height: '100px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#666',
-            fontSize: '16px',
-            fontStyle: 'italic',
+            fontSize: "15px",
+            fontWeight: "bold",
+            color: "#ffce56",
+            height: "80px",
+            width: "63px",
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            textAlign: "center",
         },
-        '.has-tooltip': {
-            cursor: 'help',
+        trendIndicator: {
+            fontSize: "12px",
+            fontWeight: "bold",
+            color: "#fff",
+            position: "absolute",
+            bottom: "10px",
+            width: "100%",
+            textAlign: "center",
         },
-        metricsToggleContainer: {
-            display: 'flex',
-            justifyContent: 'center',
-            marginBottom: '20px',
+        statusWrapper: {
+            backgroundColor: '#75c7b6',
+            width: "100%",
+            borderRadius: "8px",
+            padding: "5px",
+            marginTop: "8px",
+            textAlign: "center",
         },
-        toggleButton: {
-            padding: '10px 20px',
-            fontSize: '16px',
-            backgroundColor: '#007bff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: 'pointer',
-            transition: 'background-color 0.3s',
-            '&:hover': {
-                backgroundColor: '#0056b3',
-            },
+        statusLabel: {
+            fontSize: "15px",
+            fontWeight: "bold",
+            color: "#fff",
         },
-        statusIcon: {
-            fontSize: '24px',
 
+        // LOWER RIGHT BOX
+        lowerRightBox: {
+            backgroundColor: 'rgba(242, 242, 242, 0.1)',
+            borderRadius: "10px",
+            height: "35%", // Adjust height for smaller boxes
+            width: "95%",
         },
-        ...additionalStyles,
-        tooltipContainer: {
-            zIndex: 9999,
-            pointerEvents: 'none',
-            transform: 'translate(-50%, -100%)',
+        // NARRATIVE REPORT
+        narrativeReportContainer: {
+            borderRadius: "8px",
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+            padding: "20px",
+            overflowY: "auto", // Adds scrolling if content overflows
+            height: "100%", // Ensures it fits the allocated height
+        },
+        narrativeTitle: {
+            color: "#fff",
+            marginTop: 0,
+            marginBottom: "15px",
+            fontSize: "16px", // Optional: Adjust title font size
+            fontWeight: "bold",
+        },
+        narrativeContent: {
+            whiteSpace: "pre-line",
+            margin: 0,
+            fontSize: "14px", // Optional: Adjust content font size
+            color: "#fff", // Optional: Adjust text color
         },
         tooltipContent: {
-            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-            color: 'white',
+            backgroundColor: 'rgba(255, 255, 255, 1)',
+            color: 'black',
             padding: '10px 15px',
             borderRadius: '8px',
             fontSize: '14px',
@@ -894,42 +944,27 @@ const Air = () => {
                 fontSize: '14px',
             }
         },
-        progressWrapper: {
-            width: '100px', // Fixed width
-            height: '180px', // Increased from 150px
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '12px', // Increased from 10px
-            marginTop: '10px'
-        },
-        statusLabel: {
-            fontSize: '16px',
-            fontWeight: 'bold',
-            textAlign: 'center',
-            marginTop: '5px',
-        },
-        hourCard: {
-            // Update existing hourCard style
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            minWidth: '150px', // Increased to accommodate the circular progress bar
-            padding: '15px',
-            backgroundColor: 'white',
-            borderRadius: '8px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
-            margin: '0 5px',
-            transition: 'transform 0.2s ease',
-            '&:hover': {
-                transform: 'translateY(-5px)',
-            },
-        },
-        circularProgressContainer: {
-            width: '100px', // Fixed width
-            height: '100px', // Fixed height
-            position: 'relative'
-        }
+
+        
+    };
+
+    const handleHourRangeShift = (direction) => {
+        setVisibleHourRange(prev => {
+            const shift = direction === 'next' ? 6 : -6;
+            return prev.map(hour => {
+                let newHour = hour + shift;
+                // Handle wraparound for 24-hour format
+                if (newHour <= 0) newHour = 24 + newHour; // Convert negative hours
+                if (newHour > 24) newHour = newHour - 24; // Convert hours > 24
+                if (newHour === 24) newHour = 0; // Convert 24 to 0 for midnight
+                return newHour;
+            }).sort((a, b) => {
+                // Special sorting that treats 0 (midnight) as 24 for ordering
+                const aSort = a === 0 ? 24 : a;
+                const bSort = b === 0 ? 24 : b;
+                return aSort - bSort;
+            });
+        });
     };
 
     const renderTooltip = () => {
@@ -952,128 +987,16 @@ const Air = () => {
                     <p>Trend: {trend}</p>
                 </div>
             </div>
+
         );
     };
 
-    const renderMetricContainer = (metric) => {
-        // Get the maximum value for this metric's scale
-        const getMaxValue = (metricId) => {
-            const thresholdValues = thresholds[metricId];
-            // Use the second-to-last threshold's max value as the gauge maximum
-            return thresholdValues[thresholdValues.length - 2]?.max || 100;
-        };
-
-        return (
-            <div style={styles.metricContainer}>
-                <Tooltip title={metric.tooltip || ''} placement="top" arrow>
-                    <h3 style={styles.metricTitle}>
-                        {metric.name}
-                    </h3>
-                </Tooltip>
-                <div style={styles.timelineWrapper}>
-                    <button
-                        onClick={() => handleManualScroll('right')}
-                        style={styles.scrollButton}
-                    >
-                        ←
-                    </button>
-                    <div style={styles.scrollContainer} id={`${metric.id}-container`}>
-                        <div style={styles.timelineContainer}>
-                            {visibleHours.map((hour) => {
-                                const hourData = hourlyData[hour];
-                                const value = hourData?.[metric.id];
-                                const previousHourData = hourlyData[(hour - 1 + 24) % 24];
-                                const previousValue = previousHourData?.[metric.id];
-                                const status = getAirQualityStatus(value, metric.id);
-                                const maxValue = getMaxValue(metric.id);
-
-                                // Simplified trend calculation
-                                let trend = 'Stable';
-                                if (value && previousValue) {
-                                    trend = value > previousValue ? 'Worsening' : value < previousValue ? 'Improving' : 'Stable';
-                                }
-
-                                const trendColors = {
-                                    Improving: '#4CAF50',
-                                    Worsening: '#F44336',
-                                    Stable: '#9E9E9E'
-                                };
-
-                                return (
-                                    <div
-                                        key={hour}
-                                        style={{
-                                            ...styles.hourCard,
-                                            cursor: 'pointer',
-                                            border: hour === selectedHourForNarrative ? '2px solid #007bff' : 'none'
-                                        }}
-                                        onClick={() => setSelectedHourForNarrative(hour)}
-                                        onMouseEnter={(e) => {
-                                            const rect = e.currentTarget.getBoundingClientRect();
-                                            setHoveredData({
-                                                hour,
-                                                value,
-                                                metric,
-                                                trend,
-                                                position: {
-                                                    x: rect.left + rect.width / 2,
-                                                    y: rect.top
-                                                }
-                                            });
-                                        }}
-                                        onMouseLeave={() => setHoveredData(null)}
-                                    >
-                                        <div style={styles.hourLabel}>{formatHour(hour)}</div>
-                                        {value !== null && value !== undefined ? (
-                                            <div style={styles.progressWrapper}>
-                                                <div style={styles.circularProgressContainer}>
-                                                    <CircularProgressbar
-                                                        value={(value / maxValue) * 100}
-                                                        text={`${value.toFixed(1)}`}
-                                                        styles={buildStyles({
-                                                            rotation: 0,
-                                                            strokeLinecap: 'round',
-                                                            textSize: '16px',
-                                                            pathTransitionDuration: 0.5,
-                                                            pathColor: status?.color || '#75c7b6',
-                                                            textColor: status?.color || '#75c7b6',
-                                                            trailColor: '#d6d6d6',
-                                                        })}
-                                                    />
-                                                </div>
-                                                <div style={{
-                                                    ...styles.statusLabel,
-                                                    color: status?.color || '#75c7b6'
-                                                }}>
-                                                    {status?.label}
-                                                </div>
-                                                <div style={{
-                                                    ...styles.trendIndicator,
-                                                    color: trendColors[trend],
-                                                    padding: '4px 8px'
-                                                }}>
-                                                    {trend}
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div style={styles.noDataLabel}>No Data</div>
-                                        )}
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-                    <button
-                        onClick={() => handleManualScroll('left')}
-                        style={styles.scrollButton}
-                    >
-                        →
-                    </button>
-                </div>
-            </div>
-        );
+    const getMaxValue = (metricId) => {
+        const thresholdValues = thresholds[metricId];
+        return thresholdValues[thresholdValues.length - 2]?.max || 100;
     };
 
+    
     const generateNarrative = (hour) => {
         const hourData = hourlyData[hour];
         if (!hourData) return "No data available for this hour.";
@@ -1108,124 +1031,342 @@ const Air = () => {
         return narrative;
     };
 
+    const calculateMaxValues = () => {
+        const hourData = hourlyData[selectedHourForNarrative];
+        return metrics.reduce((acc, metric) => {
+            if (['pm25', 'pm10', 'temperature', 'humidity', 'oxygen'].includes(metric.id)) {
+                const value = hourData?.[metric.id] || 0;
+                return Math.max(acc, value);
+            }
+            return acc;
+        }, 0);
+    };
+    
+
+    // Add this helper function for bar chart data
+    const getBarChartData = () => {
+        const hourData = hourlyData[selectedHourForNarrative];
+        return {
+            labels: metrics
+                .filter(metric => ['pm25', 'pm10', 'temperature', 'humidity', 'oxygen'].includes(metric.id))
+                .map(metric => metric.name),
+            datasets: [{
+                label: 'Air Quality Metrics',
+                data: metrics
+                    .filter(metric => ['pm25', 'pm10', 'temperature', 'humidity', 'oxygen'].includes(metric.id))
+                    .map(metric => hourData?.[metric.id] || 0),
+                backgroundColor: metrics
+                    .filter(metric => ['pm25', 'pm10', 'temperature', 'humidity', 'oxygen'].includes(metric.id))
+                    .map(metric => {
+                        const value = hourData?.[metric.id];
+                        const status = getAirQualityStatus(value, metric.id);
+                        return status?.color || 'rgba(75, 192, 192, 0.6)';
+                    }),
+                borderWidth: 1,
+                borderRadius: 10, // Rounded corners
+            }]
+        };
+    };
+    
+    const maxValues = calculateMaxValues(); // Calculate the maximum value for the chart
+    
+    const barChartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                suggestedMax: maxValues, // Use the dynamically calculated maximum value
+                ticks: {
+                    color: '#fff',
+                    callback: (value) => value.toFixed(1), // Display raw values
+                },
+                grid: {
+                    display: false, // Hide y-axis grid lines
+                },
+            },
+            x: {
+                ticks: {
+                    color: '#fff',
+                    minRotation: 0,
+                    maxRotation: 0,
+                    font: {
+                        size: 12, // Adjust font size to prevent overlap
+                    },
+                    padding: 10, // Adjust padding between the x-axis labels
+                },
+                grid: {
+                    display: false, // Hide x-axis grid lines
+                },
+            },
+        },
+        elements: {
+            bar: {
+                borderRadius: 10, // Rounded corners for bars
+            },
+        },
+        datasets: {
+            bar: {
+                barPercentage: 0.9, // Adjust the width of the bars
+                categoryPercentage: 1, // Adjust the space between bars
+            },
+        },
+        plugins: {
+            legend: {
+                labels: {
+                    color: '#fff',
+                },
+            },
+            tooltip: {
+                callbacks: {
+                    label: (context) => context.raw.toFixed(2), // Show raw values in the tooltip
+                },
+            },
+        },
+    };    
+    
+    
+
+    // Add this helper function near your other utility functions
+    const getAverageAirQualityStatus = (hourData) => {
+        if (!hourData || (!hourData.pm25 && !hourData.pm10)) return null;
+
+        const pm25Status = getAirQualityStatus(hourData.pm25, 'pm25');
+        const pm10Status = getAirQualityStatus(hourData.pm10, 'pm10');
+
+        // Get the more severe status
+        if (!pm25Status) return pm10Status;
+        if (!pm10Status) return pm25Status;
+
+        // Compare threshold indices to determine which is more severe
+        const pm25Index = thresholds.pm25.findIndex(t => t.label === pm25Status.label);
+        const pm10Index = thresholds.pm10.findIndex(t => t.label === pm10Status.label);
+
+        return pm25Index >= pm10Index ? pm25Status : pm10Status;
+    };
+
     return (
-        <Box m="20px">
-            {/* HEADER */}
-            <Box display="flex" justifyContent="space-between" alignItems="center" mb="20px">
-                <Box>
-                    <h2 style={{ margin: 0 }}>Air Quality Dashboard</h2>
-                    <p style={{ margin: "5px 0 0 0", color: "#666" }}>Monitor real-time air quality metrics</p>
-                </Box>
-
-                <Box display="flex" gap="10px">
-                    <input
-                        type="date"
-                        value={selectedDate}
-                        onChange={(e) => setSelectedDate(e.target.value)}
-                        style={{ ...styles.datePicker, margin: 0 }}
-                    />
-                    <select
-                        value={selectedLocation}
-                        onChange={(e) => setSelectedLocation(Number(e.target.value))}
-                        style={{ ...styles.locationSelect, margin: 0 }}
-                    >
-                        {locations.map(location => (
-                            <option key={location.id} value={location.id}>
-                                {location.name}
-                            </option>
-                        ))}
-                    </select>
-                </Box>
-            </Box>
-
-            {/* Toggle Button for Additional Metrics */}
-            <Box display="flex" justifyContent="center" mb="20px">
-                <Button
-                    variant="contained"
-                    onClick={() => setShowAdditionalMetrics(!showAdditionalMetrics)}
-                    sx={{
-                        backgroundColor: '#007bff',
-                        '&:hover': { backgroundColor: '#0056b3' }
-                    }}
-                >
-                    {showAdditionalMetrics ? 'Hide Additional Metrics' : 'Show Additional Metrics'}
-                </Button>
-            </Box>
-
-            {/* GRID LAYOUT */}
-            <Box
-                display="grid"
-                gridTemplateColumns="repeat(12, 1fr)"
-                gap="20px"
-            >
-                {/* Main Metrics - PM2.5 and PM10 */}
-                {metrics
-                    .filter(metric => ['pm25', 'pm10'].includes(metric.id))
-                    .map(metric => (
-                        <Box
-                            key={metric.id}
-                            gridColumn="span 6"
-                            bgcolor="white"
-                            borderRadius="8px"
-                            boxShadow="0 4px 6px rgba(0,0,0,0.1)"
-                            p="20px"
+        <div style={styles.fullcontainer}>
+            {/* Header Section */}
+            <div style={styles.headerContainer}>
+                <header style={styles.header}>
+                    <div>
+                        <h1 style={styles.title}>Air Quality Dashboard</h1>
+                        <p style={styles.subtitle}>Monitor real-time air quality metrics</p>
+                    </div>
+                    <div style={styles.inputContainer}>
+                        <input
+                            type="date"
+                            value={selectedDate}
+                            onChange={(e) => setSelectedDate(e.target.value)}
+                            style={styles.datePicker}
+                        />
+                        <select
+                            value={selectedLocation}
+                            onChange={(e) => setSelectedLocation(Number(e.target.value))}
+                            style={styles.locationSelect}
                         >
-                            {renderMetricContainer(metric)}
-                        </Box>
-                    ))}
-
-                {/* Additional Metrics - Stacked in a single column */}
-                {showAdditionalMetrics && (
-                    <Box
-                        gridColumn="span 12"
-                        display="flex"
-                        flexDirection="column"
-                        gap="20px"
-                    >
-                        {metrics
-                            .filter(metric => !['pm25', 'pm10'].includes(metric.id))
-                            .map(metric => (
-                                <Box
-                                    key={metric.id}
-                                    bgcolor="white"
-                                    borderRadius="8px"
-                                    boxShadow="0 4px 6px rgba(0,0,0,0.1)"
-                                    p="20px"
-                                >
-                                    {renderMetricContainer(metric)}
-                                </Box>
+                            {locations.map((location) => (
+                                <option key={location.id} value={location.id}>
+                                    {location.name}
+                                </option>
                             ))}
-                    </Box>
-                )}
+                        </select>
+                    </div>
+                </header>
+            </div>
 
-                {/* Info Slideshow and Narrative - Split Layout */}
-                <Box
-                    gridColumn="span 8"
-                    bgcolor="black"
-                    borderRadius="8px"
-                    boxShadow="0 4px 6px rgba(0,0,0,0.1)"
-                    p="20px"
-                >
-                    {renderInfoSlideshow()}
-                </Box>
+            {/* Main Content Section */}
+            <div style={styles.content}>
+                {/* Left Container Section */}
+                <div style={styles.leftContainer}>
+                    <div style={styles.upperLeftBox}>
+                        <div style={styles.chartContainer}>
+                            <Bar data={getBarChartData()} options={barChartOptions} />
+                        </div>
+                    </div>
+                    <div style={styles.lowerLeftBox}>
+                        <div style={styles.slideHeader}>
+                            {/* Surfboard-like Wrapper */}
+                            <div
+                                style={{
+                                    ...styles.thresholdWrapper,
+                                    backgroundColor: thresholdInfo[currentSlide].color,
+                                }}
+                            >
+                                <div style={styles.wrapperContent}>
+                                    <span style={styles.slideIcon}>{thresholdInfo[currentSlide].icon}</span>
+                                    <h2 style={styles.slideTitle}>{thresholdInfo[currentSlide].level}</h2>
+                                </div>
+                            </div>
+                            {/* Navigation buttons */}
+                            <div style={styles.slideHeaderRight}>
+                                <button onClick={prevSlide} style={styles.slideButton}>←</button>
+                                <button onClick={nextSlide} style={styles.slideButton}>→</button>
+                            </div>
+                        </div>
+                        <div style={styles.slideshowBody}>
+                            <div style={styles.slide}>
+                                <div style={styles.slideContent}>
+                                    <div style={styles.slideBody}>
+                                        <p style={styles.slideDescription}>
+                                            {thresholdInfo[currentSlide].description}
+                                        </p>
+                                        <div style={styles.rangeInfo}></div>
+                                        <div style={styles.recommendations}>
+                                            <h5>Recommendations:</h5>
+                                            <ul>
+                                                {thresholdInfo[currentSlide].recommendations.map((rec, index) => (
+                                                    <li key={index}>{rec}</li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                {/* Narrative Report */}
-                <Box
-                    gridColumn="span 4"
-                    bgcolor="white"
-                    borderRadius="8px"
-                    boxShadow="0 4px 6px rgba(0,0,0,0.1)"
-                    p="20px"
-                >
-                    <h3 style={{ marginTop: 0, marginBottom: '15px' }}>Air Quality Report</h3>
-                    <p style={{ whiteSpace: 'pre-line' }}>{generateNarrative(selectedHourForNarrative)}</p>
-                </Box>
-            </Box>
+                {/* Right Container Section */}
+                <div style={styles.rightContainer}>
+                    <div style={styles.upperRightBox}>
+                        {/* Header */}
+                        <h2 style={styles.upperRightHeader}>24-Hour View for Air Quality</h2>
 
+                        <div style={styles.hourSelector}>
+                            <button
+                                style={styles.hourButton}
+                                onClick={() => handleHourRangeShift('prev')}
+                            >
+                                <ArrowLeftIcon style={{ fontSize: 60 }} />
+                            </button>
+
+                            <div style={styles.hoursContainer}>
+                                {visibleHourRange.map((hour) => {
+                                    const hourData = hourlyData[hour];
+                                    const airQualityStatus = getAverageAirQualityStatus(hourData);
+
+                                    return (
+                                        <div
+                                            key={hour}
+                                            style={{
+                                                ...styles.upperHourCard,
+                                                ...(hour === selectedHourForNarrative ? styles.selectedHourCard : {}),
+                                                border: hour === selectedHourForNarrative ? '3px solid #00fffb' : 'none',
+                                            }}
+                                            onClick={() => setSelectedHourForNarrative(hour)}
+                                        >
+                                            <div style={styles.hourText}>{formatHour(hour)}</div>
+                                            {airQualityStatus && (
+                                                <div
+                                                    style={{
+                                                        textAlign: 'center',
+                                                        fontSize: '15px',
+                                                        color: '#fff',
+                                                        marginTop: '5px',
+                                                        fontWeight: 'bold',
+                                                        backgroundColor: airQualityStatus
+                                                            ? airQualityStatus.color.replace('1)', '1)') // Apply the color only around the label
+                                                            : 'transparent', // Ensure background is transparent when no status
+                                                        padding: '5px 10px', // Add padding around the label for better visibility
+                                                        borderRadius: '20px', // Rounded corners for a bubble effect
+                                                        minWidth: '50px', // Ensure the label has a minimum width
+                                                        textTransform: 'capitalize', // Optional: Capitalize the status text
+                                                    }}
+                                                >
+                                                    {airQualityStatus.label}
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
+                            <button
+                                style={styles.hourButton}
+                                onClick={() => handleHourRangeShift('next')}
+                            >
+                                <ArrowRightIcon style={{ fontSize: 60 }} />
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style={styles.middleRightBox}>
+                        {metrics
+                            .filter((metric) =>
+                                ['pm25', 'pm10', 'temperature', 'humidity', 'oxygen'].includes(metric.id)
+                            )
+                            .map((metric) => {
+                                const hourData = hourlyData[selectedHourForNarrative];
+                                const value = hourData?.[metric.id];
+                                const status = getAirQualityStatus(value, metric.id);
+                                const maxValue = getMaxValue(metric.id);
+
+                                return (
+                                    <div key={metric.id} style={styles.metricBoxWrapper}>
+                                        <div style={styles.metricBox}>
+                                            <Tooltip title={metric.tooltip || ''} placement="top" arrow>
+                                                <h3 style={styles.metricTitle}>{metric.name}</h3>
+                                            </Tooltip>
+                                            <div style={styles.progressWrapper}>
+                                                <div style={styles.circularProgressContainer}>
+                                                    {value !== null && value !== undefined ? (
+                                                        <CircularProgressbar
+                                                            value={(value / maxValue) * 100}
+                                                            text={`${value.toFixed(1)}`}
+                                                            strokeWidth={20}
+                                                            styles={buildStyles({
+                                                                rotation: 0,
+                                                                strokeLinecap: 'round',
+                                                                textSize: '14px',
+                                                                pathTransitionDuration: 0.5,
+                                                                pathColor: status?.color || '#75c7b6',
+                                                                textColor: status?.color || '#75c7b6',
+                                                                trailColor: '#fff',
+                                                            })}
+                                                        />
+                                                    ) : (
+                                                        <div style={styles.noDataLabel}>No Data</div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <div style={styles.trendIndicator}>
+                                                {value && hourlyData[(selectedHourForNarrative - 1 + 24) % 24]?.[metric.id] ? 
+                                                    value > hourlyData[(selectedHourForNarrative - 1 + 24) % 24][metric.id] ?
+                                                    'Worsening' : value < hourlyData[(selectedHourForNarrative - 1 + 24) % 24][metric.id] ?
+                                                    'Improving' : 'Stable'
+                                                    : ''}
+                                            </div>
+                                        </div>
+
+                                        {status && (
+                                            <div style={{ ...styles.statusWrapper, backgroundColor: status.color }}>
+                                                <div style={styles.statusLabel}>{status.label}</div>
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                    </div>
+
+                    
+                    <div style={styles.lowerRightBox}>
+                        {/* Narrative Report */}
+                        <div style={styles.narrativeReportContainer}>
+                            <h3 style={styles.narrativeTitle}>Air Quality Report</h3>
+                            <p style={styles.narrativeContent}>
+                                {generateNarrative(selectedHourForNarrative)}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
             {hoveredData && renderTooltip()}
             <ToastContainer />
-        </Box>
+        </div>
     );
 };
 
-export default Air;
+
+export default AirView;
