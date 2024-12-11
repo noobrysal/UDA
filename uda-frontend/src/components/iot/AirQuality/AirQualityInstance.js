@@ -37,82 +37,37 @@ const locations = [
 // Updated thresholds for air quality metrics
 const thresholds1 = {
     pm25: [
-        { min: 0, max: 25, label: "Good", color: "rgba(75, 192, 192, 1)" },
-        { min: 25, max: 35, label: "Fair", color: "rgba(154, 205, 50, 1)" },
-        { min: 35, max: 45, label: "Unhealthy", color: "rgba(255, 206, 86, 1)" },
-        {
-            min: 45,
-            max: 55,
-            label: "Very Unhealthy",
-            color: "rgba(255, 140, 0, 1)",
-        },
-        {
-            min: 55,
-            max: 90,
-            label: "Severely Unhealthy",
-            color: "rgba(255, 99, 132, 1)",
-        },
-        {
-            min: 90,
-            max: Infinity,
-            label: "Emergency",
-            color: "rgba(139, 0, 0, 1)",
-        },
+        { min: 0, max: 25.99, label: "Good", color: "rgba(22, 186, 1)" },
+        { min: 26, max: 35.99, label: "Fair", color: "rgba(255, 206, 86)" },
+        { min: 36, max: 45.99, label: "Unhealthy", color: "rgba(255, 140, 0)" },
+        { min: 46, max: 55.99, label: "Very Unhealthy", color: "rgba(254, 0, 0)" },
+        { min: 56, max: 90.99, label: "Severely Unhealthy", color: "rgba(129, 0, 127)" },
+        { min: 91, max: Infinity, label: "Emergency", color: "rgba(140, 1, 4)" },
     ],
     pm10: [
-        { min: 0, max: 50, label: "Good", color: "rgba(75, 192, 192, 1)" },
-        { min: 50, max: 100, label: "Fair", color: "rgba(154, 205, 50, 1)" },
-        {
-            min: 100,
-            max: 150,
-            label: "Unhealthy",
-            color: "rgba(255, 206, 86, 1)",
-        },
-        {
-            min: 150,
-            max: 200,
-            label: "Very Unhealthy",
-            color: "rgba(255, 140, 0, 1)",
-        },
-        {
-            min: 200,
-            max: 300,
-            label: "Severely Unhealthy",
-            color: "rgba(255, 99, 132, 1)",
-        },
-        {
-            min: 300,
-            max: Infinity,
-            label: "Emergency",
-            color: "rgba(139, 0, 0, 1)",
-        },
+        { min: 0, max: 50.99, label: "Good", color: "rgba(22, 186, 1)" },
+        { min: 51, max: 100.99, label: "Fair", color: "rgba(255, 206, 86)" },
+        { min: 101, max: 150.99, label: "Unhealthy", color: "rgba(255, 140, 0)" },
+        { min: 151, max: 200.99, label: "Very Unhealthy", color: "rgba(254, 0, 0)" },
+        { min: 201, max: 300.99, label: "Severely Unhealthy", color: "rgba(129, 0, 127)" },
+        { min: 301, max: Infinity, label: "Emergency", color: "rgba(140, 1, 4)" },
     ],
     humidity: [
-        { min: 0, max: 24, label: "Poor", color: "rgba(139, 0, 0, 1)" },
-        { min: 24, max: 30, label: "Fair", color: "rgba(255, 206, 86, 1)" },
-        { min: 30, max: 60, label: "Good", color: "rgba(75, 192, 192, 1)" },
-        { min: 60, max: 70, label: "Fair", color: "rgba(154, 205, 50, 1)" },
-        { min: 70, max: Infinity, label: "Poor", color: "rgba(255, 99, 132, 1)" },
+        { min: 0, max: 25.99, label: "Poor", color: "rgba(255, 140, 0)" },
+        { min: 26, max: 30.99, label: "Fair", color: "rgba(255, 206, 86)" },
+        { min: 31, max: 60.99, label: "Good", color: "rgba(22, 186, 1)" },
+        { min: 61, max: 70.99, label: "Fair", color: "rgba(255, 206, 86)" },
+        { min: 71, max: Infinity, label: "Poor", color: "rgba(254, 0, 0)" },
     ],
     temperature: [
-        { min: 0, max: 33, label: "Good", color: "rgba(75, 192, 192, 1)" },
-        { min: 33, max: 41, label: "Caution", color: "rgba(255, 206, 86, 1)" },
-        { min: 41, max: 54, label: "Danger", color: "rgba(255, 140, 0, 1)" },
-        {
-            min: 54,
-            max: Infinity,
-            label: "Extreme Danger",
-            color: "rgba(139, 0, 0, 1)",
-        },
+        { min: 0, max: 33.99, label: "Good", color: "rgba(22, 186, 1)" },
+        { min: 34, max: 41.99, label: "Caution", color: "rgba(255, 206, 86)" },
+        { min: 42, max: 54.99, label: "Danger", color: "rgba(255, 140, 0)" },
+        { min: 55, max: Infinity, label: "Extreme Danger", color: "rgba(254, 0, 0)" },
     ],
     oxygen: [
-        { min: 0, max: 19.5, label: "Poor", color: "rgba(255, 206, 86, 1)" },
-        {
-            min: 19.5,
-            max: Infinity,
-            label: "Safe",
-            color: "rgba(75, 192, 192, 1)",
-        },
+        { min: 0, max: 19.49, label: "Poor", color: "rgba(254, 0, 0)" },
+        { min: 19.5, max: Infinity, label: "Safe", color: "rgba(22, 186, 1)" },
     ],
 };
 
@@ -181,6 +136,7 @@ const AirQualityInstance = () => {
                 <CircularProgressbar 
                     value={value}
                     text={`${value}`}
+                    strokeWidth={20}
                     styles={buildStyles({
                         pathColor: color,
                         textColor: color,
@@ -285,6 +241,8 @@ const styles = {
         display: 'flex',
         flexDirection: 'column',
         minHeight: '100vh',
+        alignItems: 'center', // Align items horizontally in the center
+        // justifyContent: 'center', // Align items vertically in the center
     },
     // mainContent: {
     //     padding: '20px',
@@ -301,7 +259,7 @@ const styles = {
     //     marginBottom: '20px',
     // },
     h2: {
-        fontSize: '1.5rem',
+        fontSize: '2rem',
         fontWeight: 200,
         color: '#fff',
         marginBottom: '20px',
@@ -321,7 +279,7 @@ const styles = {
         borderRadius: '8px', // Optional: add rounded corners
         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // Optional: subtle shadow for better visuals
         margin: '30px',
-        marginLeft: '160px', //NARA TAN MARGIN
+        // marginLeft: '160px', //NARA TAN MARGIN
         padding: '35px',
         paddingTop: '10px',
         paddingBottom: '10px',
@@ -338,7 +296,7 @@ const styles = {
         padding: '20px',
         borderRadius: '10px',
         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Subtle shadow for depth   
-        color: 'white'
+        color: 'white',
     },
     button: {
         display: 'flex', 
@@ -350,7 +308,7 @@ const styles = {
         borderRadius: '15px',
         cursor: 'pointer',
         fontSize: '1rem',
-        width: 'auto',
+        width: '300px',
         justifyContent: 'center', // Center the content horizontally
         alignItems: 'center',     // Center the content vertically
         textAlign: 'center',      // Make sure the text is centered
@@ -361,12 +319,12 @@ const styles = {
     },
     p: {
         marginTop: '10px',
-        fontSize: '14px',
+        fontSize: '20px',
         fontWeight: 'bold',
     },
     legend: {
         marginTop: '10px',
-        fontSize: '12px',
+        fontSize: '15px',
         textAlign: 'left',
         lineHeight: '1.5',
     },

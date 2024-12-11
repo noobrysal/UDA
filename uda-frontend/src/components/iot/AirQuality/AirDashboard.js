@@ -56,37 +56,37 @@ const AirDashboard = () => {
 
     const thresholds = {
         pm25: [
-            { min: 0, max: 24.99, status: "Good", color: "rgba(75, 192, 192, 1)" },
-            { min: 25, max: 34.99, status: "Fair", color: "rgba(154, 205, 50, 1)" },
-            { min: 34.9, max: 44.99, status: "Unhealthy", color: "rgba(255, 206, 86, 1)" },
-            { min: 45, max: 54.99, status: "Very Unhealthy", color: "rgba(255, 140, 0, 1)" },
-            { min: 55, max: 89.99, status: "Severely Unhealthy", color: "rgba(255, 99, 132, 1)" },
-            { min: 90, max: Infinity, status: "Emergency", color: "rgba(139, 0, 0, 1)" },
+            { min: 0, max: 25.99, label: "Good", color: "rgba(22, 186, 1)" },
+            { min: 26, max: 35.99, label: "Fair", color: "rgba(255, 206, 86)" },
+            { min: 36, max: 45.99, label: "Unhealthy", color: "rgba(255, 140, 0)" },
+            { min: 46, max: 55.99, label: "Very Unhealthy", color: "rgba(254, 0, 0)" },
+            { min: 56, max: 90.99, label: "Severely Unhealthy", color: "rgba(129, 0, 127)" },
+            { min: 91, max: Infinity, label: "Emergency", color: "rgba(140, 1, 4)" },
         ],
         pm10: [
-            { min: 0, max: 49.99, status: "Good", color: "rgba(75, 192, 192, 1)" },
-            { min: 50, max: 99.99, status: "Fair", color: "rgba(154, 205, 50, 1)" },
-            { min: 100, max: 149.99, status: "Unhealthy", color: "rgba(255, 206, 86, 1)" },
-            { min: 150, max: 199.99, status: "Very Unhealthy", color: "rgba(255, 140, 0, 1)" },
-            { min: 200, max: 299.99, status: "Severely Unhealthy", color: "rgba(255, 99, 132, 1)" },
-            { min: 300, max: Infinity, status: "Emergency", color: "rgba(139, 0, 0, 1)" },
+            { min: 0, max: 50.99, label: "Good", color: "rgba(22, 186, 1)" },
+            { min: 51, max: 100.99, label: "Fair", color: "rgba(255, 206, 86)" },
+            { min: 101, max: 150.99, label: "Unhealthy", color: "rgba(255, 140, 0)" },
+            { min: 151, max: 200.99, label: "Very Unhealthy", color: "rgba(254, 0, 0)" },
+            { min: 201, max: 300.99, label: "Severely Unhealthy", color: "rgba(129, 0, 127)" },
+            { min: 301, max: Infinity, label: "Emergency", color: "rgba(140, 1, 4)" },
         ],
         humidity: [
-            { min: 0, max: 23.99, status: "Poor", color: "rgba(139, 0, 0, 1)" },
-            { min: 24, max: 29.99, status: "Fair", color: "rgba(255, 206, 86, 1)" },
-            { min: 30, max: 59.99, status: "Good", color: "rgba(75, 192, 192, 1)" },
-            { min: 60, max: 69.99, status: "Fair", color: "rgba(154, 205, 50, 1)" },
-            { min: 70, max: Infinity, status: "Poor", color: "rgba(255, 99, 132, 1)" },
+            { min: 0, max: 25.99, label: "Poor", color: "rgba(255, 140, 0)" },
+            { min: 26, max: 30.99, label: "Fair", color: "rgba(255, 206, 86)" },
+            { min: 31, max: 60.99, label: "Good", color: "rgba(22, 186, 1)" },
+            { min: 61, max: 70.99, label: "Fair", color: "rgba(255, 206, 86)" },
+            { min: 71, max: Infinity, label: "Poor", color: "rgba(254, 0, 0)" },
         ],
         temperature: [
-            { min: 0, max: 32.99, status: "Good", color: "rgba(75, 192, 192, 1)" },
-            { min: 33, max: 40.99, status: "Caution", color: "rgba(255, 206, 86, 1)" },
-            { min: 41, max: 53.99, status: "Danger", color: "rgba(255, 140, 0, 1)" },
-            { min: 54, max: Infinity, status: "Extreme Danger", color: "rgba(139, 0, 0, 1)" },
+            { min: 0, max: 33.99, label: "Good", color: "rgba(22, 186, 1)" },
+            { min: 34, max: 41.99, label: "Caution", color: "rgba(255, 206, 86)" },
+            { min: 42, max: 54.99, label: "Danger", color: "rgba(255, 140, 0)" },
+            { min: 55, max: Infinity, label: "Extreme Danger", color: "rgba(254, 0, 0)" },
         ],
         oxygen: [
-            { min: 0, max: 19.49, status: "Poor", color: "rgba(255, 206, 86, 1)" },
-            { min: 19.5, max: Infinity, status: "Safe", color: "rgba(75, 192, 192, 1)" },
+            { min: 0, max: 19.49, label: "Poor", color: "rgba(254, 0, 0)" },
+            { min: 19.5, max: Infinity, label: "Safe", color: "rgba(22, 186, 1)" },
         ],
     };
 
@@ -430,37 +430,37 @@ const AirDashboard = () => {
 
     const thresholds1 = {
         pm25: [
-            { min: 0, max: 24.99, label: "Good", color: "rgba(75, 192, 192, 1)" },
-            { min: 25, max: 34.99, label: "Fair", color: "rgba(154, 205, 50, 1)" },
-            { min: 34.9, max: 44.99, label: "Unhealthy", color: "rgba(255, 206, 86, 1)" },
-            { min: 45, max: 54.99, label: "Very Unhealthy", color: "rgba(255, 140, 0, 1)" },
-            { min: 55, max: 89.99, label: "Severely Unhealthy", color: "rgba(255, 99, 132, 1)" },
-            { min: 90, max: Infinity, label: "Emergency", color: "rgba(139, 0, 0, 1)" },
+            { min: 0, max: 25.99, label: "Good", color: "rgba(22, 186, 1)" },
+            { min: 26, max: 35.99, label: "Fair", color: "rgba(255, 206, 86)" },
+            { min: 36, max: 45.99, label: "Unhealthy", color: "rgba(255, 140, 0)" },
+            { min: 46, max: 55.99, label: "Very Unhealthy", color: "rgba(254, 0, 0)" },
+            { min: 56, max: 90.99, label: "Severely Unhealthy", color: "rgba(129, 0, 127)" },
+            { min: 91, max: Infinity, label: "Emergency", color: "rgba(140, 1, 4)" },
         ],
         pm10: [
-            { min: 0, max: 49.99, label: "Good", color: "rgba(75, 192, 192, 1)" },
-            { min: 50, max: 99.99, label: "Fair", color: "rgba(154, 205, 50, 1)" },
-            { min: 100, max: 149.99, label: "Unhealthy", color: "rgba(255, 206, 86, 1)" },
-            { min: 150, max: 199.99, label: "Very Unhealthy", color: "rgba(255, 140, 0, 1)" },
-            { min: 200, max: 299.99, label: "Severely Unhealthy", color: "rgba(255, 99, 132, 1)" },
-            { min: 300, max: Infinity, label: "Emergency", color: "rgba(139, 0, 0, 1)" },
+            { min: 0, max: 50.99, label: "Good", color: "rgba(22, 186, 1)" },
+            { min: 51, max: 100.99, label: "Fair", color: "rgba(255, 206, 86)" },
+            { min: 101, max: 150.99, label: "Unhealthy", color: "rgba(255, 140, 0)" },
+            { min: 151, max: 200.99, label: "Very Unhealthy", color: "rgba(254, 0, 0)" },
+            { min: 201, max: 300.99, label: "Severely Unhealthy", color: "rgba(129, 0, 127)" },
+            { min: 301, max: Infinity, label: "Emergency", color: "rgba(140, 1, 4)" },
         ],
         humidity: [
-            { min: 0, max: 23.99, label: "Poor", color: "rgba(139, 0, 0, 1)" },
-            { min: 24, max: 29.99, label: "Fair", color: "rgba(255, 206, 86, 1)" },
-            { min: 30, max: 59.99, label: "Good", color: "rgba(75, 192, 192, 1)" },
-            { min: 60, max: 69.99, label: "Fair", color: "rgba(154, 205, 50, 1)" },
-            { min: 70, max: Infinity, label: "Poor", color: "rgba(255, 99, 132, 1)" },
+            { min: 0, max: 25.99, label: "Poor", color: "rgba(255, 140, 0)" },
+            { min: 26, max: 30.99, label: "Fair", color: "rgba(255, 206, 86)" },
+            { min: 31, max: 60.99, label: "Good", color: "rgba(22, 186, 1)" },
+            { min: 61, max: 70.99, label: "Fair", color: "rgba(255, 206, 86)" },
+            { min: 71, max: Infinity, label: "Poor", color: "rgba(254, 0, 0)" },
         ],
         temperature: [
-            { min: 0, max: 32.99, label: "Good", color: "rgba(75, 192, 192, 1)" },
-            { min: 33, max: 40.99, label: "Caution", color: "rgba(255, 206, 86, 1)" },
-            { min: 41, max: 53.99, label: "Danger", color: "rgba(255, 140, 0, 1)" },
-            { min: 54, max: Infinity, label: "Extreme Danger", color: "rgba(139, 0, 0, 1)" },
+            { min: 0, max: 33.99, label: "Good", color: "rgba(22, 186, 1)" },
+            { min: 34, max: 41.99, label: "Caution", color: "rgba(255, 206, 86)" },
+            { min: 42, max: 54.99, label: "Danger", color: "rgba(255, 140, 0)" },
+            { min: 55, max: Infinity, label: "Extreme Danger", color: "rgba(254, 0, 0)" },
         ],
         oxygen: [
-            { min: 0, max: 19.49, label: "Poor", color: "rgba(255, 206, 86, 1)" },
-            { min: 19.5, max: Infinity, label: "Safe", color: "rgba(75, 192, 192, 1)" },
+            { min: 0, max: 19.49, label: "Poor", color: "rgba(254, 0, 0)" },
+            { min: 19.5, max: Infinity, label: "Safe", color: "rgba(22, 186, 1)" },
         ],
     };
 
@@ -530,25 +530,29 @@ const AirDashboard = () => {
     );
 
     const renderComparisonChart = (comparisonData) => {
-        if (!comparisonData) {
-            return null;
-        }
-
-        const { first, second } = comparisonData;
         const metrics = ["pm25", "pm10", "humidity", "temperature", "oxygen"];
-
+    
+        // Default values when comparisonData is null or undefined
+        const defaultData = {
+            first: metrics.reduce((acc, metric) => ({ ...acc, [metric]: { avg: 0 } }), {}),
+            second: metrics.reduce((acc, metric) => ({ ...acc, [metric]: { avg: 0 } }), {}),
+        };
+    
+        const dataToUse = comparisonData || defaultData;
+        const { first, second } = dataToUse;
+    
         const getStatus = (value, metric) => {
-            const threshold = thresholds1[metric].find((t) => value <= t.max);
+            const threshold = thresholds1[metric]?.find((t) => value <= t.max);
             return threshold ? threshold.label : "Unknown";
         };
-
+    
         const labels = metrics.map((metric) => metric.toUpperCase());
         const firstAverages = metrics.map((metric) => first[metric]?.avg || 0);
         const secondAverages = metrics.map((metric) => second[metric]?.avg || 0);
-
-        const firstDateLabel = formatDateLabel(filters.first);
-        const secondDateLabel = formatDateLabel(filters.second);
-
+    
+        const firstDateLabel = comparisonData ? formatDateLabel(filters.first) : "No Range Selected";
+        const secondDateLabel = comparisonData ? formatDateLabel(filters.second) : "No Range Selected";
+    
         const data = {
             labels,
             datasets: [
@@ -556,23 +560,23 @@ const AirDashboard = () => {
                     label: `First Range: (${firstDateLabel})`,
                     data: firstAverages,
                     backgroundColor: firstAverages.map((value, index) =>
-                        thresholds1[metrics[index]].find((t) => value <= t.max)?.color
+                        thresholds1[metrics[index]]?.find((t) => value <= t.max)?.color || "rgba(128, 128, 128, 0.5)"
                     ),
-                    borderColor: "rgb(25, 25, 112)",
+                    borderColor: "rgb(0, 255, 156)",
                     borderWidth: 3,
                 },
                 {
                     label: `Second Range: (${secondDateLabel})`,
                     data: secondAverages,
                     backgroundColor: secondAverages.map((value, index) =>
-                        thresholds1[metrics[index]].find((t) => value <= t.max)?.color
+                        thresholds1[metrics[index]]?.find((t) => value <= t.max)?.color || "rgba(192, 192, 192, 0.5)"
                     ),
-                    borderColor: "rgb(220, 20, 60)",
+                    borderColor: "rgb(255, 227, 26)",
                     borderWidth: 3,
                 },
             ],
         };
-
+    
         const options = {
             maintainAspectRatio: false,
             responsive: true,
@@ -591,10 +595,10 @@ const AirDashboard = () => {
                     display: true,
                     position: "top",
                     labels: {
-                        color: "#fff", // Set legend text color
+                        color: "#fff",
                         font: {
-                            size: 14, // Adjust legend font size
-                            family: "Arial", // Optional: Change font family
+                            size: 14,
+                            family: "Arial",
                         },
                     },
                 },
@@ -602,42 +606,71 @@ const AirDashboard = () => {
             scales: {
                 x: {
                     grid: {
-                        display: false, // Hide grid lines on the x-axis
+                        display: false,
                     },
                     ticks: {
-                        color: "#fff", // Set x-axis tick label color
+                        color: "#fff",
                         font: {
-                            size: 20, // Adjust x-axis tick label size
-                            family: "Verdana", // Optional: Change font family
+                            size: 14,
+                            family: "Verdana",
                         },
                     },
                 },
                 y: {
                     grid: {
-                        display: false, // Hide grid lines on the y-axis
+                        display: false,
                     },
                     ticks: {
-                        color: "#fff", // Set y-axis tick label color
+                        color: "#fff",
                         font: {
-                            size: 20, // Adjust y-axis tick label size
-                            family: "Verdana", // Optional: Change font family
+                            size: 14,
+                            family: "Verdana",
                         },
-                        beginAtZero: true, // Ensure the y-axis starts at zero
+                        beginAtZero: true,
                     },
                 },
             },
             elements: {
                 bar: {
-                    borderRadius: 10, // Add border radius to the bars
-                    borderWidth: 2, // Optional: Add a border to the bars
+                    borderRadius: 15,
+                    borderWidth: 2,
                 },
             },
         };
-
+    
+        const generateInsight = () => {
+            if (!comparisonData) {
+                return "No data available for comparison.";
+            }
+    
+            return metrics.map((metric, index) => {
+                const firstValue = firstAverages[index];
+                const secondValue = secondAverages[index];
+                const firstStatus = getStatus(firstValue, metric);
+                const secondStatus = getStatus(secondValue, metric);
+    
+                return `${metric.toUpperCase()} - First Range (${firstStatus}): ${firstValue.toFixed(
+                    2
+                )}, Second Range (${secondStatus}): ${secondValue.toFixed(
+                    2
+                )}. ${firstValue > secondValue ? "Decreased" : "Increased"} between ranges.`;
+            }).join("\n");
+        };
+    
+        const narrativeInsight = generateInsight();
+    
         return (
-            <div style={{ display: 'flex', flexDirection: 'column', height: '45vh' }}>
-                <div style={{ flex: 1, height: '100%' }}>
-                    <Bar data={data} options={options} height={null} />
+            <div style={{ display: "flex", flexDirection: "column", height: "70%" }}>
+                <div style={{ flex: 1 }}>
+                    <Bar data={data} options={options} height="100%" />
+                </div>
+                <div style={{ marginTop: "20px", color: "#fff", fontSize: "1rem", textAlign: "justify" }}>
+                    <strong>Narrative Insight:</strong>
+                    {comparisonData ? (
+                        <pre style={{ textAlign: "justify", whiteSpace: "pre-wrap" }}>{narrativeInsight}</pre>
+                    ) : (
+                        " No data available for comparison."
+                    )}
                 </div>
             </div>
         );
