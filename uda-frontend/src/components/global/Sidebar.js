@@ -141,7 +141,7 @@ const SidebarComponent = () => {
                     <Box paddingLeft={isCollapsed ? undefined : "2%"} display="flex" flexDirection="column" gap="8px">
                         <Item
                             title="Dashboard"
-                            to="/air"
+                            to="/general-screen"
                             icon={<DashboardIcon />}
                             selected={selected}
                             setSelected={setSelected}
@@ -171,14 +171,14 @@ const SidebarComponent = () => {
                             setSelected={setSelected}
                             isCollapsed={isCollapsed}
                         />
-                        <Item
+                        {/* <Item
                             title="Calendar"
                             to="/calendar"
                             icon={<CalendarMonthIcon />}
                             selected={selected}
                             setSelected={setSelected}
                             isCollapsed={isCollapsed}
-                        />
+                        /> */}
                     </Box>
 
                     <Box paddingBottom="140px" />

@@ -634,6 +634,13 @@ const AirDashboard = () => {
                 bar: {
                     borderRadius: 15,
                     borderWidth: 2,
+                    borderSkipped: false, // Ensure all edges of the bar have a border radius
+                },
+            },
+            datasets: {
+                bar: {
+                    barPercentage: 0.95, // Adjust the width of the bars
+                    categoryPercentage: 0.95, // Adjust the space between bars
                 },
             },
         };
@@ -1419,6 +1426,8 @@ const styles = {
         marginTop: '20px',
         marginLeft: '70px',
         marginRight: 'auto',
+        alignItems: 'center',
+        justifyContent: 'center',
         width: '100%',
         maxWidth: '1440px', // Restrict to a maximum width for large screens
         backgroundColor: 'rgba(15, 13, 26, 0)',
@@ -1897,7 +1906,44 @@ const styles = {
         comparisonContainer: {
             flexWrap: 'nowrap',
         }
-    }
+    },
+    // Styles for laptop screens (1920 x 1200 and smaller)
+    '@media (max-width: 1920px)': {
+        container: {
+            marginTop: '20px',
+            marginLeft: '40px',
+            marginRight: '40px',
+            padding: '15px', // Slightly reduced padding for laptops
+        },
+    },
+
+    // Styles for screens smaller than 1440px
+    '@media (max-width: 1440px)': {
+        container: {
+            marginLeft: '20px',
+            marginRight: '20px',
+            padding: '10px', // Further reduced padding for smaller screens
+        },
+    },
+
+    // Styles for screens smaller than 1024px (tablets and small laptops)
+    '@media (max-width: 1024px)': {
+        container: {
+            flexDirection: 'column', // Stack content vertically
+            alignItems: 'stretch',  // Stretch items to fit smaller width
+            padding: '10px 5px',    // Reduced padding
+        },
+    },
+
+    // Styles for mobile devices (768px and smaller)
+    '@media (max-width: 768px)': {
+        container: {
+            flexDirection: 'column',
+            marginLeft: '10px',
+            marginRight: '10px',
+            padding: '5px', // Minimal padding for mobile
+        },
+    },
 };
 
 

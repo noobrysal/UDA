@@ -1062,8 +1062,8 @@ const AirView = () => {
                         const status = getAirQualityStatus(value, metric.id);
                         return status?.color || 'rgba(75, 192, 192, 0.6)';
                     }),
-                borderColor: "rgb(0, 255, 251)",
-                borderWidth: 2,
+                // borderColor: "rgb(0, 255, 251)",
+                // borderWidth: 2,
                 borderRadius: 25, // Rounded corners
             }]
         };
@@ -1104,6 +1104,7 @@ const AirView = () => {
         elements: {
             bar: {
                 borderRadius: 10, // Rounded corners for bars
+                borderSkipped: false, // Ensure all edges of the bar have a border radius
             },
         },
         datasets: {
