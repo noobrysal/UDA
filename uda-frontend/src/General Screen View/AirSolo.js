@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '../src/components/iot/AirQuality/supabaseClient';
+import { supabase } from '../components/iot/AirQuality/supabaseClient';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Line, Bar } from 'react-chartjs-2'; // Add Bar import
-import backgroundImage from '../src/assets/airdash.png';
+import backgroundImage from '../assets/airdash.png';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import {
@@ -57,45 +57,45 @@ const AirView = () => {
     // Update thresholds 
     const thresholds = {
         pm25: [
-            { min: 0, max: 25.99, label: "Good", color: "rgba(22, 186, 1)" },
-            { min: 26, max: 35.99, label: "Fair", color: "rgba(255, 206, 86)" },
-            { min: 36, max: 45.99, label: "Unhealthy", color: "rgba(255, 140, 0)" },
-            { min: 46, max: 55.99, label: "Very Unhealthy", color: "rgba(254, 0, 0)" },
-            { min: 56, max: 90.99, label: "Severely Unhealthy", color: "rgba(129, 0, 127)" },
-            { min: 91, max: Infinity, label: "Emergency", color: "rgba(140, 1, 4)" },
+            { min: 0, max: 25.99, label: "Good", color: "rgba(94, 196, 165)" },
+            { min: 26, max: 35.99, label: "Fair", color: "rgba(217, 184, 65)" },
+            { min: 36, max: 45.99, label: "Unhealthy", color: "rgba(235, 123, 59)" },
+            { min: 46, max: 55.99, label: "Very Unhealthy", color: "rgba(214, 54, 49)" },
+            { min: 56, max: 90.99, label: "Acutely Unhealthy", color: "rgba(71, 29, 84)" },
+            { min: 91, max: Infinity, label: "Emergency", color: "rgba(110, 22, 24)" },
         ],
         pm10: [
-            { min: 0, max: 50.99, label: "Good", color: "rgba(22, 186, 1)" },
-            { min: 51, max: 100.99, label: "Fair", color: "rgba(255, 206, 86)" },
-            { min: 101, max: 150.99, label: "Unhealthy", color: "rgba(255, 140, 0)" },
-            { min: 151, max: 200.99, label: "Very Unhealthy", color: "rgba(254, 0, 0)" },
-            { min: 201, max: 300.99, label: "Severely Unhealthy", color: "rgba(129, 0, 127)" },
-            { min: 301, max: Infinity, label: "Emergency", color: "rgba(140, 1, 4)" },
+            { min: 0, max: 50.99, label: "Good", color: "rgba(94, 196, 165)" },
+            { min: 51, max: 100.99, label: "Fair", color: "rgba(217, 184, 65)" },
+            { min: 101, max: 150.99, label: "Unhealthy", color: "rgba(235, 123, 59)" },
+            { min: 151, max: 200.99, label: "Very Unhealthy", color: "rgba(214, 54, 49)" },
+            { min: 201, max: 300.99, label: "Acutely Unhealthy", color: "rgba(71, 29, 84)" },
+            { min: 301, max: Infinity, label: "Emergency", color: "rgba(110, 22, 24)" },
         ],
         humidity: [
-            { min: 0, max: 25.99, label: "Poor", color: "rgba(255, 140, 0)" },
-            { min: 26, max: 30.99, label: "Fair", color: "rgba(255, 206, 86)" },
-            { min: 31, max: 60.99, label: "Good", color: "rgba(22, 186, 1)" },
-            { min: 61, max: 70.99, label: "Fair", color: "rgba(255, 206, 86)" },
-            { min: 71, max: Infinity, label: "Poor", color: "rgba(254, 0, 0)" },
+            { min: 0, max: 25.99, label: "Poor", color: "rgba(235, 123, 59)" },
+            { min: 26, max: 30.99, label: "Fair", color: "rgba(217, 184, 65)" },
+            { min: 31, max: 60.99, label: "Good", color: "rgba(94, 196, 165)" },
+            { min: 61, max: 70.99, label: "Fair", color: "rgba(217, 184, 65)" },
+            { min: 71, max: Infinity, label: "Poor", color: "rgba(214, 54, 49)" },
         ],
         temperature: [
-            { min: 0, max: 33.99, label: "Good", color: "rgba(22, 186, 1)" },
-            { min: 34, max: 41.99, label: "Caution", color: "rgba(255, 206, 86)" },
-            { min: 42, max: 54.99, label: "Danger", color: "rgba(255, 140, 0)" },
-            { min: 55, max: Infinity, label: "Extreme Danger", color: "rgba(254, 0, 0)" },
+            { min: 0, max: 33.99, label: "Good", color: "rgba(94, 196, 165)" },
+            { min: 34, max: 41.99, label: "Caution", color: "rgba(217, 184, 65)" },
+            { min: 42, max: 54.99, label: "Danger", color: "rgba(235, 123, 59)" },
+            { min: 55, max: Infinity, label: "Extreme", color: "rgba(214, 54, 49)" },
         ],
         oxygen: [
-            { min: 0, max: 19.49, label: "Poor", color: "rgba(254, 0, 0)" },
-            { min: 19.5, max: Infinity, label: "Safe", color: "rgba(22, 186, 1)" },
+            { min: 0, max: 19.49, label: "Poor", color: "rgba(214, 54, 49)" },
+            { min: 19.5, max: Infinity, label: "Safe", color: "rgba(94, 196, 165)" },
         ],
     };
 
     const thresholdInfo = [
         {
             level: "Good",
-            color: "rgb(0, 176, 79)",
-            description: "Air quality is satisfactory, and air pollution poses little or no risk.",
+            color: "rgb(94, 196, 165)",
+            description: "The air is clean, and pollution levels are very low. It is safe for everyone to go outside, and no health risks are expected.",
             icon: "😊",
             recommendations: [
                 "Ideal for outdoor activities",
@@ -105,8 +105,8 @@ const AirView = () => {
         },
         {
             level: "Fair",
-            color: "rgb(181, 181, 2)",
-            description: "Air quality is acceptable but may pose a risk to unusually sensitive individuals.",
+            color: "rgb(217, 184, 65)",
+            description: "The air is okay, but sensitive people might have slight health problems. Most people can still go outside without issues.",
             icon: "🙂",
             recommendations: [
                 "Generally safe for outdoor activities",
@@ -116,8 +116,8 @@ const AirView = () => {
         },
         {
             level: "Unhealthy",
-            color: "rgb(236, 125, 49)",
-            description: "Sensitive groups may face health effects. General public is unlikely to be affected.",
+            color: "rgb(235, 123, 59)",
+            description: "People with breathing problems like asthma should spend less time outdoors. They may feel discomfort or breathing difficulty.",
             icon: "😷",
             recommendations: [
                 "Reduce prolonged outdoor activities",
@@ -127,8 +127,8 @@ const AirView = () => {
         },
         {
             level: "Very Unhealthy",
-            color: "rgb(255, 0, 0)",
-            description: "Health alert: The risk of health effects is increased for everyone.",
+            color: "rgb(214, 54, 49)",
+            description: "People with breathing or heart issues should stay indoors. Avoid unnecessary trips, as the air can harm health if you stay outside too long.",
             icon: "⚠️",
             recommendations: [
                 "Avoid outdoor activities",
@@ -137,9 +137,9 @@ const AirView = () => {
             ]
         },
         {
-            level: "Severely Unhealthy",
-            color: "rgb(111, 47, 160)",
-            description: "Health warning of emergency conditions: everyone is more likely to be affected.",
+            level: "Acutely Unhealthy",
+            color: "rgb(71, 29, 84)",
+            description: "People with health issues should stay indoors. Driving and factory work may be restricted because the air can cause serious harm.",
             icon: "🚫",
             recommendations: [
                 "Stay indoors",
@@ -149,8 +149,8 @@ const AirView = () => {
         },
         {
             level: "Emergency",
-            color: "rgb(125, 0, 35)",
-            description: "Health alert: everyone may experience serious health effects.",
+            color: "rgb(110, 22, 24)",
+            description: "Everyone should stay inside with windows closed. The air is too dangerous for outdoor activities, except for emergencies.",
             icon: "☠️",
             recommendations: [
                 "Avoid all outdoor activities",
@@ -716,8 +716,8 @@ const AirView = () => {
             textAlign: "left",
         },
         slideDescription: {
-            marginBottom: "10px", // Reduce margin
-            fontSize: "16px", // Adjust font size for text
+            marginTop: "15px", // Reduce margin
+            fontSize: "25px", // Adjust font size for text
             lineHeight: "1.4", // Slightly tighter line spacing
         },
         rangeInfo: {
@@ -1062,8 +1062,9 @@ const AirView = () => {
                         const status = getAirQualityStatus(value, metric.id);
                         return status?.color || 'rgba(75, 192, 192, 0.6)';
                     }),
-                borderWidth: 1,
-                borderRadius: 10, // Rounded corners
+                borderColor: "rgb(0, 255, 251)",
+                borderWidth: 2,
+                borderRadius: 25, // Rounded corners
             }]
         };
     };
@@ -1212,15 +1213,15 @@ const AirView = () => {
                                         <p style={styles.slideDescription}>
                                             {thresholdInfo[currentSlide].description}
                                         </p>
-                                        <div style={styles.rangeInfo}></div>
-                                        <div style={styles.recommendations}>
+                                        {/* <div style={styles.rangeInfo}></div> */}
+                                        {/* <div style={styles.recommendations}>
                                             <h5>Recommendations:</h5>
                                             <ul>
                                                 {thresholdInfo[currentSlide].recommendations.map((rec, index) => (
                                                     <li key={index}>{rec}</li>
                                                 ))}
                                             </ul>
-                                        </div>
+                                        </div> */}
                                     </div>
                                 </div>
                             </div>
@@ -1319,7 +1320,7 @@ const AirView = () => {
                                                             styles={buildStyles({
                                                                 rotation: 0,
                                                                 strokeLinecap: 'round',
-                                                                textSize: '14px',
+                                                                textSize: '20px',
                                                                 pathTransitionDuration: 0.5,
                                                                 pathColor: status?.color || '#75c7b6',
                                                                 textColor: status?.color || '#75c7b6',

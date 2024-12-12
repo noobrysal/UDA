@@ -4,7 +4,7 @@ import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { createGlobalStyle } from 'styled-components'; // <-- Import createGlobalStyle
 import RegisterForm from './components/RegisterForm';
 import LoginForm from './components/LoginForm';
-import Air from './AirSolo';
+import Air from '../src/General Screen View/AirSolo';
 import AirDashboard from './components/iot/AirQuality/AirDashboard';
 import AirQualityInstance from './components/iot/AirQuality/AirQualityInstance';
 import AirQualityByDate from './components/iot/AirQuality/AirQualityByDate';
