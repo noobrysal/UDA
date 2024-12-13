@@ -15,8 +15,6 @@ const LandingPage = ({
     // Button styles
     const buttonStyles = {
         padding: '10px 40px',
-        marginTop: '20px',
-        marginLeft: '20px',
         fontSize: '18px',
         backgroundColor: colors.grey[100],
         color: colors.grey[900],
@@ -26,8 +24,6 @@ const LandingPage = ({
         fontWeight: 'bold',
         transition: 'transform 0.2s, background-color 0.3s, box-shadow 0.3s', 
         outline: 'none',
-        position: 'absolute', 
-        ...buttonPosition, // Use passed buttonPosition
     };
 
     const handleMouseOver = (e) => {
@@ -130,29 +126,23 @@ const LandingPage = ({
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    paddingRight: '50px',
-                    width: '50%',
-                    backgroundColor: 'transparent', 
-                    position: 'relative',
+                    position: 'absolute',
+                    top: '45%', // Move the entire container slightly up
+                    right: '10%',
+                    transform: 'translateY(-50%)', // Keep it centered vertically
+                    backgroundColor: 'transparent',
                 }}
             >
                 {/* Logo */}
-                <div
-                    style={{
-                        position: 'absolute',
-                        top: '15%', 
-                    }}
-                >
+                <div style={{ marginBottom: '10px' }}> {/* Reduce space between logo and button */}
                     <img src={logoImage} alt="Logo" 
                         style={{ 
-                            marginTop: '-60px',
-                            marginLeft: '50px',
                             width: '35vw', 
                             height: 'auto' }} />
                 </div>
 
                 {/* Button */}
-                <div style={{ marginTop: '200px' }}> {/* Adjust vertical margin as necessary */}
+                <div>
                     <button
                         style={buttonStyles}
                         onMouseOver={handleMouseOver}

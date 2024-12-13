@@ -56,37 +56,37 @@ const AirDashboard = () => {
 
     const thresholds = {
         pm25: [
-            { min: 0, max: 25.99, label: "Good", color: "rgba(22, 186, 1)" },
-            { min: 26, max: 35.99, label: "Fair", color: "rgba(255, 206, 86)" },
-            { min: 36, max: 45.99, label: "Unhealthy", color: "rgba(255, 140, 0)" },
-            { min: 46, max: 55.99, label: "Very Unhealthy", color: "rgba(254, 0, 0)" },
-            { min: 56, max: 90.99, label: "Severely Unhealthy", color: "rgba(129, 0, 127)" },
-            { min: 91, max: Infinity, label: "Emergency", color: "rgba(140, 1, 4)" },
+            { min: 0, max: 25.99, label: "Good", color: "rgba(92, 225, 230)" },
+            { min: 26, max: 35.99, label: "Fair", color: "rgba(126, 205, 160)" },
+            { min: 36, max: 45.99, label: "Unhealthy", color: "rgba(255, 222, 89)" },
+            { min: 46, max: 55.99, label: "Very Unhealthy", color: "rgba(235, 123, 59)" },
+            { min: 56, max: 90.99, label: "Acutely Unhealthy", color: "rgba(111, 41, 133)" },
+            { min: 91, max: Infinity, label: "Emergency", color: "rgba(214, 54, 49)" },
         ],
         pm10: [
-            { min: 0, max: 50.99, label: "Good", color: "rgba(22, 186, 1)" },
-            { min: 51, max: 100.99, label: "Fair", color: "rgba(255, 206, 86)" },
-            { min: 101, max: 150.99, label: "Unhealthy", color: "rgba(255, 140, 0)" },
-            { min: 151, max: 200.99, label: "Very Unhealthy", color: "rgba(254, 0, 0)" },
-            { min: 201, max: 300.99, label: "Severely Unhealthy", color: "rgba(129, 0, 127)" },
-            { min: 301, max: Infinity, label: "Emergency", color: "rgba(140, 1, 4)" },
+            { min: 0, max: 50.99, label: "Good", color: "rgba(92, 225, 230)" },
+            { min: 51, max: 100.99, label: "Fair", color: "rgba(126, 205, 160)" },
+            { min: 101, max: 150.99, label: "Unhealthy", color: "rgba(255, 222, 89)" },
+            { min: 151, max: 200.99, label: "Very Unhealthy", color: "rgba(235, 123, 59)" },
+            { min: 201, max: 300.99, label: "Acutely Unhealthy", color: "rgba(111, 41, 133)" },
+            { min: 301, max: Infinity, label: "Emergency", color: "rgba(214, 54, 49)" },
         ],
         humidity: [
-            { min: 0, max: 25.99, label: "Poor", color: "rgba(255, 140, 0)" },
-            { min: 26, max: 30.99, label: "Fair", color: "rgba(255, 206, 86)" },
-            { min: 31, max: 60.99, label: "Good", color: "rgba(22, 186, 1)" },
-            { min: 61, max: 70.99, label: "Fair", color: "rgba(255, 206, 86)" },
-            { min: 71, max: Infinity, label: "Poor", color: "rgba(254, 0, 0)" },
+            { min: 0, max: 25.99, label: "Poor", color: "rgba(255, 222, 89)" },
+            { min: 26, max: 30.99, label: "Fair", color: "rgba(126, 205, 160)" },
+            { min: 31, max: 60.99, label: "Good", color: "rgba(92, 225, 230)" },
+            { min: 61, max: 70.99, label: "Fair", color: "rgba(126, 205, 160)" },
+            { min: 71, max: Infinity, label: "Poor", color: "rgba(235, 123, 59)" },
         ],
         temperature: [
-            { min: 0, max: 33.99, label: "Good", color: "rgba(22, 186, 1)" },
-            { min: 34, max: 41.99, label: "Caution", color: "rgba(255, 206, 86)" },
-            { min: 42, max: 54.99, label: "Danger", color: "rgba(255, 140, 0)" },
-            { min: 55, max: Infinity, label: "Extreme Danger", color: "rgba(254, 0, 0)" },
+            { min: 0, max: 33.99, label: "Good", color: "rgba(92, 225, 230)" },
+            { min: 34, max: 41.99, label: "Caution", color: "rgba(126, 205, 160)" },
+            { min: 42, max: 54.99, label: "Danger", color: "rgba(255, 222, 89)" },
+            { min: 55, max: Infinity, label: "Extreme", color: "rgba(235, 123, 59)" },
         ],
         oxygen: [
-            { min: 0, max: 19.49, label: "Poor", color: "rgba(254, 0, 0)" },
-            { min: 19.5, max: Infinity, label: "Safe", color: "rgba(22, 186, 1)" },
+            { min: 0, max: 19.49, label: "Poor", color: "rgba(235, 123, 59)" },
+            { min: 19.5, max: Infinity, label: "Safe", color: "rgba(92, 225, 230)" },
         ],
     };
 
@@ -520,37 +520,37 @@ const AirDashboard = () => {
 
     const thresholds1 = {
         pm25: [
-            { min: 0, max: 25.99, label: "Good", color: "rgba(22, 186, 1)" },
-            { min: 26, max: 35.99, label: "Fair", color: "rgba(255, 206, 86)" },
-            { min: 36, max: 45.99, label: "Unhealthy", color: "rgba(255, 140, 0)" },
-            { min: 46, max: 55.99, label: "Very Unhealthy", color: "rgba(254, 0, 0)" },
-            { min: 56, max: 90.99, label: "Severely Unhealthy", color: "rgba(129, 0, 127)" },
-            { min: 91, max: Infinity, label: "Emergency", color: "rgba(140, 1, 4)" },
+            { min: 0, max: 25.99, label: "Good", color: "rgba(92, 225, 230)" },
+            { min: 26, max: 35.99, label: "Fair", color: "rgba(126, 205, 160)" },
+            { min: 36, max: 45.99, label: "Unhealthy", color: "rgba(255, 222, 89)" },
+            { min: 46, max: 55.99, label: "Very Unhealthy", color: "rgba(235, 123, 59)" },
+            { min: 56, max: 90.99, label: "Acutely Unhealthy", color: "rgba(111, 41, 133)" },
+            { min: 91, max: Infinity, label: "Emergency", color: "rgba(214, 54, 49)" },
         ],
         pm10: [
-            { min: 0, max: 50.99, label: "Good", color: "rgba(22, 186, 1)" },
-            { min: 51, max: 100.99, label: "Fair", color: "rgba(255, 206, 86)" },
-            { min: 101, max: 150.99, label: "Unhealthy", color: "rgba(255, 140, 0)" },
-            { min: 151, max: 200.99, label: "Very Unhealthy", color: "rgba(254, 0, 0)" },
-            { min: 201, max: 300.99, label: "Severely Unhealthy", color: "rgba(129, 0, 127)" },
-            { min: 301, max: Infinity, label: "Emergency", color: "rgba(140, 1, 4)" },
+            { min: 0, max: 50.99, label: "Good", color: "rgba(92, 225, 230)" },
+            { min: 51, max: 100.99, label: "Fair", color: "rgba(126, 205, 160)" },
+            { min: 101, max: 150.99, label: "Unhealthy", color: "rgba(255, 222, 89)" },
+            { min: 151, max: 200.99, label: "Very Unhealthy", color: "rgba(235, 123, 59)" },
+            { min: 201, max: 300.99, label: "Acutely Unhealthy", color: "rgba(111, 41, 133)" },
+            { min: 301, max: Infinity, label: "Emergency", color: "rgba(214, 54, 49)" },
         ],
         humidity: [
-            { min: 0, max: 25.99, label: "Poor", color: "rgba(255, 140, 0)" },
-            { min: 26, max: 30.99, label: "Fair", color: "rgba(255, 206, 86)" },
-            { min: 31, max: 60.99, label: "Good", color: "rgba(22, 186, 1)" },
-            { min: 61, max: 70.99, label: "Fair", color: "rgba(255, 206, 86)" },
-            { min: 71, max: Infinity, label: "Poor", color: "rgba(254, 0, 0)" },
+            { min: 0, max: 25.99, label: "Poor", color: "rgba(255, 222, 89)" },
+            { min: 26, max: 30.99, label: "Fair", color: "rgba(126, 205, 160)" },
+            { min: 31, max: 60.99, label: "Good", color: "rgba(92, 225, 230)" },
+            { min: 61, max: 70.99, label: "Fair", color: "rgba(126, 205, 160)" },
+            { min: 71, max: Infinity, label: "Poor", color: "rgba(235, 123, 59)" },
         ],
         temperature: [
-            { min: 0, max: 33.99, label: "Good", color: "rgba(22, 186, 1)" },
-            { min: 34, max: 41.99, label: "Caution", color: "rgba(255, 206, 86)" },
-            { min: 42, max: 54.99, label: "Danger", color: "rgba(255, 140, 0)" },
-            { min: 55, max: Infinity, label: "Extreme Danger", color: "rgba(254, 0, 0)" },
+            { min: 0, max: 33.99, label: "Good", color: "rgba(92, 225, 230)" },
+            { min: 34, max: 41.99, label: "Caution", color: "rgba(126, 205, 160)" },
+            { min: 42, max: 54.99, label: "Danger", color: "rgba(255, 222, 89)" },
+            { min: 55, max: Infinity, label: "Extreme", color: "rgba(235, 123, 59)" },
         ],
         oxygen: [
-            { min: 0, max: 19.49, label: "Poor", color: "rgba(254, 0, 0)" },
-            { min: 19.5, max: Infinity, label: "Safe", color: "rgba(22, 186, 1)" },
+            { min: 0, max: 19.49, label: "Poor", color: "rgba(235, 123, 59)" },
+            { min: 19.5, max: Infinity, label: "Safe", color: "rgba(92, 225, 230)" },
         ],
     };
 
@@ -652,7 +652,7 @@ const AirDashboard = () => {
                     backgroundColor: firstAverages.map((value, index) =>
                         thresholds1[metrics[index]]?.find((t) => value <= t.max)?.color || "rgba(128, 128, 128, 0.5)"
                     ),
-                    borderColor: "rgb(0, 255, 156)",
+                    borderColor: "rgb(252, 252, 247)",
                     borderWidth: 3,
                 },
                 {
@@ -661,7 +661,7 @@ const AirDashboard = () => {
                     backgroundColor: secondAverages.map((value, index) =>
                         thresholds1[metrics[index]]?.find((t) => value <= t.max)?.color || "rgba(192, 192, 192, 0.5)"
                     ),
-                    borderColor: "rgb(255, 227, 26)",
+                    borderColor: "rgb(3, 3, 3)",
                     borderWidth: 3,
                 },
             ],
@@ -724,6 +724,13 @@ const AirDashboard = () => {
                 bar: {
                     borderRadius: 15,
                     borderWidth: 2,
+                    borderSkipped: false, // Ensure all edges of the bar have a border radius
+                },
+            },
+            datasets: {
+                bar: {
+                    barPercentage: 0.95, // Adjust the width of the bars
+                    categoryPercentage: 0.95, // Adjust the space between bars
                 },
             },
         };
@@ -1523,6 +1530,8 @@ const styles = {
         marginTop: '20px',
         marginLeft: '70px',
         marginRight: 'auto',
+        alignItems: 'center',
+        justifyContent: 'center',
         width: '100%',
         maxWidth: '1440px', // Restrict to a maximum width for large screens
         backgroundColor: 'rgba(15, 13, 26, 0)',
@@ -2001,7 +2010,44 @@ const styles = {
         comparisonContainer: {
             flexWrap: 'nowrap',
         }
-    }
+    },
+    // Styles for laptop screens (1920 x 1200 and smaller)
+    '@media (max-width: 1920px)': {
+        container: {
+            marginTop: '20px',
+            marginLeft: '40px',
+            marginRight: '40px',
+            padding: '15px', // Slightly reduced padding for laptops
+        },
+    },
+
+    // Styles for screens smaller than 1440px
+    '@media (max-width: 1440px)': {
+        container: {
+            marginLeft: '20px',
+            marginRight: '20px',
+            padding: '10px', // Further reduced padding for smaller screens
+        },
+    },
+
+    // Styles for screens smaller than 1024px (tablets and small laptops)
+    '@media (max-width: 1024px)': {
+        container: {
+            flexDirection: 'column', // Stack content vertically
+            alignItems: 'stretch',  // Stretch items to fit smaller width
+            padding: '10px 5px',    // Reduced padding
+        },
+    },
+
+    // Styles for mobile devices (768px and smaller)
+    '@media (max-width: 768px)': {
+        container: {
+            flexDirection: 'column',
+            marginLeft: '10px',
+            marginRight: '10px',
+            padding: '5px', // Minimal padding for mobile
+        },
+    },
 };
 
 

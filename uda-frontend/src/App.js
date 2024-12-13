@@ -4,7 +4,7 @@ import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { createGlobalStyle } from 'styled-components'; // <-- Import createGlobalStyle
 import RegisterForm from './components/RegisterForm';
 import LoginForm from './components/LoginForm';
-import Air from './AirSolo';
+import Air from '../src/General Screen View/AirSolo';
 import AirDashboard from './components/iot/AirQuality/AirDashboard';
 import AirQualityInstance from './components/iot/AirQuality/AirQualityInstance';
 import AirQualityByDate from './components/iot/AirQuality/AirQualityByDate';
@@ -15,6 +15,7 @@ import WaterQualityByDate from './components/iot/WaterQuality/WaterQualityByDate
 import WaterQualityInstance from './components/iot/WaterQuality/WaterQualityInstance';
 import WaterDashboard from './components/iot/WaterQuality/WaterDashboard';
 
+import GeneralScreen from '../src/General Screen View/GeneralScreen';
 
 
 // Define global styles for scrollbar
@@ -52,10 +53,10 @@ const AppContent = () => {
   const sidebarPaths = [
     '/air-dashboard',
     '/air-quality',
-    // '/airview',
     '/air-quality/date/:date/location/:locationId',
     '/air-quality/id/:id',
     '/air',
+    '/general-screen',
   ];
 
   // Check if the current route is in the sidebarPaths array
@@ -70,6 +71,10 @@ const AppContent = () => {
           <Route path="/" element={<LandingPage />} />
           <Route path="/register" element={<RegisterForm />} />
           <Route path="/login" element={<LoginForm />} />
+
+          {/* General Screen with Solo IOTs */}
+          <Route path="/general-screen" element={<GeneralScreen />} />
+
 
           {/* Routes with Sidebar */}
           <Route path="/air" element={<Air />} />
