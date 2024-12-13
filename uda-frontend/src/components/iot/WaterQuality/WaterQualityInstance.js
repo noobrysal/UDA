@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { supabase } from './supabaseClient';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-import backgroundImage from '../../../assets/airdash.png';
+import backgroundImage from '../../../assets/waterdash.png';
 import { useNavigate } from 'react-router-dom';
 // import Sidebar from '../../Sidebar';
 
@@ -28,22 +28,22 @@ const getWaterQualityById = async (id) => {
 // Updated thresholds for water quality metrics
 const thresholds1 = {
     pH: [
-        { min: 0, max: 6.49, label: "Too Acidic", color: "rgba(254, 0, 0)" },
-        { min: 6.5, max: 8.5, label: "Acceptable", color: "rgba(22, 186, 1)" },
+        { min: 0, max: 6.49, label: "Too Acidic", color: "rgba(235, 66, 61)" },
+        { min: 6.5, max: 8.5, label: "Acceptable", color: "rgba(85, 214, 69)" },
         { min: 8.51, max: Infinity, label: "Too Alkaline", color: "rgba(255, 140, 0)" },
     ],
     temperature: [
         { min: 0, max: 25.99, label: "Too Cold", color: "rgba(255, 140, 0)" },
-        { min: 26, max: 30, label: "Acceptable", color: "rgba(22, 186, 1)" },
-        { min: 30.01, max: Infinity, label: "Too Hot", color: "rgba(254, 0, 0)" },
+        { min: 26, max: 30, label: "Acceptable", color: "rgba(85, 214, 69)" },
+        { min: 30.01, max: Infinity, label: "Too Hot", color: "rgba(235, 66, 61)" },
     ],
     tss: [
-        { min: 0, max: 50, label: "Acceptable", color: "rgba(22, 186, 1)" },
-        { min: 50.01, max: Infinity, label: "Too Cloudy", color: "rgba(254, 0, 0)" },
+        { min: 0, max: 50, label: "Acceptable", color: "rgba(85, 214, 69)" },
+        { min: 50.01, max: Infinity, label: "Too Cloudy", color: "rgba(235, 66, 61)" },
     ],
     tds_ppm: [
-        { min: 0, max: 500, label: "Acceptable", color: "rgba(22, 186, 1)" },
-        { min: 500.01, max: Infinity, label: "High Dissolved Substances", color: "rgba(254, 0, 0)" },
+        { min: 0, max: 500, label: "Acceptable", color: "rgba(85, 214, 69)" },
+        { min: 500.01, max: Infinity, label: "High Dissolved Substances", color: "rgba(235, 66, 61)" },
     ],
 };
 
@@ -289,7 +289,7 @@ const styles = {
         display: 'flex',
         flexDirection: 'row',
         padding: '10px 10px',
-        background: 'linear-gradient(50deg, #00CCDD, #006E77)', // Gradient background
+        background: 'linear-gradient(50deg, #62b31b, #316901)', // Gradient background
         color: '#fff',
         border: 'none',
         borderRadius: '15px',

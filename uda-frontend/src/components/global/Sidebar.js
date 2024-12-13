@@ -157,7 +157,7 @@ const SidebarComponent = () => {
                         />
                         <Item
                             title="River"
-                            to="/"
+                            to="/water-dashboard"
                             icon={<WaterOutlinedIcon />}
                             selected={selected}
                             setSelected={setSelected}

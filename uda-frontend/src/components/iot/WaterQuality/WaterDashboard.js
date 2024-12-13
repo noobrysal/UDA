@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Bar } from 'react-chartjs-2';
 import { useNavigate } from 'react-router-dom';
 // import Sidebar from '../../Sidebar';
-import backgroundImage from '../../../assets/airdash.png';
+import backgroundImage from '../../../assets/waterdash.png';
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -528,22 +528,22 @@ const WaterDashboard = () => {
 
     const thresholds1 = {
         pH: [
-            { min: 0, max: 6.49, label: "Too Acidic", color: "rgba(254, 0, 0)" },
-            { min: 6.5, max: 8.5, label: "Acceptable", color: "rgba(22, 186, 1)" },
+            { min: 0, max: 6.49, label: "Too Acidic", color: "rgba(235, 66, 61)" },
+            { min: 6.5, max: 8.5, label: "Acceptable", color: "rgba(85, 214, 69)" },
             { min: 8.51, max: Infinity, label: "Too Alkaline", color: "rgba(255, 140, 0)" },
         ],
         temperature: [
             { min: 0, max: 25.99, label: "Too Cold", color: "rgba(255, 140, 0)" },
-            { min: 26, max: 30, label: "Acceptable", color: "rgba(22, 186, 1)" },
-            { min: 30.01, max: Infinity, label: "Too Hot", color: "rgba(254, 0, 0)" },
+            { min: 26, max: 30, label: "Acceptable", color: "rgba(85, 214, 69)" },
+            { min: 30.01, max: Infinity, label: "Too Hot", color: "rgba(235, 66, 61)" },
         ],
         tss: [
-            { min: 0, max: 50, label: "Acceptable", color: "rgba(22, 186, 1)" },
-            { min: 50.01, max: Infinity, label: "Too Cloudy", color: "rgba(254, 0, 0)" },
+            { min: 0, max: 50, label: "Acceptable", color: "rgba(85, 214, 69)" },
+            { min: 50.01, max: Infinity, label: "Too Cloudy", color: "rgba(235, 66, 61)" },
         ],
         tds_ppm: [
-            { min: 0, max: 500, label: "Acceptable", color: "rgba(22, 186, 1)" },
-            { min: 500.01, max: Infinity, label: "High Dissolved Substances", color: "rgba(254, 0, 0)" },
+            { min: 0, max: 500, label: "Acceptable", color: "rgba(85, 214, 69)" },
+            { min: 500.01, max: Infinity, label: "High Dissolved Substances", color: "rgba(235, 66, 61)" },
         ],
     };
 
@@ -645,7 +645,7 @@ const WaterDashboard = () => {
                     backgroundColor: firstAverages.map((value, index) =>
                         thresholds1[metrics[index]]?.find((t) => value <= t.max)?.color || "rgba(128, 128, 128, 0.5)"
                     ),
-                    borderColor: "rgb(0, 255, 156)",
+                    borderColor: "rgb(255, 225, 255)",
                     borderWidth: 3,
                 },
                 {
@@ -654,7 +654,7 @@ const WaterDashboard = () => {
                     backgroundColor: secondAverages.map((value, index) =>
                         thresholds1[metrics[index]]?.find((t) => value <= t.max)?.color || "rgba(192, 192, 192, 0.5)"
                     ),
-                    borderColor: "rgb(255, 227, 26)",
+                    borderColor: "rgb(0, 0, 0)",
                     borderWidth: 3,
                 },
             ],
@@ -979,7 +979,7 @@ const WaterDashboard = () => {
                     <button
                         style={styles.detailedWaterButton}
                         onMouseEnter={(e) => {
-                            e.target.style.boxShadow = '0 0 15px 5px rgba(0, 198, 255, 0.8)'; // Apply glow on hover
+                            e.target.style.boxShadow = '0 0 15px 5px rgba(55, 237, 45, 0.8)'; // Apply glow on hover
                             e.target.style.transform = 'scale(1.05)'; // Slightly enlarge the button
                         }}
                         onMouseLeave={(e) => {
@@ -1160,7 +1160,7 @@ const WaterDashboard = () => {
                                         style={styles.alertRangeSelect}
                                     />
                                 </label>
-                                <label style={styles.alertRangeText}>
+                                {/* <label style={styles.alertRangeText}>
                                     Location:
                                     <select
                                         name="locationId"
@@ -1177,7 +1177,7 @@ const WaterDashboard = () => {
                                             </option>
                                         ))}
                                     </select>
-                                </label>
+                                </label> */}
                                 <button style={styles.fetchButton} onClick={fetchLogs}>
                                     Fetch Logs
                                 </button>
@@ -1204,7 +1204,7 @@ const WaterDashboard = () => {
                     <div style={styles.containerFilterBox}>
                         <h3 style={styles.sectionTitle}>Comparison Chart Selection</h3>
                         {/* Location Filter */}
-                        <div>
+                        {/* <div>
                             <label style={styles.comparisonLabel}>Select Location: </label>
                             <select
                                 value={filters.location}
@@ -1220,7 +1220,7 @@ const WaterDashboard = () => {
                                     ))
                                     : null}
                             </select>
-                        </div>
+                        </div> */}
                         {/* Range selection */}
                         <div>
                             <label style={styles.comparisonLabel}>Select Filter:</label>
@@ -1569,7 +1569,7 @@ const styles = {
     // BUTTON STYLE
     detailedWaterButton: {
         padding: '10px 20px',
-        background: 'linear-gradient(50deg, #00CCDD, #006E77)', // Gradient background
+        background: 'linear-gradient(50deg, #62b31b, #316901)', // Gradient background
         color: '#fff',
         border: 'none',
         borderRadius: '15px',
@@ -1639,7 +1639,7 @@ const styles = {
         marginLeft: '5px',
         padding: '10px 5px',
         borderRadius: '5px',
-        backgroundColor: 'rgba(0, 204, 221, 0.46)',
+        backgroundColor: 'rgba(60, 115, 14)',
         color: '#fff',
         border: 'none',
         outline: 'none',
@@ -1655,7 +1655,7 @@ const styles = {
         fontSize: '14px',
         padding: '10px 0px',
         borderRadius: '5px',
-        backgroundColor: 'rgb(0, 204, 221, 0.46)',
+        backgroundColor: 'rgb(60, 115, 14)',
         color: '#fff',
         border: 'none',
         outline: 'none',
@@ -1719,7 +1719,7 @@ const styles = {
     },
     summaryPanel: {
         flex: '1 1 calc(45% - 10px)', // Two panels per row
-        backgroundColor: 'rgb(27, 119, 211, 0.46)',
+        backgroundColor: 'rgb(4, 153, 2, 0.46)',
         padding: '20px',
         paddingLeft: '25px',
         borderRadius: '25px',
@@ -1767,7 +1767,7 @@ const styles = {
         marginLeft: '7px',
         padding: '10px 5px',
         borderRadius: '5px',
-        backgroundColor: 'rgb(0, 204, 221, 0.46)',
+        backgroundColor: 'rgb(60, 115, 14)',
         color: '#fff',
         border: 'none',
         outline: 'none',
@@ -1778,7 +1778,7 @@ const styles = {
         marginLeft: '7px',
         padding: '10px 5px',
         borderRadius: '5px',
-        backgroundColor: 'rgb(0, 204, 221, 0.46)',
+        backgroundColor: 'rgb(60, 115, 14)',
         color: '#fff',
         border: 'none',
         outline: 'none',
@@ -1788,7 +1788,7 @@ const styles = {
     fetchButton: {
         padding: '10px 20px',
         marginLeft: '13px',
-        backgroundColor: '#00CCDD',
+        backgroundColor: '#62b31b',
         color: '#fff',
         border: 'none',
         borderRadius: '5px',
@@ -1841,7 +1841,7 @@ const styles = {
         borderRadius: '10px',
         marginBottom: '20px',
         marginLeft: '25px',
-        backgroundColor: 'rgb(27, 119, 211, 0.46)',
+        backgroundColor: 'rgb(60, 115, 14)',
         color: "#fff",
         border: 'none',
     },
@@ -1958,14 +1958,14 @@ const styles = {
         // border: "1px solid #ccc", 
         padding: "10px",
         borderRadius: '20px',
-        backgroundColor: "rgb(29, 144, 154)",
+        backgroundColor: "rgb(19, 143, 3, 0.46)",
         color: "#fff",
         height: "500px", // Set fixed height for each metric block
         overflowY: "auto", // Enable vertical scrolling if content overflows
         textAlign: "center",
     },
     metricTitle: {
-        backgroundColor: 'rgb(0, 235, 255)',
+        backgroundColor: 'rgb(85, 184, 15)',
         height: '40px',
         width: '235px',
         marginBottom: '-38px',
@@ -1980,7 +1980,7 @@ const styles = {
         // marginLeft: '40px',
         display: 'inline-block',
         padding: '10px 20px',
-        backgroundColor: '#007bff',
+        backgroundColor: '#62b31b',
         color: '#ffffff',
         borderRadius: '10px',
         border: 'none',

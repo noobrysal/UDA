@@ -71,37 +71,37 @@ const AirQualityByDate = () => {
 
     const thresholds = {
         pm25: [
-            { min: 0, max: 25.99, label: "Good", color: "rgba(92, 225, 230)" },
-            { min: 26, max: 35.99, label: "Fair", color: "rgba(126, 205, 160)" },
-            { min: 36, max: 45.99, label: "Unhealthy", color: "rgba(255, 222, 89)" },
-            { min: 46, max: 55.99, label: "Very Unhealthy", color: "rgba(235, 123, 59)" },
+            { min: 0, max: 25.99, label: "Good", color: "rgba(85, 214, 69)" },
+            { min: 26, max: 35.99, label: "Fair", color: "rgba(255, 222, 89)" },
+            { min: 36, max: 45.99, label: "Unhealthy", color: "rgba(252, 184, 45)" },
+            { min: 46, max: 55.99, label: "Very Unhealthy", color: "rgba(235, 66, 61)" },
             { min: 56, max: 90.99, label: "Acutely Unhealthy", color: "rgba(111, 41, 133)" },
-            { min: 91, max: Infinity, label: "Emergency", color: "rgba(214, 54, 49)" },
+            { min: 91, max: Infinity, label: "Emergency", color: "rgba(140, 1, 4)" },
         ],
         pm10: [
-            { min: 0, max: 50.99, label: "Good", color: "rgba(92, 225, 230)" },
-            { min: 51, max: 100.99, label: "Fair", color: "rgba(126, 205, 160)" },
-            { min: 101, max: 150.99, label: "Unhealthy", color: "rgba(255, 222, 89)" },
-            { min: 151, max: 200.99, label: "Very Unhealthy", color: "rgba(235, 123, 59)" },
+            { min: 0, max: 50.99, label: "Good", color: "rgba(85, 214, 69)" },
+            { min: 51, max: 100.99, label: "Fair", color: "rgba(255, 222, 89)" },
+            { min: 101, max: 150.99, label: "Unhealthy", color: "rgba(252, 184, 45)" },
+            { min: 151, max: 200.99, label: "Very Unhealthy", color: "rgba(235, 66, 61)" },
             { min: 201, max: 300.99, label: "Acutely Unhealthy", color: "rgba(111, 41, 133)" },
-            { min: 301, max: Infinity, label: "Emergency", color: "rgba(214, 54, 49)" },
+            { min: 301, max: Infinity, label: "Emergency", color: "rgba(140, 1, 4)" },
         ],
         humidity: [
-            { min: 0, max: 25.99, label: "Poor", color: "rgba(255, 222, 89)" },
-            { min: 26, max: 30.99, label: "Fair", color: "rgba(126, 205, 160)" },
-            { min: 31, max: 60.99, label: "Good", color: "rgba(92, 225, 230)" },
-            { min: 61, max: 70.99, label: "Fair", color: "rgba(126, 205, 160)" },
-            { min: 71, max: Infinity, label: "Poor", color: "rgba(235, 123, 59)" },
+            { min: 0, max: 25.99, label: "Poor", color: "rgba(252, 184, 45)" },
+            { min: 26, max: 30.99, label: "Fair", color: "rgba(255, 222, 89)" },
+            { min: 31, max: 60.99, label: "Good", color: "rgba(85, 214, 69)" },
+            { min: 61, max: 70.99, label: "Fair", color: "rgba(255, 222, 89)" },
+            { min: 71, max: Infinity, label: "Poor", color: "rgba(235, 66, 61)" },
         ],
         temperature: [
-            { min: 0, max: 33.99, label: "Good", color: "rgba(92, 225, 230)" },
-            { min: 34, max: 41.99, label: "Caution", color: "rgba(126, 205, 160)" },
-            { min: 42, max: 54.99, label: "Danger", color: "rgba(255, 222, 89)" },
-            { min: 55, max: Infinity, label: "Extreme", color: "rgba(235, 123, 59)" },
+            { min: 0, max: 33.99, label: "Good", color: "rgba(85, 214, 69)" },
+            { min: 34, max: 41.99, label: "Caution", color: "rgba(255, 222, 89)" },
+            { min: 42, max: 54.99, label: "Danger", color: "rgba(252, 184, 45)" },
+            { min: 55, max: Infinity, label: "Extreme", color: "rgba(235, 66, 61)" },
         ],
         oxygen: [
-            { min: 0, max: 19.49, label: "Poor", color: "rgba(235, 123, 59)" },
-            { min: 19.5, max: Infinity, label: "Safe", color: "rgba(92, 225, 230)" },
+            { min: 0, max: 19.49, label: "Poor", color: "rgba(235, 66, 61)" },
+            { min: 19.5, max: Infinity, label: "Safe", color: "rgba(85, 214, 69)" },
         ],
     };
 
@@ -1513,7 +1513,7 @@ const styles = {
         gap: "15px",
     },
     controlButton: {
-        backgroundColor: "rgba(0, 123, 255, 0.7)",
+        backgroundColor: "rgba(0, 204, 221)",
         color: "#fff",
         border: "none",
         padding: "10px 20px",
@@ -1521,9 +1521,6 @@ const styles = {
         cursor: "pointer",
         fontWeight: "bold",
         transition: "background-color 0.3s",
-    },
-    controlButtonHover: {
-        backgroundColor: "rgba(5, 218, 255, 0.8)",
     },
     dropdownContainer: {
         display: "flex",
@@ -1543,7 +1540,7 @@ const styles = {
     calendarSelect: {
         padding: '8px',
         borderRadius: '5px',
-        backgroundColor: 'rgba(27, 119, 211, 0.46)',
+        backgroundColor: 'rgba(0, 204, 221, 0.46)',
         color: '#fff',
         border: 'none',
         outline: 'none',
