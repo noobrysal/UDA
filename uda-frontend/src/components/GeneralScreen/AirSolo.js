@@ -913,10 +913,13 @@ const AirView = () => {
             height: "100%", // Ensures it fits the allocated height
         },
         narrativeTitle: {
+            display: "flex",
+            alignItems: "center",
+            gap: "15px",
             color: "#fff",
             marginTop: 0,
             marginBottom: "15px",
-            fontSize: "16px", // Optional: Adjust title font size
+            fontSize: "16px",
             fontWeight: "bold",
         },
         narrativeContent: {
@@ -943,6 +946,23 @@ const AirView = () => {
                 margin: '4px 0',
                 fontSize: '14px',
             }
+        },
+        reportStatusWrapper: {
+            display: "flex",
+            alignItems: "center",
+            backgroundColor: 'rgba(242, 242, 242, 0.1)',
+            borderRadius: "15px",
+            padding: "5px 15px",
+            width: "fit-content"
+        },
+        reportIcon: {
+            fontSize: "20px",
+            marginRight: "8px"
+        },
+        reportStatus: {
+            fontSize: "16px",
+            fontWeight: "bold",
+            color: "#fff"
         },
 
 
@@ -999,7 +1019,7 @@ const AirView = () => {
 
     const generateNarrative = (hour) => {
         const hourData = hourlyData[hour];
-        if (!hourData) return "No data available for this hour.";
+        if (!hourData) return { text: "No data available for this hour.", status: null };
 
         const status = getAirQualityStatus(hourData.pm25, 'pm25');
         const time = formatHour(hour);
@@ -1020,7 +1040,6 @@ const AirView = () => {
             narrative += `Humidity levels are at ${hourData.humidity.toFixed(1)}% (${humidStatus?.label || 'normal'}). `;
         }
 
-        // Add recommendations based on overall status
         if (status) {
             const recommendations = thresholdInfo.find(t => t.level === status.label)?.recommendations || [];
             if (recommendations.length > 0) {
@@ -1028,7 +1047,7 @@ const AirView = () => {
             }
         }
 
-        return narrative;
+        return { text: narrative, status };
     };
 
     const calculateMaxValues = () => {
@@ -1049,20 +1068,29 @@ const AirView = () => {
         const metricThresholds = thresholds[metricId];
         if (!metricThresholds) return 0;
 
-        // Find the "Good" threshold range (first threshold in the array)
-        const goodThreshold = metricThresholds[0];
-        const maxGoodValue = goodThreshold.max;
+        // Special handling for PM2.5 and PM10
+        if (['pm25', 'pm10'].includes(metricId)) {
+            const emergencyThreshold = metricThresholds[metricThresholds.length - 1].min; // Get emergency level threshold
+            const goodThreshold = metricThresholds[0].max;
 
-        // For metrics where lower is better (pm25, pm10, temperature)
-        if (['pm25', 'pm10', 'temperature'].includes(metricId)) {
-            // Calculate percentage where lower values give higher percentages
+            // If value is at emergency level or higher, return 0%
+            if (value >= emergencyThreshold) return 0;
+
+            // Calculate percentage based on position between good and emergency levels
+            let percentage = ((emergencyThreshold - value) / (emergencyThreshold - goodThreshold)) * 100;
+            return Math.min(Math.max(percentage, 0), 100);
+        }
+
+        // For temperature (keep the reversed calculation)
+        if (metricId === 'temperature') {
+            const maxGoodValue = metricThresholds[0].max;
             let percentage = ((maxGoodValue - value) / maxGoodValue) * 100;
-            // Add 100 to make it positive and cap at 100%
             percentage = Math.min(Math.max(percentage + 100, 0), 100);
             return percentage;
         }
 
-        // For other metrics where higher is better (humidity, oxygen)
+        // For other metrics (humidity, oxygen) - keep original calculation
+        const maxGoodValue = metricThresholds[0].max;
         let percentage = (maxGoodValue / value) * 100;
         percentage = Math.min(percentage, 100);
         return percentage;
@@ -1384,9 +1412,24 @@ const AirView = () => {
                     <div style={styles.lowerRightBox}>
                         {/* Narrative Report */}
                         <div style={styles.narrativeReportContainer}>
-                            <h3 style={styles.narrativeTitle}>Air Quality Report</h3>
+                            <div style={styles.narrativeTitle}>
+                                <h3 style={{ margin: 0 }}>Air Quality Report</h3>
+                                {(() => {
+                                    const { text, status } = generateNarrative(selectedHourForNarrative);
+                                    const thresholdData = thresholdInfo.find(t => t.level === status?.label);
+                                    return status && thresholdData ? (
+                                        <div style={{
+                                            ...styles.reportStatusWrapper,
+                                            backgroundColor: status.color
+                                        }}>
+                                            <span style={styles.reportIcon}>{thresholdData.icon}</span>
+                                            <span style={styles.reportStatus}>{status.label}</span>
+                                        </div>
+                                    ) : null;
+                                })()}
+                            </div>
                             <p style={styles.narrativeContent}>
-                                {generateNarrative(selectedHourForNarrative)}
+                                {generateNarrative(selectedHourForNarrative).text}
                             </p>
                         </div>
                     </div>
