@@ -10,7 +10,12 @@ import AirQualityInstance from './components/iot/AirQuality/AirQualityInstance';
 import AirQualityByDate from './components/iot/AirQuality/AirQualityByDate';
 import LandingPage from './components/LandingPage';
 import SidebarComponent from './components/global/Sidebar'; // Adjust the import path as needed
-import AirView from './components/iot/AirQuality/AirView';
+import SoilQualityByDate from './components/iot/SoilQuality/SoilQualityByDate';
+import WaterQualityByDate from './components/iot/WaterQuality/WaterQualityByDate';
+import WaterQualityInstance from './components/iot/WaterQuality/WaterQualityInstance';
+import WaterDashboard from './components/iot/WaterQuality/WaterDashboard';
+
+
 
 // Define global styles for scrollbar
 const GlobalStyle = createGlobalStyle`
@@ -71,6 +76,12 @@ const AppContent = () => {
           <Route path="/air-dashboard" element={<AirDashboard />} />
           <Route path="/air-quality" element={<AirQualityByDate />} />
           <Route path="/air-quality/id/:id" element={<AirQualityInstance />} />
+          <Route path="/soil-quality" element={<SoilQualityByDate />} />
+          <Route path="/water-quality" element={<WaterQualityByDate />} />
+          <Route path="/water-quality/id/:id" element={<WaterQualityInstance />} />
+          <Route path="/water-dashboard" element={<WaterDashboard />} />
+
+
           {/* <Route path="/airview" element={<AirView />} /> */}
         </Routes>
       </div>

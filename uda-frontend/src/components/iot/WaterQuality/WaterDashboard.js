@@ -22,8 +22,8 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
 
 
-const AirDashboard = () => {
-    const [airData, setAirData] = useState([]);
+const WaterDashboard = () => {
+    const [waterData, setWaterData] = useState([]);
     const [summary, setSummary] = useState([]);
     const [visibleIndices, setVisibleIndices] = useState([0, 1]); // Tracks visible locations for the carousel
     const [isTransitioning, setIsTransitioning] = useState(false); // Track if a transition is in progress
@@ -38,12 +38,12 @@ const AirDashboard = () => {
 
     const [comparisonData, setComparisonData] = useState(null); // State for comparison chart data
 
-    //BUTTON NAVIGATION TO AIR DETAILED DATA
+    //BUTTON NAVIGATION TO WATER DETAILED DATA
     const navigate = useNavigate();
 
     const handleButtonClick = () => {
         // Navigate to the desired route when the button is clicked
-        navigate('/air-quality'); // Change '/detailed-data' to the route you want
+        navigate('/water-quality'); // Change '/detailed-data' to the route you want
     };
 
     const locations = [
@@ -55,38 +55,23 @@ const AirDashboard = () => {
     ];
 
     const thresholds = {
-        pm25: [
-            { min: 0, max: 25.99, label: "Good", color: "rgba(22, 186, 1)" },
-            { min: 26, max: 35.99, label: "Fair", color: "rgba(255, 206, 86)" },
-            { min: 36, max: 45.99, label: "Unhealthy", color: "rgba(255, 140, 0)" },
-            { min: 46, max: 55.99, label: "Very Unhealthy", color: "rgba(254, 0, 0)" },
-            { min: 56, max: 90.99, label: "Severely Unhealthy", color: "rgba(129, 0, 127)" },
-            { min: 91, max: Infinity, label: "Emergency", color: "rgba(140, 1, 4)" },
-        ],
-        pm10: [
-            { min: 0, max: 50.99, label: "Good", color: "rgba(22, 186, 1)" },
-            { min: 51, max: 100.99, label: "Fair", color: "rgba(255, 206, 86)" },
-            { min: 101, max: 150.99, label: "Unhealthy", color: "rgba(255, 140, 0)" },
-            { min: 151, max: 200.99, label: "Very Unhealthy", color: "rgba(254, 0, 0)" },
-            { min: 201, max: 300.99, label: "Severely Unhealthy", color: "rgba(129, 0, 127)" },
-            { min: 301, max: Infinity, label: "Emergency", color: "rgba(140, 1, 4)" },
-        ],
-        humidity: [
-            { min: 0, max: 25.99, label: "Poor", color: "rgba(255, 140, 0)" },
-            { min: 26, max: 30.99, label: "Fair", color: "rgba(255, 206, 86)" },
-            { min: 31, max: 60.99, label: "Good", color: "rgba(22, 186, 1)" },
-            { min: 61, max: 70.99, label: "Fair", color: "rgba(255, 206, 86)" },
-            { min: 71, max: Infinity, label: "Poor", color: "rgba(254, 0, 0)" },
+        pH: [
+            { min: 0, max: 6.49, label: "Too Acidic", color: "rgba(254, 0, 0)" },
+            { min: 6.5, max: 8.5, label: "Acceptable", color: "rgba(22, 186, 1)" },
+            { min: 8.51, max: Infinity, label: "Too Alkaline", color: "rgba(255, 140, 0)" },
         ],
         temperature: [
-            { min: 0, max: 33.99, label: "Good", color: "rgba(22, 186, 1)" },
-            { min: 34, max: 41.99, label: "Caution", color: "rgba(255, 206, 86)" },
-            { min: 42, max: 54.99, label: "Danger", color: "rgba(255, 140, 0)" },
-            { min: 55, max: Infinity, label: "Extreme Danger", color: "rgba(254, 0, 0)" },
+            { min: 0, max: 25.99, label: "Too Cold", color: "rgba(255, 140, 0)" },
+            { min: 26, max: 30, label: "Acceptable", color: "rgba(22, 186, 1)" },
+            { min: 30.01, max: Infinity, label: "Too Hot", color: "rgba(254, 0, 0)" },
         ],
-        oxygen: [
-            { min: 0, max: 19.49, label: "Poor", color: "rgba(254, 0, 0)" },
-            { min: 19.5, max: Infinity, label: "Safe", color: "rgba(22, 186, 1)" },
+        tss: [
+            { min: 0, max: 50, label: "Acceptable", color: "rgba(22, 186, 1)" },
+            { min: 50.01, max: Infinity, label: "Too Cloudy", color: "rgba(254, 0, 0)" },
+        ],
+        tds_ppm: [
+            { min: 0, max: 500, label: "Acceptable", color: "rgba(22, 186, 1)" },
+            { min: 500.01, max: Infinity, label: "High Dissolved Substances", color: "rgba(254, 0, 0)" },
         ],
     };
 
@@ -120,78 +105,60 @@ const AirDashboard = () => {
                     month: "2-digit",
                     day: "2-digit",
                     hour12: true,
-                    timeZone: "Asia/Manila" // Respect the timezone from the database
+                    timeZone: "UTC" // Changed to UTC for water data
                 });
             };
 
             // Calculate start and end dates for the main date range
             if (range === 'day') {
-                start = `${date}T00:00:00+08:00`;
-                end = `${date}T23:59:59+08:00`;
+                start = `${date}T00:00:00.000Z`;
+                end = `${date}T23:59:59.999Z`;
             } else if (range === 'week') {
                 start = calculateStartDate(date, range);
                 end = calculateEndDate(date, range);
             } else if (range === 'month') {
                 const startDate = new Date(date);
                 startDate.setDate(1);
-                start = `${startDate.toISOString().split('T')[0]}T00:00:00+08:00`;
+                start = `${startDate.toISOString().split('T')[0]}T00:00:00.000Z`;
                 const endDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0);
-                end = `${endDate.toISOString().split('T')[0]}T23:59:59.999+08:00`;
+                end = `${endDate.toISOString().split('T')[0]}T23:59:59.999Z`;
             }
 
             // Calculate start and end dates for the comparison date range using the same range
             if (range === 'day') {
-                comparisonStart = `${comparisonDate}T00:00:00+08:00`;
-                comparisonEnd = `${comparisonDate}T23:59:59+08:00`;
+                comparisonStart = `${comparisonDate}T00:00:00.000Z`;
+                comparisonEnd = `${comparisonDate}T23:59:59.999Z`;
             } else if (range === 'week') {
                 comparisonStart = calculateStartDate(comparisonDate, range);
                 comparisonEnd = calculateEndDate(comparisonDate, range);
             } else if (range === 'month') {
                 const comparisonStartDate = new Date(comparisonDate);
                 comparisonStartDate.setDate(1);
-                comparisonStart = `${comparisonStartDate.toISOString().split('T')[0]}T00:00:00+08:00`;
+                comparisonStart = `${comparisonStartDate.toISOString().split('T')[0]}T00:00:00.000Z`;
                 const comparisonEndDate = new Date(comparisonStartDate.getFullYear(), comparisonStartDate.getMonth() + 1, 0);
-                comparisonEnd = `${comparisonEndDate.toISOString().split('T')[0]}T23:59:59.999+08:00`;
+                comparisonEnd = `${comparisonEndDate.toISOString().split('T')[0]}T23:59:59.999Z`;
             }
 
-            const locationData = [];
-            let hasData = false;
-            let hasMainData = false;
-            let hasComparisonData = false;
+            // Single data fetch without location filtering
+            const { data, error } = await supabase
+                .from('sensor_data')
+                .select('*')
+                .gte('timestamp', start)
+                .lt('timestamp', end);
 
-            for (const location of locations) {
-                const { data, error } = await supabase
-                    .from('sensors')
-                    .select('*')
-                    .gte('date', start)
-                    .lt('date', end)
-                    .eq('locationId', location.id);
+            if (error) throw error;
 
-                if (error) throw error;
+            const summaryComparisonData = await supabase
+                .from('sensor_data')
+                .select('*')
+                .gte('timestamp', comparisonStart)
+                .lt('timestamp', comparisonEnd);
 
-                const summaryComparisonData = await supabase
-                    .from('sensors')
-                    .select('*')
-                    .gte('date', comparisonStart)
-                    .lt('date', comparisonEnd)
-                    .eq('locationId', location.id);
+            if (summaryComparisonData.error) throw summaryComparisonData.error;
 
-                if (summaryComparisonData.error) throw summaryComparisonData.error;
-
-                if (data.length > 0) {
-                    hasMainData = true;
-                }
-
-                if (summaryComparisonData.data.length > 0) {
-                    hasComparisonData = true;
-                }
-
-                if (data.length > 0 || summaryComparisonData.data.length > 0) {
-                    hasData = true;
-                }
-
-                locationData.push({ location: location.name, data, summaryComparisonData: summaryComparisonData.data });
-            }
+            let hasData = data.length > 0 || summaryComparisonData.data.length > 0;
+            let hasMainData = data.length > 0;
+            let hasComparisonData = summaryComparisonData.data.length > 0;
 
             if (!hasData) {
                 const formattedStart = formatDateToLocaleString(start);
@@ -211,12 +178,15 @@ const AirDashboard = () => {
                 toast.error(`No data found for the comparison date range starting at ${formattedComparisonStart}`);
                 return;
             }
-            hasData = false;
-            hasMainData = false;
-            hasComparisonData = false;
 
-            setAirData(locationData);
-            calculateSummary(locationData);
+            // Simplified data structure without location
+            const waterData = [{
+                data,
+                summaryComparisonData: summaryComparisonData.data
+            }];
+
+            setWaterData(waterData);
+            calculateSummary(waterData);
             toast.success('Summary data fetched successfully.');
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -240,75 +210,101 @@ const AirDashboard = () => {
         return () => clearInterval(timer);
     }, [locations.length, isTransitioning, transitionDirection]);
 
-    const calculateSummary = (locationData) => {
-        const summaries = locationData.map(({ location, data, summaryComparisonData }) => {
+    const calculateSummary = (waterData) => {
+        const summaries = waterData.map(({ data, summaryComparisonData }) => {
             const calculateMetric = (metric) => {
-                // Helper function to calculate average based on range
                 const calculateRangeAverage = (data, range) => {
                     if (!data || data.length === 0) return NaN;
 
-                    // Sort data by date
-                    const sortedData = [...data].sort((a, b) => new Date(a.date) - new Date(b.date));
+                    // Helper function to safely parse dates
+                    const safeParseDate = (dateStr) => {
+                        try {
+                            const date = new Date(dateStr);
+                            // Check if date is valid
+                            if (isNaN(date.getTime())) {
+                                console.warn('Invalid date:', dateStr);
+                                return null;
+                            }
+                            return date;
+                        } catch (err) {
+                            console.warn('Error parsing date:', dateStr, err);
+                            return null;
+                        }
+                    };
+
+                    // Sort data by date and filter out invalid dates
+                    const sortedData = [...data]
+                        .map(item => ({
+                            ...item,
+                            parsedDate: safeParseDate(item.timestamp) // Use timestamp instead of date
+                        }))
+                        .filter(item => item.parsedDate !== null)
+                        .sort((a, b) => a.parsedDate - b.parsedDate);
+
+                    if (sortedData.length === 0) return NaN;
+
+                    const calculateGroupedAverage = (data, groupKeyFn) => {
+                        const groups = {};
+                        data.forEach(item => {
+                            try {
+                                const key = groupKeyFn(item.parsedDate);
+                                if (!groups[key]) {
+                                    groups[key] = { sum: 0, count: 0 };
+                                }
+                                const value = item[metric];
+                                if (value != null && !isNaN(value)) {
+                                    groups[key].sum += value;
+                                    groups[key].count++;
+                                }
+                            } catch (err) {
+                                console.warn('Error processing item:', item, err);
+                            }
+                        });
+
+                        const groupAverages = Object.values(groups)
+                            .map(g => g.count > 0 ? g.sum / g.count : NaN)
+                            .filter(v => !isNaN(v));
+
+                        return groupAverages.length > 0
+                            ? groupAverages.reduce((a, b) => a + b) / groupAverages.length
+                            : NaN;
+                    };
+
+                    // Helper function to format date to ISO string safely
+                    const safeFormatDate = (date, formatter) => {
+                        try {
+                            return formatter(date);
+                        } catch (err) {
+                            console.warn('Error formatting date:', date, err);
+                            return null;
+                        }
+                    };
 
                     switch (range) {
                         case 'hour':
-                            // Group by hour and calculate hourly averages
                             return calculateGroupedAverage(sortedData, d =>
-                                new Date(d.date).toISOString().split(':')[0]
-                            );
+                                safeFormatDate(d, date => date.toISOString().split(':')[0]));
                         case 'day':
-                            // Group by day and calculate daily averages
                             return calculateGroupedAverage(sortedData, d =>
-                                new Date(d.date).toISOString().split('T')[0]
-                            );
+                                safeFormatDate(d, date => date.toISOString().split('T')[0]));
                         case 'week':
-                            // Group by week and calculate weekly averages
                             return calculateGroupedAverage(sortedData, d => {
-                                const date = new Date(d.date);
-                                const startOfWeek = new Date(date);
-                                startOfWeek.setDate(date.getDate() - date.getDay());
-                                return startOfWeek.toISOString().split('T')[0];
+                                const startOfWeek = new Date(d);
+                                startOfWeek.setDate(d.getDate() - d.getDay());
+                                return safeFormatDate(startOfWeek, date => date.toISOString().split('T')[0]);
                             });
                         case 'month':
-                            // Group by month and calculate monthly averages
                             return calculateGroupedAverage(sortedData, d =>
-                                new Date(d.date).toISOString().slice(0, 7)
-                            );
+                                safeFormatDate(d, date => date.toISOString().slice(0, 7)));
                         default:
                             return NaN;
                     }
-                };
-
-                // Helper function to calculate grouped averages
-                const calculateGroupedAverage = (data, groupKeyFn) => {
-                    const groups = {};
-                    data.forEach(item => {
-                        const key = groupKeyFn(item);
-                        if (!groups[key]) {
-                            groups[key] = { sum: 0, count: 0 };
-                        }
-                        const value = item[metric];
-                        if (value != null && !isNaN(value)) {
-                            groups[key].sum += value;
-                            groups[key].count++;
-                        }
-                    });
-
-                    // Calculate average of group averages
-                    const groupAverages = Object.values(groups)
-                        .map(g => g.sum / g.count)
-                        .filter(v => !isNaN(v));
-
-                    return groupAverages.length > 0
-                        ? groupAverages.reduce((a, b) => a + b) / groupAverages.length
-                        : NaN;
                 };
 
                 // Calculate averages for both periods
                 const avg = calculateRangeAverage(data, summaryFilters.range);
                 const comparisonAvg = calculateRangeAverage(summaryComparisonData, summaryFilters.range);
 
-                // Determine trend by comparing averages
                 const trend = !isNaN(avg) && !isNaN(comparisonAvg)
                     ? (avg < comparisonAvg ? 'improving' : avg > comparisonAvg ? 'worsening' : 'stable')
                     : '';
@@ -318,17 +314,17 @@ const AirDashboard = () => {
                 return { avg, status, trend };
             };
 
+            // Return a single summary object instead of array
             return {
-                location,
-                pm25: calculateMetric('pm25'),
-                pm10: calculateMetric('pm10'),
-                humidity: calculateMetric('humidity'),
+                pH: calculateMetric('pH'),
                 temperature: calculateMetric('temperature'),
-                oxygen: calculateMetric('oxygen'),
+                tss: calculateMetric('tss'),
+                tds_ppm: calculateMetric('tds_ppm'),
             };
         });
 
-        setSummary(summaries);
+        // Set the first summary as it's a single dataset
+        setSummary(summaries[0]);
     };
 
     const getStatus = (value, metric) => {
@@ -402,31 +398,70 @@ const AirDashboard = () => {
     const fetchComparisonData = async () => {
         setComparisonData(null); // Clear chart
         try {
-            const { range, first, second, location } = filters;
-
-            if (!location) {
-                toast.warning('Please select a location.');
-                return;
-            }
+            const { range, first, second } = filters; // Removed location since we don't need it
 
             let firstDate = first.date;
             let secondDate = second.date;
 
-            if (range === 'week') {
-                firstDate = first.weekStart;
-                secondDate = second.weekStart;
+            let firstStart, firstEnd, secondStart, secondEnd;
+
+            // Set up date ranges for first period
+            if (range === 'hour' && first.hour !== null) {
+                firstStart = `${firstDate}T${first.hour}:00:00.000Z`;
+                firstEnd = `${firstDate}T${first.hour}:59:59.999Z`;
+            } else if (range === 'day') {
+                firstStart = `${firstDate}T00:00:00.000Z`;
+                firstEnd = `${firstDate}T23:59:59.999Z`;
+            } else if (range === 'week') {
+                firstStart = calculateStartDate(first.weekStart, range);
+                firstEnd = calculateEndDate(first.weekStart, range);
             } else if (range === 'month') {
                 const currentYear = new Date().getFullYear();
-                firstDate = `${first.year || currentYear}-${first.month}-01`;
-                secondDate = `${second.year || currentYear}-${second.month}-01`;
+                const startDate = new Date(`${currentYear}-${first.month}-01`);
+                firstStart = `${startDate.toISOString().split('T')[0]}T00:00:00.000Z`;
+                const endDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0);
+                firstEnd = `${endDate.toISOString().split('T')[0]}T23:59:59.999Z`;
             }
 
-            const firstData = await fetchDataForTimeRange(firstDate, first.hour, range, location);
-            const secondData = await fetchDataForTimeRange(secondDate, second.hour, range, location);
+            // Set up date ranges for second period
+            if (range === 'hour' && second.hour !== null) {
+                secondStart = `${secondDate}T${second.hour}:00:00.000Z`;
+                secondEnd = `${secondDate}T${second.hour}:59:59.999Z`;
+            } else if (range === 'day') {
+                secondStart = `${secondDate}T00:00:00.000Z`;
+                secondEnd = `${secondDate}T23:59:59.999Z`;
+            } else if (range === 'week') {
+                secondStart = calculateStartDate(second.weekStart, range);
+                secondEnd = calculateEndDate(second.weekStart, range);
+            } else if (range === 'month') {
+                const currentYear = new Date().getFullYear();
+                const startDate = new Date(`${currentYear}-${second.month}-01`);
+                secondStart = `${startDate.toISOString().split('T')[0]}T00:00:00.000Z`;
+                const endDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0);
+                secondEnd = `${endDate.toISOString().split('T')[0]}T23:59:59.999Z`;
+            }
+
+            // Fetch first period data
+            const { data: firstData, error: firstError } = await supabase
+                .from('sensor_data')
+                .select('*')
+                .gte('timestamp', firstStart)
+                .lt('timestamp', firstEnd);
+
+            if (firstError) throw firstError;
+
+            // Fetch second period data
+            const { data: secondData, error: secondError } = await supabase
+                .from('sensor_data')
+                .select('*')
+                .gte('timestamp', secondStart)
+                .lt('timestamp', secondEnd);
+
+            if (secondError) throw secondError;
 
             if (!firstData.length || !secondData.length) {
                 toast.warning('No data found for one or both ranges.');
-                setComparisonData(null); // Clear chart
+                setComparisonData(null);
                 return;
             }
 
@@ -439,34 +474,7 @@ const AirDashboard = () => {
         }
     };
 
-    const fetchDataForTimeRange = async (date, hour, range, location) => {
-        if (!date || !location) throw new Error("Date and location are required.");
-
-        let start, end;
-
-        if (range === 'hour' && hour !== null) {
-            start = `${date}T${hour}:00:00+00:00`;
-            end = `${date}T${hour}:59:59+00:00`;
-        } else if (range === 'day') {
-            start = `${date}T00:00:00+00:00`;
-            end = `${date}T23:59:59+00:00`;
-        } else if (range === 'week' || range === 'month') {
-            start = calculateStartDate(date, range);
-            end = calculateEndDate(date, range);
-        }
-
-        const { data, error } = await supabase
-            .from('sensors')
-            .select('*')
-            .eq('locationId', location) // Filter by location
-            .gte('date', start)
-            .lt('date', end);
-
-        if (error) throw error;
-
-        return data;
-    };
-
+    // Remove fetchDataForTimeRange function as it's no longer needed
 
     // Helper function for calculating start date for 'month' and 'week'
     const calculateStartDate = (date, range) => {
@@ -506,7 +514,7 @@ const AirDashboard = () => {
             return { avg, status };
         };
 
-        const metrics = ['pm25', 'pm10', 'humidity', 'temperature', 'oxygen'];
+        const metrics = ['pH', 'temperature', 'tss', 'tds_ppm'];
         const firstResult = {};
         const secondResult = {};
 
@@ -519,38 +527,23 @@ const AirDashboard = () => {
     };
 
     const thresholds1 = {
-        pm25: [
-            { min: 0, max: 25.99, label: "Good", color: "rgba(22, 186, 1)" },
-            { min: 26, max: 35.99, label: "Fair", color: "rgba(255, 206, 86)" },
-            { min: 36, max: 45.99, label: "Unhealthy", color: "rgba(255, 140, 0)" },
-            { min: 46, max: 55.99, label: "Very Unhealthy", color: "rgba(254, 0, 0)" },
-            { min: 56, max: 90.99, label: "Severely Unhealthy", color: "rgba(129, 0, 127)" },
-            { min: 91, max: Infinity, label: "Emergency", color: "rgba(140, 1, 4)" },
-        ],
-        pm10: [
-            { min: 0, max: 50.99, label: "Good", color: "rgba(22, 186, 1)" },
-            { min: 51, max: 100.99, label: "Fair", color: "rgba(255, 206, 86)" },
-            { min: 101, max: 150.99, label: "Unhealthy", color: "rgba(255, 140, 0)" },
-            { min: 151, max: 200.99, label: "Very Unhealthy", color: "rgba(254, 0, 0)" },
-            { min: 201, max: 300.99, label: "Severely Unhealthy", color: "rgba(129, 0, 127)" },
-            { min: 301, max: Infinity, label: "Emergency", color: "rgba(140, 1, 4)" },
-        ],
-        humidity: [
-            { min: 0, max: 25.99, label: "Poor", color: "rgba(255, 140, 0)" },
-            { min: 26, max: 30.99, label: "Fair", color: "rgba(255, 206, 86)" },
-            { min: 31, max: 60.99, label: "Good", color: "rgba(22, 186, 1)" },
-            { min: 61, max: 70.99, label: "Fair", color: "rgba(255, 206, 86)" },
-            { min: 71, max: Infinity, label: "Poor", color: "rgba(254, 0, 0)" },
+        pH: [
+            { min: 0, max: 6.49, label: "Too Acidic", color: "rgba(254, 0, 0)" },
+            { min: 6.5, max: 8.5, label: "Acceptable", color: "rgba(22, 186, 1)" },
+            { min: 8.51, max: Infinity, label: "Too Alkaline", color: "rgba(255, 140, 0)" },
         ],
         temperature: [
-            { min: 0, max: 33.99, label: "Good", color: "rgba(22, 186, 1)" },
-            { min: 34, max: 41.99, label: "Caution", color: "rgba(255, 206, 86)" },
-            { min: 42, max: 54.99, label: "Danger", color: "rgba(255, 140, 0)" },
-            { min: 55, max: Infinity, label: "Extreme Danger", color: "rgba(254, 0, 0)" },
+            { min: 0, max: 25.99, label: "Too Cold", color: "rgba(255, 140, 0)" },
+            { min: 26, max: 30, label: "Acceptable", color: "rgba(22, 186, 1)" },
+            { min: 30.01, max: Infinity, label: "Too Hot", color: "rgba(254, 0, 0)" },
         ],
-        oxygen: [
-            { min: 0, max: 19.49, label: "Poor", color: "rgba(254, 0, 0)" },
-            { min: 19.5, max: Infinity, label: "Safe", color: "rgba(22, 186, 1)" },
+        tss: [
+            { min: 0, max: 50, label: "Acceptable", color: "rgba(22, 186, 1)" },
+            { min: 50.01, max: Infinity, label: "Too Cloudy", color: "rgba(254, 0, 0)" },
+        ],
+        tds_ppm: [
+            { min: 0, max: 500, label: "Acceptable", color: "rgba(22, 186, 1)" },
+            { min: 500.01, max: Infinity, label: "High Dissolved Substances", color: "rgba(254, 0, 0)" },
         ],
     };
 
@@ -620,7 +613,7 @@ const AirDashboard = () => {
     );
 
     const renderComparisonChart = (comparisonData) => {
-        const metrics = ["pm25", "pm10", "humidity", "temperature", "oxygen"];
+        const metrics = ["pH", "temperature", "tss", "tds_ppm"];
 
         // Default values when comparisonData is null or undefined
         const defaultData = {
@@ -767,7 +760,7 @@ const AirDashboard = () => {
     };
 
     const renderLegend = () => {
-        const metrics = ["pm25", "pm10", "humidity", "temperature", "oxygen"];
+        const metrics = ["pH", "temperature", "tss", "tds_ppm"];
         return (
             <div style={{ marginTop: "30px" }}>
                 {metrics.map((metric) => (
@@ -829,42 +822,68 @@ const AirDashboard = () => {
     const logsContainerRef = useRef(null); // Add this near other state declarations
 
     const fetchLogs = async () => {
-        const { range, date, locationId } = logFilters;
+        const { range, date } = logFilters;
 
         // Validate inputs
-        if (!date || !locationId) {
-            setLogsErrorMessage('Please select both a location and a date.');
+        if (!date) {
+            setLogsErrorMessage('Please select a date.');
             return;
         }
 
-        setLogsErrorMessage('');  // Clear any previous error messages
+        setLogsErrorMessage('');
 
-        const start = calculateStartDate(date, range);
-        const end = calculateEndDate(date, range);
+        let start, end;
 
-        const { data, error } = await supabase
-            .from('sensors')
-            .select('*')
-            .eq('locationId', locationId)
-            .gte('date', start)
-            .lt('date', end);
+        if (range === 'month') {
+            const startDate = new Date(date);
+            startDate.setDate(1);
+            start = `${startDate.getFullYear()}-${String(startDate.getMonth() + 1).padStart(2, '0')}-01T00:00:00.000Z`;
+            const endDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0);
+            end = `${endDate.getFullYear()}-${String(endDate.getMonth() + 1).padStart(2, '0')}-${String(endDate.getDate()).padStart(2, '0')}T23:59:59.999Z`;
+        } else {
+            start = calculateStartDate(date, range);
+            end = calculateEndDate(date, range);
+        }
 
-        if (error) {
-            console.error('Error fetching logs:', error);
-            setLogsErrorMessage('An error occurred while fetching logs.');
+        const PAGE_SIZE = 100;
+        let currentPage = 0;
+        let hasMore = true;
+        const allData = [];
+
+        while (hasMore) {
+            const { data, error } = await supabase
+                .from('sensor_data')
+                .select('timestamp, pH, temperature, tss, tds_ppm')
+                .gte('timestamp', start)
+                .lt('timestamp', end)
+                .range(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE - 1)
+                .order('timestamp', { ascending: true });
+
+            if (error) {
+                console.error('Error fetching logs:', error);
+                setLogsErrorMessage('An error occurred while fetching logs.');
+                return;
+            }
+
+            if (!data || data.length === 0) {
+                hasMore = false;
+                break;
+            }
+
+            allData.push(...data);
+            hasMore = data.length === PAGE_SIZE;
+            currentPage++;
+            await new Promise(resolve => setTimeout(resolve, 100)); // Delay to avoid rate limiting
+        }
+
+        if (allData.length === 0) {
+            setLogsErrorMessage('No logs found for the selected date.');
             return;
         }
 
-        // Check if no logs were found
-        if (!data || data.length === 0) {
-            setLogsErrorMessage('No logs found for the selected date and location.');
-            return;
-        }
-
-        generateLogs(data);
+        generateLogs(allData);
         toast.success('Logs fetched successfully.');
 
-        // Scroll to logs container after data is loaded
         if (logsContainerRef.current) {
             logsContainerRef.current.scrollIntoView({
                 behavior: 'smooth',
@@ -874,59 +893,70 @@ const AirDashboard = () => {
     };
 
     const generateLogs = (data) => {
-        console.log('generateLogs called');
-        const thresholds = {
-            pm25: thresholds1.pm25.slice(2), // Unhealthy to Emergency
-            pm10: thresholds1.pm10.slice(2), // Unhealthy to Emergency
-            humidity: thresholds1.humidity.filter((t) => t.label === "Poor"),
-            temperature: thresholds1.temperature.filter(
-                (t) => t.label === "Danger" || t.label === "Extreme Danger"
-            ),
-            oxygen: [
-                { max: 19.5, label: "Poor", color: "rgba(255, 206, 86, 1)" },
-            ],  // Added oxygen thresholds
+        // Define what values are considered critical for each metric
+        const isValueCritical = (value, metric) => {
+            const metricThresholds = thresholds[metric];
+            if (!metricThresholds || value === null || value === undefined || isNaN(value)) {
+                return false;
+            }
+
+            // For each metric, find if the value is in an unacceptable range
+            switch (metric) {
+                case 'pH':
+                    return value < 6.5 || value > 8.5;
+                case 'temperature':
+                    return value < 26 || value > 30;
+                case 'tss':
+                    return value > 50;
+                case 'tds_ppm':
+                    return value > 500;
+                default:
+                    return false;
+            }
+        };
+
+        const getThresholdForValue = (value, metric) => {
+            const metricThresholds = thresholds[metric];
+            return metricThresholds.find(t => value >= t.min && value <= t.max) || metricThresholds[metricThresholds.length - 1];
         };
 
         const groupedLogs = {
-            pm25: [],
-            pm10: [],
-            humidity: [],
+            pH: [],
             temperature: [],
-            oxygen: [],  // Added oxygen grouping
+            tss: [],
+            tds_ppm: [],
         };
 
         data.forEach((entry) => {
-            ["pm25", "pm10", "humidity", "temperature", "oxygen"].forEach((metric) => {
+            ["pH", "temperature", "tss", "tds_ppm"].forEach((metric) => {
                 const value = entry[metric];
-                const timestamp = new Date(entry.date).toLocaleString("en-US", {
-                    year: "numeric",
-                    month: "2-digit",
-                    day: "2-digit",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    second: "2-digit",
-                    hour12: false,
-                    timeZone: "Asia/Manila" // Adjust to the desired time zone
-                });
-                const remark = entry[`${metric}Remarks`];
 
-                // Match threshold for each metric
-                const matchingThreshold = thresholds[metric]?.find(
-                    (threshold) => (metric === "oxygen" ? value <= threshold.max : threshold.label === remark)
-                );
+                // Only log if the value is in a critical range
+                if (isValueCritical(value, metric)) {
+                    const threshold = getThresholdForValue(value, metric);
+                    const timestamp = new Date(entry.timestamp).toLocaleString("en-US", {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                        hour12: true, // Use 12-hour clock with AM/PM
+                        timeZone: "UTC"
+                    });
 
-                if (matchingThreshold) {
                     groupedLogs[metric].push({
                         metric,
-                        threshold: matchingThreshold.label,
-                        color: matchingThreshold.color, // Include the color
+                        value: value,
+                        threshold: threshold.label,
+                        color: threshold.color,
                         timestamp,
                     });
                 }
             });
         });
 
-        // Sort each metric's logs by descending timestamp
+        // Sort logs by timestamp
         Object.keys(groupedLogs).forEach((metric) => {
             groupedLogs[metric].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
         });
@@ -945,9 +975,9 @@ const AirDashboard = () => {
             {/* <Sidebar> */}
             <div style={styles.container}>
                 <div style={styles.headerRow}>
-                    <h1 style={styles.dashboardTitle}>Air Quality Dashboard</h1>
+                    <h1 style={styles.dashboardTitle}>Water Quality Dashboard</h1>
                     <button
-                        style={styles.detailedAirButton}
+                        style={styles.detailedWaterButton}
                         onMouseEnter={(e) => {
                             e.target.style.boxShadow = '0 0 15px 5px rgba(0, 198, 255, 0.8)'; // Apply glow on hover
                             e.target.style.transform = 'scale(1.05)'; // Slightly enlarge the button
@@ -1086,7 +1116,7 @@ const AirDashboard = () => {
                                 ) : Object.keys(summary).length > 0 ? (
                                     <div style={{ display: "flex", gap: "20px" }}>
                                         {/* Loop through all available metrics */}
-                                        {["pm25", "pm10", "humidity", "temperature", "oxygen"].map((metric) => {
+                                        {["pH", "temperature", "tss", "tds_ppm"].map((metric) => {
                                             const metricSummary = summary[metric];
                                             // Render metric summary if needed
                                         })}
@@ -1155,27 +1185,19 @@ const AirDashboard = () => {
                         </div>
                     </div>
                 </div>
-                <div
-                    className={`location-panels ${transitionDirection === 'left' ? 'left' : 'right'}`}
+                <div className={`location-panels ${transitionDirection === 'left' ? 'left' : 'right'}`}
                     onAnimationEnd={() => setIsTransitioning(false)} // Reset isTransitioning after animation ends
                     style={styles.locationPanels}
                 >
-                    {visibleIndices.map((index) => {
-                        const { location } = airData[index] || {};
-                        const locationSummary = summary[index];
-                        return location ? (
-                            <div key={index} style={styles.locationPanel}>
-                                <h3 style={styles.locationTitle}>{location}</h3> {/* Apply the locationTitle style here */}
-                                <div style={styles.summaryPanels}>
-                                    {renderSummaryPanel('pm25', 'PM2.5', locationSummary)}
-                                    {renderSummaryPanel('pm10', 'PM10', locationSummary)}
-                                    {renderSummaryPanel('humidity', 'Humidity', locationSummary)}
-                                    {renderSummaryPanel('temperature', 'Temperature', locationSummary)}
-                                    {renderSummaryPanel('oxygen', 'Oxygen', locationSummary)}
-                                </div>
-                            </div>
-                        ) : null;
-                    })}
+                    <div style={styles.locationPanel}>
+                        <h3 style={styles.locationTitle}>Water Quality Summary</h3>
+                        <div style={styles.summaryPanels}>
+                            {renderSummaryPanel('pH', 'pH', summary)}
+                            {renderSummaryPanel('temperature', 'TEMPERATURE', summary)}
+                            {renderSummaryPanel('tss', 'TSS', summary)}
+                            {renderSummaryPanel('tds_ppm', 'TDS', summary)}
+                        </div>
+                    </div>
                 </div>
                 <div style={styles.comparisonContainer}>
                     {/* Comparison Chart Filters */}
@@ -1393,7 +1415,7 @@ const AirDashboard = () => {
                     <div style={styles.thresholdHeader}>
                         <h3 style={styles.thresholdTitle}>Data Thresholds</h3>
                         <p style={styles.thresholdSubtitle}>
-                            Scale of the various data levels for air monitoring
+                            Scale of the various data levels for water monitoring
                         </p>
                     </div>
                     {renderLegend()}
@@ -1423,8 +1445,8 @@ const AirDashboard = () => {
                         </div>
                     ) : Object.keys(logs).length > 0 ? (
                         <div style={styles.metricContainer}>
-                            {/* Loop through all available metrics, including oxygen */}
-                            {["pm25", "pm10", "humidity", "temperature", "oxygen"].map((metric) => {
+                            {/* Loop through all available metrics, including tds_ppm */}
+                            {["pH", "temperature", "tss", "tds_ppm"].map((metric) => {
                                 const metricLogs = logs[metric];
                                 return (
                                     <div
@@ -1452,7 +1474,7 @@ const AirDashboard = () => {
                                                                 borderBottom: index < metricLogs.length - 1 ? '1px solid #ddd' : 'none'
                                                             }}
                                                         >
-                                                            <strong>{log.metric.toUpperCase()}</strong> reached{" "}
+                                                            <strong>{log.metric.toUpperCase()}</strong> reached <strong>{log.value.toFixed(2)}</strong>{" "}
                                                             <em
                                                                 style={{
                                                                     backgroundColor: log.color,
@@ -1464,16 +1486,7 @@ const AirDashboard = () => {
                                                             >
                                                                 {log.threshold}
                                                             </em>{" "}
-                                                            at {new Date(log.timestamp).toLocaleString('en-US', {
-                                                                year: 'numeric',
-                                                                month: '2-digit',
-                                                                day: '2-digit',
-                                                                hour12: true,
-                                                                hour: '2-digit',
-                                                                minute: '2-digit',
-                                                                second: '2-digit',
-                                                                timeZone: 'Asia/Manila' // Adjust to the desired time zone
-                                                            })}
+                                                            at {log.timestamp}
                                                         </li>
                                                     ))}
                                                 </ul>
@@ -1529,7 +1542,7 @@ const styles = {
         padding: '20px 0 0 20px',
     },
 
-    // AIR DASHBOARD TEXTS
+    // WATER DASHBOARD TEXTS
     dashboardTitle: {
         fontSize: '3rem',
         fontWeight: 'bold',
@@ -1554,7 +1567,7 @@ const styles = {
     },
 
     // BUTTON STYLE
-    detailedAirButton: {
+    detailedWaterButton: {
         padding: '10px 20px',
         background: 'linear-gradient(50deg, #00CCDD, #006E77)', // Gradient background
         color: '#fff',
@@ -1566,7 +1579,7 @@ const styles = {
         transition: 'box-shadow 0.3s ease, transform 0.3s ease', // Smooth transition for glow and scale
     },
     // BUTTON HOVER STYLE (Glow effect)
-    detailedAirButtonHover: {
+    detailedWaterButtonHover: {
         boxShadow: '0 0 15px 5px rgba(0, 198, 255, 0.8)', // Glowing effect
         transform: 'scale(1.05)', // Slightly enlarges the button
     },
@@ -2005,4 +2018,4 @@ const styles = {
 };
 
 
-export default AirDashboard;
+export default WaterDashboard;

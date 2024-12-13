@@ -49,6 +49,7 @@ const SoilQualityByDate = () => {
     const [highlightedDates, setHighlightedDates] = useState([]);
     const navigate = useNavigate();
     const [viewMode, setViewMode] = useState("average");
+    const [currentMonth, setCurrentMonth] = useState(new Date());
 
     const thresholds = {
         soil_moisture: [
@@ -87,24 +88,34 @@ const SoilQualityByDate = () => {
     // Fetch data for the entire month
     const fetchMonthData = async (startDate, endDate) => {
         try {
-            // Adjust dates to local timezone
-            const startFormatted = new Date(startDate.getTime() - (startDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
-            const endFormatted = new Date(endDate.getTime() - (endDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+            // Create an array of dates between start and end
+            const dates = [];
+            const currentDate = new Date(startDate);
+            while (currentDate <= endDate) {
+                const localDate = new Date(currentDate.getTime() - (currentDate.getTimezoneOffset() * 60000));
+                const formattedDate = localDate.toISOString().split('T')[0];
+                dates.push(formattedDate);
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
 
-            const response = await axiosClient.get('', {
-                params: {
-                    startDate: startFormatted,
-                    endDate: endFormatted
-                }
-            });
+            // Fetch data for each date in parallel
+            const responses = await Promise.all(
+                dates.map(date =>
+                    axiosClient.get('', {
+                        params: { date }
+                    })
+                )
+            );
 
+            // Combine all responses and extract unique dates
             const uniqueDates = new Set(
-                response.data.map(item => {
-                    // Convert timestamp to local date
-                    const itemDate = new Date(item.timestamp);
-                    const localDate = new Date(itemDate.getTime() - (itemDate.getTimezoneOffset() * 60000));
-                    return localDate.toISOString().split('T')[0];
-                })
+                responses.flatMap(response =>
+                    response.data.map(item => {
+                        const itemDate = new Date(item.timestamp);
+                        const localDate = new Date(itemDate.getTime() - (itemDate.getTimezoneOffset() * 60000));
+                        return localDate.toISOString().split('T')[0];
+                    })
+                )
             );
 
             setHighlightedDates(Array.from(uniqueDates));
@@ -115,6 +126,7 @@ const SoilQualityByDate = () => {
     };
 
     const handleMonthChange = ({ activeStartDate }) => {
+        setCurrentMonth(activeStartDate);
         const startOfMonth = new Date(
             activeStartDate.getFullYear(),
             activeStartDate.getMonth(),
@@ -176,18 +188,18 @@ const SoilQualityByDate = () => {
 
     useEffect(() => {
         const startOfMonth = new Date(
-            selectedDate.getFullYear(),
-            selectedDate.getMonth(),
+            currentMonth.getFullYear(),
+            currentMonth.getMonth(),
             1
         );
         const endOfMonth = new Date(
-            selectedDate.getFullYear(),
-            selectedDate.getMonth() + 1,
+            currentMonth.getFullYear(),
+            currentMonth.getMonth() + 1,
             0
         );
         fetchMonthData(startOfMonth, endOfMonth);
 
-    }, [selectedDate]);
+    }, [currentMonth]);
 
     const getFilteredData = (data) => {
         const selectedHourUTC = parseInt(selectedHour);
@@ -240,7 +252,6 @@ const SoilQualityByDate = () => {
         // Return the corresponding color or a default color
         return level ? level.color : "rgba(0, 0, 0, 1)";
     };
-    `   `
 
     const createChartConfig = (label, data, metric) => {
         const totalValue = filteredData.reduce((acc, item) => acc + parseFloat(item[metric]), 0);
@@ -343,7 +354,7 @@ const SoilQualityByDate = () => {
         const dailyAverageValue = averageData.reduce((acc, item) => acc + item.average, 0) / averageData.length;
 
         const averageStatus =
-            (dailyAverageValue !== null && value !== undefined) && dailyAverageValue && metric ? getStatus(dailyAverageValue, metric) : "No data";
+            (dailyAverageValue !== null && value !== undefined) && metric ? getStatus(dailyAverageValue, metric) : "No data";
         const averagebackgroundColor =
             dailyAverageValue !== null ? getColor(dailyAverageValue, metric) : "transparent";
 

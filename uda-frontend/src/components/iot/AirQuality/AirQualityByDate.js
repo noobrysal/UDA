@@ -115,30 +115,62 @@ const AirQualityByDate = () => {
     // Fetch data for the entire month
     const fetchMonthData = async (startDate, endDate) => {
         try {
-            const startFormattedDate = startDate.toISOString().split('T')[0];
-            const endFormattedDate = endDate.toISOString().split('T')[0];
+            // Get first day of month at 08:00 +08:00
+            const firstDay = new Date(
+                startDate.getFullYear(),
+                startDate.getMonth(),
+                1
+            );
+            const startDateTime = `${firstDay.toISOString().split('T')[0]}T00:00:00+08:00`;
 
-            const { data, error } = await supabase
-                .from("sensors")
-                .select("id, date")
-                .gte("date", `${startFormattedDate}T00:00:00+08:00`)  // Use local timezone for the query
-                .lte("date", `${endFormattedDate}T23:59:59.999+08:00`)  // Adjust as per the local timezone
-                .eq("locationId", selectedLocation);
+            // Get last day of month at 07:59:59.999 +08:00
+            const lastDay = new Date(
+                endDate.getFullYear(),
+                endDate.getMonth() + 1,
+                endDate.getDate() + 7,
+                0
+            );
+            const endDateTime = `${lastDay.toISOString().split('T')[0]}T11:59:59.999+08:00`;
 
-            if (error) throw error;
+            const PAGE_SIZE = 100;
+            let currentOffset = 0;
+            let hasMore = true;
+            const allDates = new Set();
 
-            // Create a Set to ensure no duplicate dates
-            const uniqueDates = new Set();
+            while (hasMore) {
+                const { data, error } = await supabase
+                    .from("sensors")
+                    .select("date")
+                    .gte("date", startDateTime)
+                    .lte("date", endDateTime)
+                    .range(currentOffset, currentOffset + PAGE_SIZE - 1)
+                    .order('date', { ascending: true })
+                    .eq("locationId", selectedLocation); // Filter by selectedLocation
 
-            // Format and add dates to the Set
-            data.forEach((item) => {
-                const localDate = new Date(item.date);
-                localDate.setHours(0, 0, 0, 0); // Strip time portion
-                uniqueDates.add(localDate.toISOString().split('T')[0]); // Add formatted date
-            });
 
-            // Convert the Set back to an array
-            setHighlightedDates(Array.from(uniqueDates));
+
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    hasMore = false;
+                    break;
+                }
+
+                // Process dates considering +08:00 timezone
+                data.forEach(item => {
+                    const date = new Date(item.date);
+                    allDates.add(date.toISOString().split('T')[0]);
+                });
+
+                hasMore = data.length === PAGE_SIZE;
+                currentOffset += PAGE_SIZE;
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+
+            const sortedDates = Array.from(allDates).sort();
+            console.log('Air Quality dates for month:', sortedDates);
+            setHighlightedDates(sortedDates);
+
         } catch (error) {
             console.error("Error fetching month data:", error);
             toast.error(`Error fetching data: ${error.message}`);
@@ -161,7 +193,9 @@ const AirQualityByDate = () => {
 
     const tileContent = ({ date, view }) => {
         if (view === "month") {
-            const formattedDate = date.toISOString().split('T')[0];
+            const nextDay = new Date(date);
+            nextDay.setDate(nextDay.getDate() + 1);
+            const formattedDate = nextDay.toISOString().split('T')[0];
             if (highlightedDates.includes(formattedDate)) {
                 return "highlight-tile"; // Apply custom class for highlighted dates
             }
@@ -232,23 +266,19 @@ const AirQualityByDate = () => {
     // Function to filter data by each hour for hourly averages
     // Preprocess airData for hourly averages
     const getFilteredDataForAverage = (data, metric) => {
-        // Create an accumulator to group data by hour in the local time zone
         const hourlyData = data.reduce((acc, item) => {
-            const hour = new Date(item.date).getHours(); // Group by local hour
+            const hour = new Date(item.date).getHours();
             if (!acc[hour]) acc[hour] = { sum: 0, count: 0 };
             acc[hour].sum += item[metric];
             acc[hour].count++;
             return acc;
         }, {});
 
-        // Calculate averages for each hour and return an array
         return Object.keys(hourlyData).map((hour) => {
             const { sum, count } = hourlyData[hour];
-            return { hour: parseInt(hour), average: sum / count }; // Return average per hour
+            return { hour: parseInt(hour), average: sum / count };
         });
     };
-    // Calculate averages from full filtered data
-    // Calculate hourly averages based on the entire day
 
     const getColor = (value, metric) => {
         // Access the metric-specific thresholds
@@ -377,7 +407,7 @@ const AirQualityByDate = () => {
             value !== null ? getColor(value, metric) : "transparent";
 
         const averageStatus =
-            (dailyAverageValue !== null && value !== undefined) && dailyAverageValue && metric ? getStatus(dailyAverageValue, metric) : "No data";
+            (dailyAverageValue !== null && value !== undefined) && metric ? getStatus(dailyAverageValue, metric) : "No data";
         const averagebackgroundColor =
             dailyAverageValue !== null ? getColor(dailyAverageValue, metric) : "transparent";
 

@@ -814,7 +814,7 @@ const AirView = () => {
             // justifyContent: "center",
             marginTop: "25px",
         },
-        
+
         // MIDDLE RIGHT BOX
         middleRightBox: {
             backgroundColor: "rgba(255, 255, 255, 0)",
@@ -945,7 +945,7 @@ const AirView = () => {
             }
         },
 
-        
+
     };
 
     const handleHourRangeShift = (direction) => {
@@ -996,7 +996,7 @@ const AirView = () => {
         return thresholdValues[thresholdValues.length - 2]?.max || 100;
     };
 
-    
+
     const generateNarrative = (hour) => {
         const hourData = hourlyData[hour];
         if (!hourData) return "No data available for this hour.";
@@ -1041,7 +1041,7 @@ const AirView = () => {
             return acc;
         }, 0);
     };
-    
+
 
     // Add this helper function for bar chart data
     const getBarChartData = () => {
@@ -1067,9 +1067,9 @@ const AirView = () => {
             }]
         };
     };
-    
+
     const maxValues = calculateMaxValues(); // Calculate the maximum value for the chart
-    
+
     const barChartOptions = {
         responsive: true,
         maintainAspectRatio: false,
@@ -1123,9 +1123,9 @@ const AirView = () => {
                 },
             },
         },
-    };    
-    
-    
+    };
+
+
 
     // Add this helper function near your other utility functions
     const getAverageAirQualityStatus = (hourData) => {
@@ -1332,10 +1332,10 @@ const AirView = () => {
                                                 </div>
                                             </div>
                                             <div style={styles.trendIndicator}>
-                                                {value && hourlyData[(selectedHourForNarrative - 1 + 24) % 24]?.[metric.id] ? 
+                                                {value && hourlyData[(selectedHourForNarrative - 1 + 24) % 24]?.[metric.id] ?
                                                     value > hourlyData[(selectedHourForNarrative - 1 + 24) % 24][metric.id] ?
-                                                    'Worsening' : value < hourlyData[(selectedHourForNarrative - 1 + 24) % 24][metric.id] ?
-                                                    'Improving' : 'Stable'
+                                                        'Worsening' : value < hourlyData[(selectedHourForNarrative - 1 + 24) % 24][metric.id] ?
+                                                            'Improving' : 'Stable'
                                                     : ''}
                                             </div>
                                         </div>
@@ -1350,7 +1350,7 @@ const AirView = () => {
                             })}
                     </div>
 
-                    
+
                     <div style={styles.lowerRightBox}>
                         {/* Narrative Report */}
                         <div style={styles.narrativeReportContainer}>

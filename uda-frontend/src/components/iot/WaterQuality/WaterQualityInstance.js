@@ -9,65 +9,41 @@ import backgroundImage from '../../../assets/airdash.png';
 import { useNavigate } from 'react-router-dom';
 // import Sidebar from '../../Sidebar';
 
-// Function to fetch air quality data by ID
-const getAirQualityById = async (id) => {
+// Function to fetch water quality data by ID
+const getWaterQualityById = async (id) => {
     const { data, error } = await supabase
-        .from('sensors')
+        .from('sensor_data')
         .select('*')
         .eq('id', id)
         .single();
 
     if (error) {
-        console.error('Error fetching air quality:', error);
-        toast.error(`Error fetching air quality: ${error.message}`);
+        console.error('Error fetching water quality:', error);
+        toast.error(`Error fetching water quality: ${error.message}`);
         throw error;
     }
     return data;
 };
 
-
-const locations = [
-    { id: 1, name: 'Lapasan' },
-    { id: 2, name: 'Agusan' },
-    { id: 3, name: 'USTP-CDO' },
-    { id: 4, name: 'El Salvador' },
-    { id: 5, name: 'Sports Complex' },
-];
-
-// Updated thresholds for air quality metrics
+// Updated thresholds for water quality metrics
 const thresholds1 = {
-    pm25: [
-        { min: 0, max: 25.99, label: "Good", color: "rgba(22, 186, 1)" },
-        { min: 26, max: 35.99, label: "Fair", color: "rgba(255, 206, 86)" },
-        { min: 36, max: 45.99, label: "Unhealthy", color: "rgba(255, 140, 0)" },
-        { min: 46, max: 55.99, label: "Very Unhealthy", color: "rgba(254, 0, 0)" },
-        { min: 56, max: 90.99, label: "Severely Unhealthy", color: "rgba(129, 0, 127)" },
-        { min: 91, max: Infinity, label: "Emergency", color: "rgba(140, 1, 4)" },
-    ],
-    pm10: [
-        { min: 0, max: 50.99, label: "Good", color: "rgba(22, 186, 1)" },
-        { min: 51, max: 100.99, label: "Fair", color: "rgba(255, 206, 86)" },
-        { min: 101, max: 150.99, label: "Unhealthy", color: "rgba(255, 140, 0)" },
-        { min: 151, max: 200.99, label: "Very Unhealthy", color: "rgba(254, 0, 0)" },
-        { min: 201, max: 300.99, label: "Severely Unhealthy", color: "rgba(129, 0, 127)" },
-        { min: 301, max: Infinity, label: "Emergency", color: "rgba(140, 1, 4)" },
-    ],
-    humidity: [
-        { min: 0, max: 25.99, label: "Poor", color: "rgba(255, 140, 0)" },
-        { min: 26, max: 30.99, label: "Fair", color: "rgba(255, 206, 86)" },
-        { min: 31, max: 60.99, label: "Good", color: "rgba(22, 186, 1)" },
-        { min: 61, max: 70.99, label: "Fair", color: "rgba(255, 206, 86)" },
-        { min: 71, max: Infinity, label: "Poor", color: "rgba(254, 0, 0)" },
+    pH: [
+        { min: 0, max: 6.49, label: "Too Acidic", color: "rgba(254, 0, 0)" },
+        { min: 6.5, max: 8.5, label: "Acceptable", color: "rgba(22, 186, 1)" },
+        { min: 8.51, max: Infinity, label: "Too Alkaline", color: "rgba(255, 140, 0)" },
     ],
     temperature: [
-        { min: 0, max: 33.99, label: "Good", color: "rgba(22, 186, 1)" },
-        { min: 34, max: 41.99, label: "Caution", color: "rgba(255, 206, 86)" },
-        { min: 42, max: 54.99, label: "Danger", color: "rgba(255, 140, 0)" },
-        { min: 55, max: Infinity, label: "Extreme Danger", color: "rgba(254, 0, 0)" },
+        { min: 0, max: 25.99, label: "Too Cold", color: "rgba(255, 140, 0)" },
+        { min: 26, max: 30, label: "Acceptable", color: "rgba(22, 186, 1)" },
+        { min: 30.01, max: Infinity, label: "Too Hot", color: "rgba(254, 0, 0)" },
     ],
-    oxygen: [
-        { min: 0, max: 19.49, label: "Poor", color: "rgba(254, 0, 0)" },
-        { min: 19.5, max: Infinity, label: "Safe", color: "rgba(22, 186, 1)" },
+    tss: [
+        { min: 0, max: 50, label: "Acceptable", color: "rgba(22, 186, 1)" },
+        { min: 50.01, max: Infinity, label: "Too Cloudy", color: "rgba(254, 0, 0)" },
+    ],
+    tds_ppm: [
+        { min: 0, max: 500, label: "Acceptable", color: "rgba(22, 186, 1)" },
+        { min: 500.01, max: Infinity, label: "High Dissolved Substances", color: "rgba(254, 0, 0)" },
     ],
 };
 
@@ -82,16 +58,24 @@ const getColor = (value, metric) => {
     return thresholds[thresholds.length - 1].color; // Default to last color if no match
 };
 
-// Function to get location name from locationId
-const getLocationName = (locationId) => {
-    const location = locations.find(loc => loc.id === locationId);
-    return location ? location.name : 'Unknown Location';
+// Add this function before the WaterQualityInstance component
+const formatTimestamp = (timestamp) => {
+    return timestamp
+        .split('.')[0]  // Remove everything after the decimal point
+        .replace('T', ' ')  // Remove T
+        .replace(/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/,
+            function (match, year, month, day, hour, minute, second) {
+                const ampm = hour >= 12 ? 'PM' : 'AM';
+                hour = hour % 12;
+                hour = hour ? hour : 12; // Convert hour 0 to 12
+                return `${month}/${day}/${year} ${hour}:${minute}:${second} ${ampm}`;
+            });
 };
 
-// Main component to display air quality instance with circular progress bars and legend
-const AirQualityInstance = () => {
+// Main component to display water quality instance with circular progress bars and legend
+const WaterQualityInstance = () => {
     const { id } = useParams();
-    const [airData, setAirData] = useState(null);
+    const [waterData, setWaterData] = useState(null);
     const [hoveredMetric, setHoveredMetric] = useState(null);
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
@@ -99,15 +83,15 @@ const AirQualityInstance = () => {
 
     useEffect(() => {
         let mounted = true;
-        getAirQualityById(id)
+        getWaterQualityById(id)
             .then(data => {
                 if (mounted) {
-                    setAirData(data);
+                    setWaterData(data);
                 }
             })
             .catch(error => {
-                console.error('Error fetching air quality:', error);
-                toast.error(`Error fetching air quality: ${error.message}`);
+                console.error('Error fetching water quality:', error);
+                toast.error(`Error fetching water quality: ${error.message}`);
             });
 
         return () => mounted = false;
@@ -115,7 +99,7 @@ const AirQualityInstance = () => {
 
     const handleButtonClick = () => {
         // Navigate to the desired route when the button is clicked
-        navigate('/air-quality');
+        navigate('/water-quality');
     };
 
     const handleMouseMove = (e) => {
@@ -125,16 +109,26 @@ const AirQualityInstance = () => {
     const renderProgressBar = (value, metric, label) => {
         const color = getColor(value, metric);
 
+        // Calculate display value for TSS and TDS
+        let displayValue = value;
+        if (metric === 'tss') {
+            // Invert the percentage for TSS (using 100 as max reference)
+            displayValue = Math.max(0, 100 - (value / 50) * 100);
+        } else if (metric === 'tds_ppm') {
+            // Invert the percentage for TDS (using 1000 as max reference)
+            displayValue = Math.max(0, 100 - (value / 500) * 100);
+        }
+
         return (
             <div
                 className="progress-container"
                 style={styles.progressContainer}
                 onMouseEnter={() => setHoveredMetric({ value, label, metric })}
                 onMouseLeave={() => setHoveredMetric(null)}
-                onMouseMove={handleMouseMove} // Track mouse movement over the progress bar
+                onMouseMove={handleMouseMove}
             >
                 <CircularProgressbar
-                    value={value}
+                    value={metric === 'tss' || metric === 'tds_ppm' ? displayValue : value}
                     text={`${value}`}
                     strokeWidth={20}
                     styles={buildStyles({
@@ -190,32 +184,25 @@ const AirQualityInstance = () => {
         );
     };
 
-    if (!airData) return null;
+    if (!waterData) return null;
 
     return (
-        <div style={styles.airQualityInstance}>
+        <div style={styles.waterQualityInstance}>
             {/* <Sidebar /> */}
             <div>
-                <h2 style={styles.h2}>Air Quality Data (ID: {id})</h2>
-                <h2 style={styles.h2}>Recorded at:{' '}{getLocationName(airData.locationId)}</h2>
+                <h2 style={styles.h2}>water Quality Data (ID: {id})</h2>
+                <h2 style={{
+                    ...styles.h2,
+                    display: waterData.location ? 'block' : 'none'
+                }}>Recorded at:{' '}{waterData.location}</h2>
                 <h2 style={styles.h2}>Recorded on:{' '}
-
-                    {new Date(airData.date).toLocaleString("en-US", {
-                        year: "numeric",
-                        month: "2-digit",
-                        day: "2-digit",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        second: "2-digit",
-                        hour12: true,
-                    })}
+                    {formatTimestamp(waterData.timestamp)}
                 </h2>
                 <div style={styles.metrics}>
-                    {renderProgressBar(airData.pm25, 'pm25', 'PM2.5')}
-                    {renderProgressBar(airData.pm10, 'pm10', 'PM10')}
-                    {renderProgressBar(airData.humidity, 'humidity', 'Humidity')}
-                    {renderProgressBar(airData.temperature, 'temperature', 'Temperature')}
-                    {renderProgressBar(airData.oxygen, 'oxygen', 'Oxygen')}
+                    {renderProgressBar(waterData.pH, 'pH', 'pH')}
+                    {renderProgressBar(waterData.temperature, 'temperature', 'Temperature')}
+                    {renderProgressBar(waterData.tss ?? 0, 'tss', 'TSS')}
+                    {renderProgressBar(waterData.tds_ppm ?? 0, 'tds_ppm', 'TDS_ppm')}
                 </div>
                 {renderHoverMiniWindow()}
             </div>
@@ -230,7 +217,7 @@ const AirQualityInstance = () => {
 };
 
 const styles = {
-    airQualityInstance: {
+    waterQualityInstance: {
         backgroundColor: '#000000',
         backgroundImage: `url(${backgroundImage})`,
         backgroundSize: 'cover',
@@ -385,4 +372,4 @@ const styles = {
     },
 };
 
-export default AirQualityInstance;
+export default WaterQualityInstance;
