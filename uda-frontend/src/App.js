@@ -11,6 +11,7 @@ import AirQualityByDate from './components/iot/AirQuality/AirQualityByDate';
 import LandingPage from './components/LandingPage';
 import SidebarComponent from './components/global/Sidebar'; // Adjust the import path as needed
 import SoilQualityByDate from './components/iot/SoilQuality/SoilQualityByDate';
+import WaterSolo from './components/GeneralScreen/WaterSolo';
 import WaterQualityByDate from './components/iot/WaterQuality/WaterQualityByDate';
 import WaterQualityInstance from './components/iot/WaterQuality/WaterQualityInstance';
 import WaterDashboard from './components/iot/WaterQuality/WaterDashboard';
@@ -85,6 +86,7 @@ const AppContent = () => {
           <Route path="/water-quality" element={<WaterQualityByDate />} />
           <Route path="/water-quality/id/:id" element={<WaterQualityInstance />} />
           <Route path="/water-dashboard" element={<WaterDashboard />} />
+          <Route path="/water" element={<WaterSolo />} />
 
 
           {/* <Route path="/airview" element={<AirView />} /> */}

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '../iot/AirQuality/supabaseClient';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Line, Bar } from 'react-chartjs-2'; // Add Bar import
+import { Bar } from 'react-chartjs-2'; // Add Bar import
 import backgroundImage from '../../assets/airdash.png';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
@@ -17,7 +17,6 @@ import {
     Legend,
 } from 'chart.js';
 import { Tooltip } from '@mui/material';
-import { Box, Button, useTheme } from "@mui/material";
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 
@@ -36,13 +35,11 @@ const AirView = () => {
     const [selectedLocation, setSelectedLocation] = useState(3); // Default to USTP-CDO
     const [loading, setLoading] = useState(true);
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
-    const [scrollPosition, setScrollPosition] = useState(0);
     const [visibleHours, setVisibleHours] = useState([0]); // Show 9 hours
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [slideDirection, setSlideDirection] = useState('left');
     const [currentSlide, setCurrentSlide] = useState(0);
     const [hoveredData, setHoveredData] = useState(null);
-    const [showAdditionalMetrics, setShowAdditionalMetrics] = useState(false);
     const [selectedHourForNarrative, setSelectedHourForNarrative] = useState(new Date().getHours());
     const [visibleHourRange, setVisibleHourRange] = useState([1, 2, 3, 4, 5, 6]); // Start from 1AM
 
@@ -220,23 +217,6 @@ const AirView = () => {
 
         return () => clearInterval(slideTimer);
     }, []);
-
-    const getFilteredDataForAverage = (data, metric) => {
-        // Create an accumulator to group data by hour in the local time zone
-        const hourlyData = data.reduce((acc, item) => {
-            const hour = new Date(item.date).getHours(); // Group by local hour
-            if (!acc[hour]) acc[hour] = { sum: 0, count: 0 };
-            acc[hour].sum += item[metric];
-            acc[hour].count++;
-            return acc;
-        }, {});
-
-        // Calculate averages for each hour and return an array
-        return Object.keys(hourlyData).map((hour) => {
-            const { sum, count } = hourlyData[hour];
-            return { hour: parseInt(hour), average: sum / count };
-        });
-    };
 
     const fetchDayData = async () => {
         try {
@@ -488,41 +468,6 @@ const AirView = () => {
     //         },
     //     },
     // };
-
-    const additionalStyles = {
-        // ...existing styles...
-        tooltip: {
-            position: 'absolute',
-            backgroundColor: 'rgba(33, 33, 33, 0.95)',
-            color: '#ffffff',
-            padding: '12px 16px',
-            borderRadius: '8px',
-            zIndex: 1000,
-            maxWidth: '250px',
-            pointerEvents: 'none',
-            transform: 'translate(-50%, -120%)',
-            left: '50%',
-            fontSize: '14px',
-            lineHeight: '1.4',
-            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            backdropFilter: 'blur(8px)',
-            fontWeight: '500',
-            textAlign: 'center',
-            '&:after': {
-                content: '""',
-                position: 'absolute',
-                bottom: '-6px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                width: '0',
-                height: '0',
-                borderLeft: '6px solid transparent',
-                borderRight: '6px solid transparent',
-                borderTop: '6px solid rgba(33, 33, 33, 0.95)'
-            }
-        },
-    };
 
     const styles = {
         fullcontainer: {
@@ -1048,17 +993,6 @@ const AirView = () => {
         }
 
         return { text: narrative, status };
-    };
-
-    const calculateMaxValues = () => {
-        const hourData = hourlyData[selectedHourForNarrative];
-        return metrics.reduce((acc, metric) => {
-            if (['pm25', 'pm10', 'temperature', 'humidity', 'oxygen'].includes(metric.id)) {
-                const value = hourData?.[metric.id] || 0;
-                return Math.max(acc, value);
-            }
-            return acc;
-        }, 0);
     };
 
     // Update the calculatePercentageValue function
