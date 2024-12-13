@@ -1,10 +1,10 @@
 import React from 'react';
-import backgroundImage from '../assets/udabackg4.png';
+import backgroundImage from '../../assets/udabackg4.png';
 
 const GeneralScreen = () => {
 
 
-    
+
     return (
         <div style={styles.fullcontainer}>
             <div style={styles.headerContainer}>
@@ -34,7 +34,7 @@ const GeneralScreen = () => {
                         </div>
                     </div>
                 </div>
-    
+
                 {/* Water Quality Column */}
                 <div style={styles.column}>
                     <div style={styles.box4}>
@@ -53,7 +53,7 @@ const GeneralScreen = () => {
                         </div>
                     </div>
                 </div>
-    
+
                 {/* Soil Quality Column */}
                 <div style={styles.column}>
                     <div style={styles.box7}>
@@ -76,8 +76,8 @@ const GeneralScreen = () => {
         </div>
     );
 };
-    
-    
+
+
 const styles = {
     // Main container with background
     fullcontainer: {

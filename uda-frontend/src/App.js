@@ -4,7 +4,7 @@ import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { createGlobalStyle } from 'styled-components'; // <-- Import createGlobalStyle
 import RegisterForm from './components/RegisterForm';
 import LoginForm from './components/LoginForm';
-import Air from '../src/General Screen View/AirSolo';
+import Air from './components/GeneralScreen/AirSolo';
 import AirDashboard from './components/iot/AirQuality/AirDashboard';
 import AirQualityInstance from './components/iot/AirQuality/AirQualityInstance';
 import AirQualityByDate from './components/iot/AirQuality/AirQualityByDate';
@@ -14,8 +14,8 @@ import SoilQualityByDate from './components/iot/SoilQuality/SoilQualityByDate';
 import WaterQualityByDate from './components/iot/WaterQuality/WaterQualityByDate';
 import WaterQualityInstance from './components/iot/WaterQuality/WaterQualityInstance';
 import WaterDashboard from './components/iot/WaterQuality/WaterDashboard';
+import GeneralScreen from './components/GeneralScreen/GeneralScreen';
 
-import GeneralScreen from '../src/General Screen View/GeneralScreen';
 
 
 // Define global styles for scrollbar

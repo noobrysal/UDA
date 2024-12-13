@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '../components/iot/AirQuality/supabaseClient';
+import { supabase } from '../iot/AirQuality/supabaseClient';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Line, Bar } from 'react-chartjs-2'; // Add Bar import
-import backgroundImage from '../assets/airdash.png';
+import backgroundImage from '../../assets/airdash.png';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import {
@@ -1042,48 +1042,71 @@ const AirView = () => {
         }, 0);
     };
 
+    // Update the calculatePercentageValue function
+    const calculatePercentageValue = (value, metricId) => {
+        if (!value) return 0;
 
-    // Add this helper function for bar chart data
+        const metricThresholds = thresholds[metricId];
+        if (!metricThresholds) return 0;
+
+        // Find the "Good" threshold range (first threshold in the array)
+        const goodThreshold = metricThresholds[0];
+        const maxGoodValue = goodThreshold.max;
+
+        // For metrics where lower is better (pm25, pm10, temperature)
+        if (['pm25', 'pm10', 'temperature'].includes(metricId)) {
+            // Calculate percentage where lower values give higher percentages
+            let percentage = ((maxGoodValue - value) / maxGoodValue) * 100;
+            // Add 100 to make it positive and cap at 100%
+            percentage = Math.min(Math.max(percentage + 100, 0), 100);
+            return percentage;
+        }
+
+        // For other metrics where higher is better (humidity, oxygen)
+        let percentage = (maxGoodValue / value) * 100;
+        percentage = Math.min(percentage, 100);
+        return percentage;
+    };
+
+    // Update the getBarChartData function
     const getBarChartData = () => {
         const hourData = hourlyData[selectedHourForNarrative];
+        const relevantMetrics = metrics.filter(metric =>
+            ['pm25', 'pm10', 'temperature', 'humidity', 'oxygen'].includes(metric.id)
+        );
+
         return {
-            labels: metrics
-                .filter(metric => ['pm25', 'pm10', 'temperature', 'humidity', 'oxygen'].includes(metric.id))
-                .map(metric => metric.name),
+            labels: relevantMetrics.map(metric => metric.name),
             datasets: [{
-                label: 'Air Quality Metrics',
-                data: metrics
-                    .filter(metric => ['pm25', 'pm10', 'temperature', 'humidity', 'oxygen'].includes(metric.id))
-                    .map(metric => hourData?.[metric.id] || 0),
-                backgroundColor: metrics
-                    .filter(metric => ['pm25', 'pm10', 'temperature', 'humidity', 'oxygen'].includes(metric.id))
-                    .map(metric => {
-                        const value = hourData?.[metric.id];
-                        const status = getAirQualityStatus(value, metric.id);
-                        return status?.color || 'rgba(75, 192, 192, 0.6)';
-                    }),
-                // borderColor: "rgb(0, 255, 251)",
-                // borderWidth: 2,
-                borderRadius: 25, // Rounded corners
+                label: 'Air Quality Safety Level (%)',
+                data: relevantMetrics.map(metric => {
+                    const value = hourData?.[metric.id];
+                    return calculatePercentageValue(value, metric.id);
+                }),
+                backgroundColor: relevantMetrics.map(metric => {
+                    const value = hourData?.[metric.id];
+                    const status = getAirQualityStatus(value, metric.id);
+                    return status?.color || 'rgba(75, 192, 192, 0.6)';
+                }),
+                borderRadius: 25,
             }]
         };
     };
 
-    const maxValues = calculateMaxValues(); // Calculate the maximum value for the chart
-
+    // Update the barChartOptions
     const barChartOptions = {
         responsive: true,
         maintainAspectRatio: false,
         scales: {
             y: {
                 beginAtZero: true,
-                suggestedMax: maxValues, // Use the dynamically calculated maximum value
+                max: 100,
                 ticks: {
                     color: '#fff',
-                    callback: (value) => value.toFixed(1), // Display raw values
+                    callback: (value) => `${value}%`,
                 },
                 grid: {
-                    display: false, // Hide y-axis grid lines
+                    display: false,
                 },
             },
             x: {
@@ -1092,25 +1115,25 @@ const AirView = () => {
                     minRotation: 0,
                     maxRotation: 0,
                     font: {
-                        size: 12, // Adjust font size to prevent overlap
+                        size: 12,
                     },
-                    padding: 10, // Adjust padding between the x-axis labels
+                    padding: 10,
                 },
                 grid: {
-                    display: false, // Hide x-axis grid lines
+                    display: false,
                 },
             },
         },
         elements: {
             bar: {
-                borderRadius: 10, // Rounded corners for bars
-                borderSkipped: false, // Ensure all edges of the bar have a border radius
+                borderRadius: 10,
+                borderSkipped: false,
             },
         },
         datasets: {
             bar: {
-                barPercentage: 0.8, // Adjust the width of the bars
-                categoryPercentage: 1, // Adjust the space between bars
+                barPercentage: 0.8,
+                categoryPercentage: 1,
             },
         },
         plugins: {
@@ -1121,13 +1144,18 @@ const AirView = () => {
             },
             tooltip: {
                 callbacks: {
-                    label: (context) => context.raw.toFixed(2), // Show raw values in the tooltip
+                    label: (context) => {
+                        const metricId = ['pm25', 'pm10', 'temperature', 'humidity', 'oxygen'][context.dataIndex];
+                        const originalValue = hourlyData[selectedHourForNarrative]?.[metricId];
+                        return [
+                            `Safety Level: ${context.raw.toFixed(1)}%`,
+                            `Actual Value: ${originalValue?.toFixed(2)}`
+                        ];
+                    },
                 },
             },
         },
     };
-
-
 
     // Add this helper function near your other utility functions
     const getAverageAirQualityStatus = (hourData) => {
