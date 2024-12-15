@@ -10,9 +10,9 @@ import AirQualityInstance from './components/iot/AirQuality/AirQualityInstance';
 import AirQualityByDate from './components/iot/AirQuality/AirQualityByDate';
 import LandingPage from './components/LandingPage';
 import SidebarComponent from './components/global/Sidebar'; // Adjust the import path as needed
-import SoilSolo from './components/GeneralScreen/SoilSolo';
 import SoilQualityByDate from './components/iot/SoilQuality/SoilQualityByDate';
 import SoilQualityInstance from './components/iot/SoilQuality/SoilQualityInstance';
+import SoilSolo from './components/GeneralScreen/SoilSolo';
 import SoilDashboard from './components/iot/SoilQuality/SoilDashboard';
 import WaterSolo from './components/GeneralScreen/WaterSolo';
 import WaterQualityByDate from './components/iot/WaterQuality/WaterQualityByDate';
@@ -59,19 +59,17 @@ const AppContent = () => {
     '/general-screen',
     '/air-dashboard',
     '/air-quality',
-    '/air-quality/date/:date/location/:locationId',
     '/air-quality/id/:id',
     '/air',
     '/water',
     '/soil',
     '/water-dashboard',
     '/water-quality',
-    '/water-quality/date/:date/location/:locationId',
+    '/water-quality/',
     '/water-quality/id/:id',
+    '/soil-quality',
     '/soil-dashboard',
-    '/soil-quality',                    // Add this
-    '/soil-quality/id/:id',            // Add this
-    '/soil-quality/date/:date',         // Add this if you have date-based routes
+    '/general-screen',
     '/carousel',
     '/profile',
   ];
@@ -100,7 +98,10 @@ const AppContent = () => {
           <Route path="/air-dashboard" element={<AirDashboard />} />
           <Route path="/air-quality" element={<AirQualityByDate />} />
           <Route path="/air-quality/id/:id" element={<AirQualityInstance />} />
-
+          <Route path="/soil" element={<SoilSolo />} />
+          <Route path="/soil-quality" element={<SoilQualityByDate />} />
+          <Route path="/soil-quality/id/:id" element={<SoilQualityInstance />} />
+          <Route path="/soil-dashboard" element={<SoilDashboard />} />
           <Route path="/water-quality" element={<WaterQualityByDate />} />
           <Route path="/water-quality/id/:id" element={<WaterQualityInstance />} />
           <Route path="/water-dashboard" element={<WaterDashboard />} />

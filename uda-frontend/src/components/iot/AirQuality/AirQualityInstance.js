@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { supabase } from './supabaseClient';
+import { supabaseAir } from './supabaseClient';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import backgroundImage from '../../../assets/airdash.png';
@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 
 // Function to fetch air quality data by ID
 const getAirQualityById = async (id) => {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAir
         .from('sensors')
         .select('*')
         .eq('id', id)

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-
 import { useParams } from 'react-router-dom';
-import { supabase } from './supabaseClient';
+import { supabaseWater } from './supabaseClient';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Line } from 'react-chartjs-2';
@@ -123,7 +122,7 @@ const WaterQualityByDate = () => {
             const allDates = new Set();
 
             while (hasMore) {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseWater
                     .from("sensor_data")
                     .select("timestamp")
                     .gte("timestamp", startDateTime.toISOString())
@@ -200,7 +199,7 @@ const WaterQualityByDate = () => {
             const endOfDay = new Date(formattedDate);
             endOfDay.setDate(endOfDay.getDate() + 1);
 
-            const { data, error } = await supabase
+            const { data, error } = await supabaseWater
                 .from("sensor_data")
                 .select("*")
                 .gte("timestamp", startOfDay.toISOString())

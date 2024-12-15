@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '../iot/AirQuality/supabaseClient';
+import { supabaseAir } from '../iot/AirQuality/supabaseClient';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Bar } from 'react-chartjs-2'; // Add Bar import
@@ -242,7 +242,7 @@ const AirView = () => {
             const nextDay = new Date(selectedDay);
             nextDay.setDate(nextDay.getDate() + 1);
 
-            const { data, error } = await supabase
+            const { data, error } = await supabaseAir
                 .from('sensors')
                 .select('*')
                 .eq('locationId', selectedLocation)

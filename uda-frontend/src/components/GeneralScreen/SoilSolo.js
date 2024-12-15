@@ -95,7 +95,7 @@ const SoilView = () => {
         {
             level: "Optimal",
             color: "rgba(75, 192, 192, 1)",
-            description: "The soil conditions are ideal for plant growth. Moisture, temperature, and humidity levels are within recommended ranges.",
+            description: "Soil moisture is between 40-70%. These conditions are ideal for plant growth, ensuring proper water availability while maintaining adequate oxygen in the soil.",
             icon: "✅",
             recommendations: [
                 "Maintain current irrigation schedule",
@@ -106,7 +106,7 @@ const SoilView = () => {
         {
             level: "Low Moisture",
             color: "rgba(255, 206, 86, 1)",
-            description: "Soil moisture levels are below optimal range. This may affect plant water uptake and growth.",
+            description: "Soil moisture is between 20-39%. Plants may start experiencing mild water stress, affecting their growth and development.",
             icon: "💧",
             recommendations: [
                 "Increase irrigation frequency",
@@ -115,13 +115,35 @@ const SoilView = () => {
             ]
         },
         {
+            level: "Dry",
+            color: "rgba(255, 99, 132, 1)",
+            description: "Soil moisture is below 20%. Plants are at risk of severe water stress and wilting. Immediate action is required.",
+            icon: "🏜️",
+            recommendations: [
+                "Implement emergency irrigation",
+                "Add organic matter to improve water retention",
+                "Consider drought-resistant crops"
+            ]
+        },
+        {
+            level: "Saturated",
+            color: "rgba(154, 205, 50, 1)",
+            description: "Soil moisture is between 71-100%. While plants have plenty of water, root health may be compromised due to limited oxygen.",
+            icon: "💦",
+            recommendations: [
+                "Reduce irrigation frequency",
+                "Improve soil drainage",
+                "Monitor for signs of root disease"
+            ]
+        },
+        {
             level: "Waterlogged",
             color: "rgba(139, 0, 0, 1)",
-            description: "Soil is oversaturated with water. This can lead to root rot and reduced oxygen availability for plants.",
+            description: "Soil moisture exceeds 100%. Plants are at risk of root rot and other water-related diseases due to oxygen deficiency in the soil.",
             icon: "🌊",
             recommendations: [
-                "Improve drainage",
-                "Reduce irrigation",
+                "Stop irrigation immediately",
+                "Implement drainage solutions",
                 "Consider raised beds or soil amendments"
             ]
         }
@@ -1021,16 +1043,22 @@ const SoilView = () => {
     // Update the getBarChartData function
     const getBarChartData = () => {
         const hourData = hourlyData[selectedHourForNarrative];
-        const relevantMetrics = metrics.filter(metric =>
-            ['soil_moisture', 'temperature', 'humidity'].includes(metric.id)
-        );
+        console.log('Hour data:', hourData); // Debug log
 
-        return {
+        const relevantMetrics = [
+            { id: 'soil_moisture', name: 'Soil Moisture' },
+            { id: 'temperature', name: 'Temperature' },
+            { id: 'humidity', name: 'Humidity' }
+        ];
+
+        const data = {
             labels: relevantMetrics.map(metric => metric.name),
             datasets: [{
                 label: 'Soil Quality Safety Level (%)',
                 data: relevantMetrics.map(metric => {
-                    const value = hourData ? parseFloat(hourData[metric.id]) : null;
+                    const rawValue = hourData ? hourData[metric.id] : null;
+                    console.log(`${metric.name} raw value:`, rawValue); // Debug log
+                    const value = rawValue !== null ? parseFloat(rawValue) : null;
                     return calculatePercentageValue(value, metric.id);
                 }),
                 backgroundColor: relevantMetrics.map(metric => {
@@ -1041,6 +1069,9 @@ const SoilView = () => {
                 borderRadius: 25,
             }]
         };
+
+        console.log('Bar chart data:', data); // Debug log
+        return data;
     };
 
     // Update the barChartOptions
@@ -1095,18 +1126,22 @@ const SoilView = () => {
             tooltip: {
                 callbacks: {
                     label: (context) => {
-                        const metricId = ['pH', 'temperature', 'tss', 'tds_ppm'][context.dataIndex];
-                        const originalValue = hourlyData[selectedHourForNarrative]?.[metricId];
+                        const hourData = hourlyData[selectedHourForNarrative];
+                        const metrics = ['soil_moisture', 'temperature', 'humidity'];
+                        const metricId = metrics[context.dataIndex];
+                        const originalValue = hourData?.[metricId];
+
                         let unit = '';
                         switch (metricId) {
                             case 'temperature': unit = '°C'; break;
-                            case 'tss': unit = 'mg/L'; break;
-                            case 'tds_ppm': unit = 'ppm'; break;
+                            case 'soil_moisture': unit = '%'; break;
+                            case 'humidity': unit = '%'; break;
                             default: unit = '';
                         }
+
                         return [
                             `Safety Level: ${context.raw.toFixed(1)}%`,
-                            `Actual Value: ${originalValue?.toFixed(2)}${unit}`
+                            `Actual Value: ${originalValue?.toFixed(1)}${unit}`
                         ];
                     },
                 },
