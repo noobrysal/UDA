@@ -1575,7 +1575,7 @@ const styles = {
     // BUTTON STYLE
     detailedWaterButton: {
         padding: '10px 20px',
-        background: 'linear-gradient(50deg, #62b31b, #316901)', // Gradient background
+        background: 'linear-gradient(50deg, #007a74, #04403d)', // Gradient background
         color: '#fff',
         border: 'none',
         borderRadius: '15px',
@@ -1645,7 +1645,7 @@ const styles = {
         marginLeft: '5px',
         padding: '10px 5px',
         borderRadius: '5px',
-        backgroundColor: 'rgba(60, 115, 14)',
+        backgroundColor: 'rgba(6, 68, 69)',
         color: '#fff',
         border: 'none',
         outline: 'none',
@@ -1661,7 +1661,7 @@ const styles = {
         fontSize: '14px',
         padding: '10px 0px',
         borderRadius: '5px',
-        backgroundColor: 'rgb(60, 115, 14)',
+        backgroundColor: 'rgb(6, 68, 69)',
         color: '#fff',
         border: 'none',
         outline: 'none',
@@ -1725,7 +1725,7 @@ const styles = {
     },
     summaryPanel: {
         flex: '1 1 calc(45% - 10px)', // Two panels per row
-        backgroundColor: 'rgb(4, 153, 2, 0.46)',
+        backgroundColor: 'rgb(8, 102, 97, 0.46)',
         padding: '20px',
         paddingLeft: '25px',
         borderRadius: '25px',
@@ -1773,7 +1773,7 @@ const styles = {
         marginLeft: '7px',
         padding: '10px 5px',
         borderRadius: '5px',
-        backgroundColor: 'rgb(60, 115, 14)',
+        backgroundColor: 'rgb(6, 68, 69)',
         color: '#fff',
         border: 'none',
         outline: 'none',
@@ -1784,7 +1784,7 @@ const styles = {
         marginLeft: '7px',
         padding: '10px 5px',
         borderRadius: '5px',
-        backgroundColor: 'rgb(60, 115, 14)',
+        backgroundColor: 'rgb(6, 69, 65)',
         color: '#fff',
         border: 'none',
         outline: 'none',
@@ -1794,7 +1794,7 @@ const styles = {
     fetchButton: {
         padding: '10px 20px',
         marginLeft: '13px',
-        backgroundColor: '#62b31b',
+        backgroundColor: '#007a74',
         color: '#fff',
         border: 'none',
         borderRadius: '5px',
@@ -1847,7 +1847,7 @@ const styles = {
         borderRadius: '10px',
         marginBottom: '20px',
         marginLeft: '25px',
-        backgroundColor: 'rgb(60, 115, 14)',
+        backgroundColor: 'rgb(6, 68, 69)',
         color: "#fff",
         border: 'none',
     },
@@ -1964,14 +1964,14 @@ const styles = {
         // border: "1px solid #ccc", 
         padding: "10px",
         borderRadius: '20px',
-        backgroundColor: "rgb(19, 143, 3, 0.46)",
+        backgroundColor: "rgb(39, 92, 88, 0.46)",
         color: "#fff",
         height: "500px", // Set fixed height for each metric block
         overflowY: "auto", // Enable vertical scrolling if content overflows
         textAlign: "center",
     },
     metricTitle: {
-        backgroundColor: 'rgb(85, 184, 15)',
+        backgroundColor: 'rgb(0, 122, 116)',
         height: '40px',
         width: '235px',
         marginBottom: '-38px',
@@ -1986,7 +1986,7 @@ const styles = {
         // marginLeft: '40px',
         display: 'inline-block',
         padding: '10px 20px',
-        backgroundColor: '#62b31b',
+        backgroundColor: '#007a74',
         color: '#ffffff',
         borderRadius: '10px',
         border: 'none',

@@ -17,6 +17,7 @@ import WaterQualityInstance from './components/iot/WaterQuality/WaterQualityInst
 import WaterDashboard from './components/iot/WaterQuality/WaterDashboard';
 import GeneralScreen from './components/GeneralScreen/GeneralScreen';
 import Carousel from './components/GeneralScreen/Carousel';
+import ProfilePage from './components/Profile';
 
 
 // Define global styles for scrollbar
@@ -64,6 +65,7 @@ const AppContent = () => {
     '/water-quality/id/:id',
     '/general-screen',
     '/carousel',
+    '/profile',
   ];
 
   // Check if the current route is in the sidebarPaths array
@@ -82,6 +84,7 @@ const AppContent = () => {
           {/* General Screen with Solo IOTs */}
           <Route path="/general-screen" element={<GeneralScreen />} />
           <Route path="/carousel" element={<Carousel />} />
+          <Route path="/profile" element={<ProfilePage />} />
 
 
           {/* Routes with Sidebar */}

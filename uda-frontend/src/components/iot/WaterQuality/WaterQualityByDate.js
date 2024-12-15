@@ -5,7 +5,7 @@ import { supabase } from './supabaseClient';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Line } from 'react-chartjs-2';
-import backgroundImage from '../../../assets/waterdash.png';
+import backgroundImage from '../../../assets/waterdash2.png';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import {
@@ -1111,7 +1111,7 @@ const styles = {
         gap: "15px",
     },
     controlButton: {
-        backgroundColor: "rgba(98, 179, 27)",
+        backgroundColor: "rgba(0, 122, 116)",
         color: "#fff",
         border: "none",
         padding: "10px 20px",
@@ -1138,7 +1138,7 @@ const styles = {
     calendarSelect: {
         padding: '8px',
         borderRadius: '5px',
-        backgroundColor: 'rgba(60, 115, 14)',
+        backgroundColor: 'rgba(6, 69, 65)',
         color: '#fff',
         border: 'none',
         outline: 'none',

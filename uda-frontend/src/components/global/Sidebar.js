@@ -11,7 +11,7 @@ import TerrainRoundedIcon from '@mui/icons-material/TerrainRounded';
 import WaterOutlinedIcon from '@mui/icons-material/WaterOutlined';
 import AirOutlinedIcon from "@mui/icons-material/AirOutlined";
 import ReplyIcon from '@mui/icons-material/Reply';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+// import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import PersonIcon from '@mui/icons-material/Person';
 
 const Item = ({ title, to, icon, selected, setSelected, isCollapsed }) => {
@@ -186,7 +186,7 @@ const SidebarComponent = () => {
                     <Box paddingLeft={isCollapsed ? undefined : "2%"} display="flex" flexDirection="column" gap="8px">
                         <Item
                             title="Profile"
-                            to="/profilepage"
+                            to="/profile"
                             icon={<PersonIcon />}
                             selected={selected}
                             setSelected={setSelected}
