@@ -165,7 +165,7 @@ const SidebarComponent = () => {
                         />
                         <Item
                             title="Soil"
-                            to="/"
+                            to="/soil-dashboard"
                             icon={<TerrainRoundedIcon />}
                             selected={selected}
                             setSelected={setSelected}

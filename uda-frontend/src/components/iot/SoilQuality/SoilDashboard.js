@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Bar } from 'react-chartjs-2';
 import { useNavigate } from 'react-router-dom';
 // import Sidebar from '../../Sidebar';
-import backgroundImage from '../../../assets/airdash.png';
+import backgroundImage from '../../../assets/soildash.png';
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -638,7 +638,7 @@ const SoilDashboard = () => {
                     backgroundColor: firstAverages.map((value, index) =>
                         thresholds1[metrics[index]]?.find((t) => value <= t.max)?.color || "rgba(128, 128, 128, 0.5)"
                     ),
-                    borderColor: "rgb(0, 255, 156)",
+                    borderColor: "rgb(255, 255, 255)",
                     borderWidth: 3,
                 },
                 {
@@ -647,7 +647,7 @@ const SoilDashboard = () => {
                     backgroundColor: secondAverages.map((value, index) =>
                         thresholds1[metrics[index]]?.find((t) => value <= t.max)?.color || "rgba(192, 192, 192, 0.5)"
                     ),
-                    borderColor: "rgb(255, 227, 26)",
+                    borderColor: "rgb(0, 0, 0)",
                     borderWidth: 3,
                 },
             ],
@@ -966,7 +966,7 @@ const SoilDashboard = () => {
                     <button
                         style={styles.detailedSoilButton}
                         onMouseEnter={(e) => {
-                            e.target.style.boxShadow = '0 0 15px 5px rgba(0, 198, 255, 0.8)'; // Apply glow on hover
+                            e.target.style.boxShadow = '0 0 15px 5px rgba(255, 247, 0, 0.8)'; // Apply glow on hover
                             e.target.style.transform = 'scale(1.05)'; // Slightly enlarge the button
                         }}
                         onMouseLeave={(e) => {
@@ -1470,7 +1470,7 @@ const styles = {
     // BUTTON STYLE
     detailedSoilButton: {
         padding: '10px 20px',
-        background: 'linear-gradient(50deg, #00CCDD, #006E77)', // Gradient background
+        background: 'linear-gradient(50deg, #d3c740, #524d18)', // Gradient background
         color: '#fff',
         border: 'none',
         borderRadius: '15px',
@@ -1540,7 +1540,7 @@ const styles = {
         marginLeft: '5px',
         padding: '10px 5px',
         borderRadius: '5px',
-        backgroundColor: 'rgba(0, 204, 221, 0.46)',
+        backgroundColor: 'rgba(145, 137, 39, 0.5)',
         color: '#fff',
         border: 'none',
         outline: 'none',
@@ -1556,7 +1556,7 @@ const styles = {
         fontSize: '14px',
         padding: '10px 0px',
         borderRadius: '5px',
-        backgroundColor: 'rgb(0, 204, 221, 0.46)',
+        backgroundColor: 'rgb(145, 137, 39, 0.5)',
         color: '#fff',
         border: 'none',
         outline: 'none',
@@ -1619,7 +1619,7 @@ const styles = {
         width: '100%',
     },
     summaryPanel: {
-        backgroundColor: 'rgb(27, 119, 211, 0.46)',
+        backgroundColor: 'rgb(157, 146, 24, 0.46)',
         padding: '20px',
         paddingLeft: '25px',
         borderRadius: '25px',
@@ -1668,7 +1668,7 @@ const styles = {
         marginLeft: '7px',
         padding: '10px 5px',
         borderRadius: '5px',
-        backgroundColor: 'rgb(0, 204, 221, 0.46)',
+        backgroundColor: 'rgb(145, 137, 39, 0.5)',
         color: '#fff',
         border: 'none',
         outline: 'none',
@@ -1679,7 +1679,7 @@ const styles = {
         marginLeft: '7px',
         padding: '10px 5px',
         borderRadius: '5px',
-        backgroundColor: 'rgb(0, 204, 221, 0.46)',
+        backgroundColor: 'rgb(145, 137, 39, 0.5)',
         color: '#fff',
         border: 'none',
         outline: 'none',
@@ -1689,7 +1689,7 @@ const styles = {
     fetchButton: {
         padding: '10px 20px',
         marginLeft: '13px',
-        backgroundColor: '#00CCDD',
+        backgroundColor: '#c4b933',
         color: '#fff',
         border: 'none',
         borderRadius: '5px',
@@ -1742,7 +1742,7 @@ const styles = {
         borderRadius: '10px',
         marginBottom: '20px',
         marginLeft: '25px',
-        backgroundColor: 'rgb(27, 119, 211, 0.46)',
+        backgroundColor: 'rgb(145, 137, 39, 0.5)',
         color: "#fff",
         border: 'none',
     },
@@ -1859,14 +1859,14 @@ const styles = {
         // border: "1px solid #ccc", 
         padding: "10px",
         borderRadius: '20px',
-        backgroundColor: "rgb(29, 144, 154)",
+        backgroundColor: "rgb(71, 67, 21, 0.46)",
         color: "#fff",
         height: "500px", // Set fixed height for each metric block
         overflowY: "auto", // Enable vertical scrolling if content overflows
         textAlign: "center",
     },
     metricTitle: {
-        backgroundColor: 'rgb(0, 235, 255)',
+        backgroundColor: 'rgb(120, 113, 37)',
         height: '40px',
         width: '100%', // Change from fixed width to 100%
         marginBottom: '-38px',
@@ -1883,7 +1883,7 @@ const styles = {
         // marginLeft: '40px',
         display: 'inline-block',
         padding: '10px 20px',
-        backgroundColor: '#007bff',
+        backgroundColor: '#d3c740',
         color: '#ffffff',
         borderRadius: '10px',
         border: 'none',

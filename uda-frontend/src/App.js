@@ -56,17 +56,19 @@ const AppContent = () => {
 
   // Define paths that require the Sidebar
   const sidebarPaths = [
+    '/general-screen',
     '/air-dashboard',
     '/air-quality',
     '/air-quality/date/:date/location/:locationId',
     '/air-quality/id/:id',
     '/air',
     '/water',
+    '/soil',
     '/water-dashboard',
     '/water-quality',
     '/water-quality/date/:date/location/:locationId',
     '/water-quality/id/:id',
-    '/general-screen',
+    '/soil-dashboard',
     '/soil-quality',                    // Add this
     '/soil-quality/id/:id',            // Add this
     '/soil-quality/date/:date',         // Add this if you have date-based routes
@@ -98,14 +100,16 @@ const AppContent = () => {
           <Route path="/air-dashboard" element={<AirDashboard />} />
           <Route path="/air-quality" element={<AirQualityByDate />} />
           <Route path="/air-quality/id/:id" element={<AirQualityInstance />} />
-          <Route path="/soil-quality" element={<SoilQualityByDate />} />
-          <Route path="/soil-quality/id/:id" element={<SoilQualityInstance />} />
-          <Route path="/soil-dashboard" element={<SoilDashboard />} />
-          <Route path="/soil" element={<SoilSolo />} />
+
           <Route path="/water-quality" element={<WaterQualityByDate />} />
           <Route path="/water-quality/id/:id" element={<WaterQualityInstance />} />
           <Route path="/water-dashboard" element={<WaterDashboard />} />
           <Route path="/water" element={<WaterSolo />} />
+
+          <Route path="/soil-quality" element={<SoilQualityByDate />} />
+          <Route path="/soil-quality/id/:id" element={<SoilQualityInstance />} />
+          <Route path="/soil-dashboard" element={<SoilDashboard />} />
+          <Route path="/soil" element={<SoilSolo />} />
 
 
           {/* <Route path="/airview" element={<AirView />} /> */}
