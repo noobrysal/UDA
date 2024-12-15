@@ -4,7 +4,7 @@ import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { createGlobalStyle } from 'styled-components'; // <-- Import createGlobalStyle
 import RegisterForm from './components/RegisterForm';
 import LoginForm from './components/LoginForm';
-import Air from './components/GeneralScreen/AirSolo';
+import AirSolo from './components/GeneralScreen/AirSolo';
 import AirDashboard from './components/iot/AirQuality/AirDashboard';
 import AirQualityInstance from './components/iot/AirQuality/AirQualityInstance';
 import AirQualityByDate from './components/iot/AirQuality/AirQualityByDate';
@@ -19,7 +19,8 @@ import WaterQualityByDate from './components/iot/WaterQuality/WaterQualityByDate
 import WaterQualityInstance from './components/iot/WaterQuality/WaterQualityInstance';
 import WaterDashboard from './components/iot/WaterQuality/WaterDashboard';
 import GeneralScreen from './components/GeneralScreen/GeneralScreen';
-
+import Carousel from './components/GeneralScreen/Carousel';
+import ProfilePage from './components/Profile';
 
 
 // Define global styles for scrollbar
@@ -60,10 +61,17 @@ const AppContent = () => {
     '/air-quality/date/:date/location/:locationId',
     '/air-quality/id/:id',
     '/air',
+    '/water',
+    '/water-dashboard',
+    '/water-quality',
+    '/water-quality/date/:date/location/:locationId',
+    '/water-quality/id/:id',
     '/general-screen',
     '/soil-quality',                    // Add this
     '/soil-quality/id/:id',            // Add this
-    '/soil-quality/date/:date'         // Add this if you have date-based routes
+    '/soil-quality/date/:date',         // Add this if you have date-based routes
+    '/carousel',
+    '/profile',
   ];
 
   // Check if the current route is in the sidebarPaths array
@@ -81,10 +89,12 @@ const AppContent = () => {
 
           {/* General Screen with Solo IOTs */}
           <Route path="/general-screen" element={<GeneralScreen />} />
+          <Route path="/carousel" element={<Carousel />} />
+          <Route path="/profile" element={<ProfilePage />} />
 
 
           {/* Routes with Sidebar */}
-          <Route path="/air" element={<Air />} />
+          <Route path="/air" element={<AirSolo />} />
           <Route path="/air-dashboard" element={<AirDashboard />} />
           <Route path="/air-quality" element={<AirQualityByDate />} />
           <Route path="/air-quality/id/:id" element={<AirQualityInstance />} />

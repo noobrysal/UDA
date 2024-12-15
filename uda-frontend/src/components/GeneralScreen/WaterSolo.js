@@ -3,7 +3,7 @@ import { supabase } from '../iot/WaterQuality/supabaseClient';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Bar } from 'react-chartjs-2'; // Add Bar import
-import backgroundImage from '../../assets/airdash.png';
+import backgroundImage from '../../assets/waterdash.png';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import {
@@ -68,22 +68,22 @@ const WaterView = () => {
     // Update thresholds 
     const thresholds = {
         pH: [
-            { min: 0, max: 6.49, label: "Too Acidic", color: "rgba(254, 0, 0)" },
-            { min: 6.5, max: 8.5, label: "Acceptable", color: "rgba(22, 186, 1)" },
+            { min: 0, max: 6.49, label: "Too Acidic", color: "rgba(242, 53, 53)" },
+            { min: 6.5, max: 8.5, label: "Acceptable", color: "rgba(75, 192, 192)" },
             { min: 8.51, max: Infinity, label: "Too Alkaline", color: "rgba(255, 140, 0)" },
         ],
         temperature: [
             { min: 0, max: 25.99, label: "Too Cold", color: "rgba(255, 140, 0)" },
-            { min: 26, max: 30, label: "Acceptable", color: "rgba(22, 186, 1)" },
-            { min: 30.01, max: Infinity, label: "Too Hot", color: "rgba(254, 0, 0)" },
+            { min: 26, max: 30, label: "Acceptable", color: "rgba(75, 192, 192)" },
+            { min: 30.01, max: Infinity, label: "Too Hot", color: "rgba(242, 53, 53)" },
         ],
         tss: [
-            { min: 0, max: 50, label: "Acceptable", color: "rgba(22, 186, 1)" },
-            { min: 50.01, max: Infinity, label: "Too Cloudy", color: "rgba(254, 0, 0)" },
+            { min: 0, max: 50, label: "Acceptable", color: "rgba(75, 192, 192)" },
+            { min: 50.01, max: Infinity, label: "Too Cloudy", color: "rgba(242, 53, 53)" },
         ],
         tds_ppm: [
-            { min: 0, max: 500, label: "Acceptable", color: "rgba(22, 186, 1)" },
-            { min: 500.01, max: Infinity, label: "High Dissolved Substances", color: "rgba(254, 0, 0)" },
+            { min: 0, max: 500, label: "Acceptable", color: "rgba(75, 192, 192)" },
+            { min: 500.01, max: Infinity, label: "High Dissolved Substances", color: "rgba(242, 53, 53)" },
         ],
     };
 
@@ -91,7 +91,7 @@ const WaterView = () => {
     const thresholdInfo = [
         {
             level: "Acceptable",
-            color: "rgba(22, 186, 1)",
+            color: "rgba(75, 192, 192)",
             description: "The water quality is within safe limits. Both TSS and TDS levels are within acceptable ranges, indicating good water clarity and mineral content.",
             icon: "✅",
             recommendations: [
@@ -102,7 +102,7 @@ const WaterView = () => {
         },
         {
             level: "Too Cloudy",
-            color: "rgba(254, 0, 0)",
+            color: "rgba(242, 53, 53)",
             description: "Total Suspended Solids (TSS) are too high, making the water cloudy. This affects water clarity and may indicate contamination.",
             icon: "🌫️",
             recommendations: [
@@ -113,7 +113,7 @@ const WaterView = () => {
         },
         {
             level: "High Dissolved Substances",
-            color: "rgba(254, 0, 0)",
+            color: "rgba(242, 53, 53)",
             description: "Total Dissolved Solids (TDS) exceed recommended levels. This may affect water taste and quality.",
             icon: "💧",
             recommendations: [
@@ -511,18 +511,18 @@ const WaterView = () => {
             padding: "5px", // Controls inner spacing (top-bottom and left-right)
             textAlign: "center", // Aligns the text inside the input
             width: "130px", // Adjusts the width if needed
-            backgroundColor: "rgba(0, 204, 221, 0.46)", // Semi-transparent white
+            backgroundColor: "rgba(4, 184, 175, 0.46)", // Semi-transparent white
         },
-        locationSelect: {
-            borderRadius: "8px",
-            border: "none",
-            color: '#fff',
-            margin: 0,
-            padding: "5px", // Controls inner spacing (top-bottom and left-right)
-            textAlign: "center", // Aligns the text inside the input
-            width: "160px", // Adjusts the width if needed
-            backgroundColor: "rgba(0, 204, 221, 0.46)", // Semi-transparent white
-        },
+        // locationSelect: {
+        //     borderRadius: "8px",
+        //     border: "none",
+        //     color: '#fff',
+        //     margin: 0,
+        //     padding: "5px", // Controls inner spacing (top-bottom and left-right)
+        //     textAlign: "center", // Aligns the text inside the input
+        //     width: "160px", // Adjusts the width if needed
+        //     backgroundColor: "rgba(0, 204, 221, 0.46)", // Semi-transparent white
+        // },
 
         // Main Content Section Styles
         content: {
@@ -546,7 +546,7 @@ const WaterView = () => {
         // UPPER LEFT BOX BAR CHART MERGED METRICS
         upperLeftBox: {
             flex: 0.62, // Reduce flex value to make the upper box smaller
-            backgroundColor: 'rgba(242, 242, 242, 0.1)',
+            backgroundColor: 'rgba(242, 242, 242, 0.15)',
             borderRadius: "20px",
             width: "100%",
             height: "150px",  // Keep the height as needed
@@ -569,7 +569,7 @@ const WaterView = () => {
             padding: "15px",
             transition: "background-color 0.3s ease",
             boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-            backgroundColor: 'rgba(242, 242, 242, 0.1)',
+            backgroundColor: 'rgba(242, 242, 242, 0.15)',
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
@@ -658,7 +658,7 @@ const WaterView = () => {
             textAlign: "left",
         },
         slideButton: {
-            backgroundColor: "rgba(0, 204, 221, 0.46)",
+            backgroundColor: "rgba(4, 184, 175, 0.46)",
             color: "#fff",
             border: "none",
             borderRadius: "5px",
@@ -796,7 +796,7 @@ const WaterView = () => {
         noDataLabel: {
             fontSize: "15px",
             fontWeight: "bold",
-            color: "#ffce56",
+            color: "#00d4ff",
             height: "80px",
             width: "63px",
             display: "inline-flex",
@@ -849,7 +849,9 @@ const WaterView = () => {
             color: "#fff",
             marginTop: 0,
             marginBottom: "15px",
-            fontSize: "16px",
+        },
+        narrativeHeader: {
+            fontSize: "25px",
             fontWeight: "bold",
         },
         narrativeContent: {
@@ -1047,7 +1049,7 @@ const WaterView = () => {
                 backgroundColor: relevantMetrics.map(metric => {
                     const value = hourData?.[metric.id];
                     const status = getAirQualityStatus(value, metric.id);
-                    return status?.color || 'rgba(75, 192, 192, 0.6)';
+                    return status?.color || 'rgba(24, 191, 15, 0.6)';
                 }),
                 borderRadius: 25,
             }]
@@ -1168,7 +1170,7 @@ const WaterView = () => {
                             onChange={(e) => setSelectedDate(e.target.value)}
                             style={styles.datePicker}
                         />
-                        <select
+                        {/* <select
                             value={selectedLocation}
                             onChange={(e) => setSelectedLocation(Number(e.target.value))}
                             style={styles.locationSelect}
@@ -1178,7 +1180,7 @@ const WaterView = () => {
                                     {location.name}
                                 </option>
                             ))}
-                        </select>
+                        </select> */}
                     </div>
                 </header>
             </div>
@@ -1362,7 +1364,7 @@ const WaterView = () => {
                         {/* Narrative Report */}
                         <div style={styles.narrativeReportContainer}>
                             <div style={styles.narrativeTitle}>
-                                <h3 style={{ margin: 0 }}>Water Quality Report</h3>
+                                <h3 style={styles.narrativeHeader}>Narrative Insight:</h3>
                                 {(() => {
                                     const { text, status } = generateNarrative(selectedHourForNarrative);
                                     const thresholdData = thresholdInfo.find(t => t.level === status?.label);

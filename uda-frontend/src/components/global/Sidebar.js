@@ -11,7 +11,7 @@ import TerrainRoundedIcon from '@mui/icons-material/TerrainRounded';
 import WaterOutlinedIcon from '@mui/icons-material/WaterOutlined';
 import AirOutlinedIcon from "@mui/icons-material/AirOutlined";
 import ReplyIcon from '@mui/icons-material/Reply';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+// import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import PersonIcon from '@mui/icons-material/Person';
 
 const Item = ({ title, to, icon, selected, setSelected, isCollapsed }) => {
@@ -64,7 +64,7 @@ const SidebarComponent = () => {
             case "Air":
                 return "#0F0D1A";
             case "River":
-                return "#0B1A12";
+                return "#0A1B1F";
             case "Soil":
                 return "#141209";
             default:
@@ -141,7 +141,7 @@ const SidebarComponent = () => {
                     <Box paddingLeft={isCollapsed ? undefined : "2%"} display="flex" flexDirection="column" gap="8px">
                         <Item
                             title="Dashboard"
-                            to="/general-screen"
+                            to="/carousel"
                             icon={<DashboardIcon />}
                             selected={selected}
                             setSelected={setSelected}
@@ -157,7 +157,7 @@ const SidebarComponent = () => {
                         />
                         <Item
                             title="River"
-                            to="/"
+                            to="/water-dashboard"
                             icon={<WaterOutlinedIcon />}
                             selected={selected}
                             setSelected={setSelected}
@@ -186,7 +186,7 @@ const SidebarComponent = () => {
                     <Box paddingLeft={isCollapsed ? undefined : "2%"} display="flex" flexDirection="column" gap="8px">
                         <Item
                             title="Profile"
-                            to="/profilepage"
+                            to="/profile"
                             icon={<PersonIcon />}
                             selected={selected}
                             setSelected={setSelected}
