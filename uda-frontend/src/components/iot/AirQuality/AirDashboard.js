@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { supabase } from './supabaseClient';
+import { supabaseAir } from './supabaseClient';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Bar } from 'react-chartjs-2';
@@ -160,7 +160,7 @@ const AirDashboard = () => {
             let hasComparisonData = false;
 
             for (const location of locations) {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseAir
                     .from('sensors')
                     .select('*')
                     .gte('date', start)
@@ -169,7 +169,7 @@ const AirDashboard = () => {
 
                 if (error) throw error;
 
-                const summaryComparisonData = await supabase
+                const summaryComparisonData = await supabaseAir
                     .from('sensors')
                     .select('*')
                     .gte('date', comparisonStart)
@@ -455,7 +455,7 @@ const AirDashboard = () => {
             end = calculateEndDate(date, range);
         }
 
-        const { data, error } = await supabase
+        const { data, error } = await supabaseAir
             .from('sensors')
             .select('*')
             .eq('locationId', location) // Filter by location
@@ -849,7 +849,7 @@ const AirDashboard = () => {
         const start = calculateStartDate(date, range);
         const end = calculateEndDate(date, range);
 
-        const { data, error } = await supabase
+        const { data, error } = await supabaseAir
             .from('sensors')
             .select('*')
             .eq('locationId', locationId)

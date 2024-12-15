@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { supabase } from './supabaseClient';
+import { supabaseWater } from './supabaseClient';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Bar } from 'react-chartjs-2';
@@ -140,7 +140,7 @@ const WaterDashboard = () => {
             }
 
             // Single data fetch without location filtering
-            const { data, error } = await supabase
+            const { data, error } = await supabaseWater
                 .from('sensor_data')
                 .select('*')
                 .gte('timestamp', start)
@@ -148,7 +148,7 @@ const WaterDashboard = () => {
 
             if (error) throw error;
 
-            const summaryComparisonData = await supabase
+            const summaryComparisonData = await supabaseWater
                 .from('sensor_data')
                 .select('*')
                 .gte('timestamp', comparisonStart)
@@ -442,7 +442,7 @@ const WaterDashboard = () => {
             }
 
             // Fetch first period data
-            const { data: firstData, error: firstError } = await supabase
+            const { data: firstData, error: firstError } = await supabaseWater
                 .from('sensor_data')
                 .select('*')
                 .gte('timestamp', firstStart)
@@ -451,7 +451,7 @@ const WaterDashboard = () => {
             if (firstError) throw firstError;
 
             // Fetch second period data
-            const { data: secondData, error: secondError } = await supabase
+            const { data: secondData, error: secondError } = await supabaseWater
                 .from('sensor_data')
                 .select('*')
                 .gte('timestamp', secondStart)
@@ -857,7 +857,7 @@ const WaterDashboard = () => {
         const allData = [];
 
         while (hasMore) {
-            const { data, error } = await supabase
+            const { data, error } = await supabaseWater
                 .from('sensor_data')
                 .select('timestamp, pH, temperature, tss, tds_ppm')
                 .gte('timestamp', start)

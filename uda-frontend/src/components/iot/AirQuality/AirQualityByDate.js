@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 import { useParams } from 'react-router-dom';
-import { supabase } from './supabaseClient';
+import { supabaseAir } from './supabaseClient';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Line } from 'react-chartjs-2';
@@ -140,7 +140,7 @@ const AirQualityByDate = () => {
             const allDates = new Set();
 
             while (hasMore) {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseAir
                     .from("sensors")
                     .select("date")
                     .gte("date", startDateTime)
@@ -211,7 +211,7 @@ const AirQualityByDate = () => {
     const fetchData = async () => {
         try {
             const formattedDate = formatDate(selectedDate); // Ensure your formatDate function respects local timezone
-            const { data, error } = await supabase
+            const { data, error } = await supabaseAir
                 .from("sensors")
                 .select("*")
                 .gte("date", `${formattedDate}T00:00:00+08:00`)  // Use local timezone for the query

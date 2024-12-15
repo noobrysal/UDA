@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '../iot/WaterQuality/supabaseClient';
+import { supabaseWater } from '../iot/WaterQuality/supabaseClient';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Bar } from 'react-chartjs-2'; // Add Bar import
@@ -214,7 +214,7 @@ const WaterView = () => {
             const startOfDay = `${selectedDate}T00:00:00.000Z`;
             const endOfDay = `${selectedDate}T23:59:59.999Z`;
 
-            const { data, error } = await supabase
+            const { data, error } = await supabaseWater
                 .from('sensor_data')
                 .select('*')
                 .gte('timestamp', startOfDay)

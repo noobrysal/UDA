@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { supabase } from './supabaseClient';
+import { supabaseWater } from './supabaseClient';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import backgroundImage from '../../../assets/waterdash.png';
@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 
 // Function to fetch water quality data by ID
 const getWaterQualityById = async (id) => {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseWater
         .from('sensor_data')
         .select('*')
         .eq('id', id)

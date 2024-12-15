@@ -4,4 +4,4 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = process.env.REACT_APP_WATER_QUALITY_URL;
 const supabaseAnonKey = process.env.REACT_APP_WATER_QUALITY_KEY;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabaseWater = createClient(supabaseUrl, supabaseAnonKey);
