@@ -4,7 +4,6 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { supabase } from './supabaseClient';
 import styled from '@emotion/styled';
-import { FaGoogle, FaFacebook } from 'react-icons/fa';
 import logoImage from '../assets/logo.png';
 import backgroundImage from '../assets/udabackg.png';
 
@@ -165,9 +164,12 @@ const RegisterForm = () => {
   const [formData, setFormData] = useState({
     email: '',
     username: '',
+    name: '',
+    phone: '',
     password: '',
-    re_password: ''
+    re_password: '',
   });
+
 
   const navigate = useNavigate();
 
@@ -184,28 +186,40 @@ const RegisterForm = () => {
     }
 
     try {
-      const { user, error } = await supabase.auth.signUp({
+      const { data, error: signUpError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
-      }, {
-        data: {
-          user_metadata: { display_name: formData.username }
+        options: {
+          data: {
+            full_name: formData.name,
+            phone: formData.phone,
+            username: formData.username
+          }
         }
       });
 
-      if (error) throw error;
+      if (signUpError) {
+        console.error('Signup error:', signUpError);
+        throw signUpError;
+      }
 
-      toast.success('Registration successful, check your email for activation before logging in.');
-      console.log('Registration successful:', user);
+      if (!data.user?.id) {
+        throw new Error('User ID not found after signup');
+      }
+
+      toast.success('Registration successful! Please check your email for verification.');
+      console.log('Registration successful:', data.user);
 
       setTimeout(() => {
         navigate('/login');
       }, 3000);
+
     } catch (error) {
-      toast.error(`Registration failed: ${error.message}`);
-      console.error('Registration failed:', error.message);
+      console.error('Full error details:', error);
+      toast.error(error.message || 'An error occurred during registration');
     }
   };
+
 
   return (
     <PageContainer>
@@ -239,6 +253,22 @@ const RegisterForm = () => {
               required
             />
             <Input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="Full Name"
+              required
+            />
+            <Input
+              type="text"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              placeholder="Phone Number"
+              required
+            />
+            <Input
               type="password"
               name="password"
               value={formData.password}
@@ -256,18 +286,6 @@ const RegisterForm = () => {
             />
             <SubmitButton type="submit">Register</SubmitButton>
           </Form>
-
-          {/* <RegisterWithText>or register with</RegisterWithText> 
-
-          <SocialContainer>
-            <button>
-              <FaGoogle /> Google
-            </button>
-            <button>
-              <FaFacebook /> Facebook
-            </button>
-          </SocialContainer>
-          */}
         </FormBox>
       </ContentContainer>
     </PageContainer>

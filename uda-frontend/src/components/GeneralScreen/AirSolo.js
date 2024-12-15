@@ -31,6 +31,13 @@ ChartJS.register(
 );
 
 const AirView = () => {
+    const getCurrentHourBlock = (hour) => {
+        // Calculate which block of 6 hours should be shown based on current hour
+        const blockStart = Math.floor(hour / 6) * 6;
+        return Array.from({ length: 6 }, (_, i) => (blockStart + i) % 24);
+    };
+
+    // Now we can use getCurrentHourBlock in our initial state
     const [hourlyData, setHourlyData] = useState([]);
     const [selectedLocation, setSelectedLocation] = useState(3); // Default to USTP-CDO
     const [loading, setLoading] = useState(true);
@@ -41,7 +48,9 @@ const AirView = () => {
     const [currentSlide, setCurrentSlide] = useState(0);
     const [hoveredData, setHoveredData] = useState(null);
     const [selectedHourForNarrative, setSelectedHourForNarrative] = useState(new Date().getHours());
-    const [visibleHourRange, setVisibleHourRange] = useState([1, 2, 3, 4, 5, 6]); // Start from 1AM
+    const [visibleHourRange, setVisibleHourRange] = useState(() =>
+        getCurrentHourBlock(new Date().getHours())
+    );
 
     const locations = [
         { id: 1, name: 'LAPASAN' },
@@ -218,6 +227,13 @@ const AirView = () => {
         return () => clearInterval(slideTimer);
     }, []);
 
+    useEffect(() => {
+        // When component mounts, show current hour block
+        const currentHour = new Date().getHours();
+        setVisibleHourRange(getCurrentHourBlock(currentHour));
+        setSelectedHourForNarrative(currentHour);
+    }, []); // Empty dependency array means this runs once on mount
+
     const fetchDayData = async () => {
         try {
             setLoading(true);
@@ -362,112 +378,19 @@ const AirView = () => {
         setCurrentSlide((prev) => (prev - 1 + thresholdInfo.length) % thresholdInfo.length);
     };
 
-
-    // const responsiveStyles = {
-    //     // Mobile styles (default)
-    //     container: {
-    //         padding: '10px',
-    //         width: '100%',
-    //         maxWidth: '100vw',
-    //         overflowX: 'hidden',
-    //     },
-    //     header: {
-    //         flexDirection: 'column',
-    //         gap: '15px',
-    //     },
-    //     controls: {
-    //         flexDirection: 'column',
-    //         width: '100%',
-    //     },
-    //     datePicker: {
-    //         width: '100%',
-    //         maxWidth: '300px',
-    //     },
-    //     locationSelect: {
-    //         width: '100%',
-    //         maxWidth: '300px',
-    //     },
-    //     scrollContainer: {
-    //         width: 'calc(100vw - 100px)', // Account for buttons and padding
-    //         maxWidth: '1000px',
-    //     },
-    //     hourCard: {
-    //         maxHeight: '10px', // Smaller cards on mobile
-    //         padding: '10px',
-    //         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)',
-
-    //     },
-    //     levelIndicator: {
-    //         height: '80px', // Smaller height on mobile
-    //         fontSize: '14px',
-    //     },
-    //     slideshowContainer: {
-    //         flexDirection: 'column',
-    //         gap: '10px',
-    //     },
-    //     slide: {
-    //         width: '100%',
-    //         maxWidth: '400px',
-    //         height: 'auto',
-    //         minHeight: '330px',
-    //     },
-    // };
-
-    // // Tablet styles
-    // const tabletStyles = {
-    //     '@media (min-width: 768px)': {
-    //         container: {
-    //             padding: '15px',
-    //         },
-    //         header: {
-    //             flexDirection: 'row',
-    //         },
-    //         controls: {
-    //             flexDirection: 'row',
-    //             width: 'auto',
-    //         },
-    //         scrollContainer: {
-    //             width: 'calc(100vw - 150px)',
-    //         },
-    //         hourCard: {
-    //             minWidth: '100px',
-    //         },
-    //         levelIndicator: {
-    //             height: '90px',
-    //             fontSize: '15px',
-    //         },
-    //         slideshowContainer: {
-    //             flexDirection: 'row',
-    //         },
-    //         slide: {
-    //             width: '600px',
-    //             height: '350px',
-    //         },
-    //     },
-    // };
-
-    // // Desktop styles
-    // const desktopStyles = {
-    //     '@media (min-width: 1024px)': {
-    //         container: {
-    //             padding: '20px',
-    //         },
-    //         scrollContainer: {
-    //             width: '1000px',
-    //         },
-    //         hourCard: {
-    //             minWidth: '120px',
-    //         },
-    //         levelIndicator: {
-    //             height: '100px',
-    //             fontSize: '16px',
-    //         },
-    //         slide: {
-    //             width: '800px',
-    //             height: '400px',
-    //         },
-    //     },
-    // };
+    const handleHourRangeShift = (direction) => {
+        setVisibleHourRange(prev => {
+            const firstHour = prev[0];
+            if (direction === 'next') {
+                const nextStart = (firstHour + 6) % 24;
+                return Array.from({ length: 6 }, (_, i) => (nextStart + i) % 24);
+            } else {
+                let prevStart = firstHour - 6;
+                if (prevStart < 0) prevStart += 24;
+                return Array.from({ length: 6 }, (_, i) => (prevStart + i) % 24);
+            }
+        });
+    };
 
     const styles = {
         fullcontainer: {
@@ -913,25 +836,6 @@ const AirView = () => {
 
     };
 
-    const handleHourRangeShift = (direction) => {
-        setVisibleHourRange(prev => {
-            const shift = direction === 'next' ? 6 : -6;
-            return prev.map(hour => {
-                let newHour = hour + shift;
-                // Handle wraparound for 24-hour format
-                if (newHour <= 0) newHour = 24 + newHour; // Convert negative hours
-                if (newHour > 24) newHour = newHour - 24; // Convert hours > 24
-                if (newHour === 24) newHour = 0; // Convert 24 to 0 for midnight
-                return newHour;
-            }).sort((a, b) => {
-                // Special sorting that treats 0 (midnight) as 24 for ordering
-                const aSort = a === 0 ? 24 : a;
-                const bSort = b === 0 ? 24 : b;
-                return aSort - bSort;
-            });
-        });
-    };
-
     const renderTooltip = () => {
         if (!hoveredData || !hoveredData.value) return null;
         const { hour, value, metric, trend, position } = hoveredData;
@@ -1136,6 +1040,8 @@ const AirView = () => {
 
         return pm25Index >= pm10Index ? pm25Status : pm10Status;
     };
+
+
 
     return (
         <div style={styles.fullcontainer}>

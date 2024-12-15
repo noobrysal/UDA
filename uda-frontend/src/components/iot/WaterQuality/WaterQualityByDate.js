@@ -51,6 +51,7 @@ const WaterQualityByDate = () => {
     const [highlightedDates, setHighlightedDates] = useState([]);
     // const navigate = useNavigate(); 
     const [viewMode, setViewMode] = useState("average"); // 'hourly' or 'average'
+    const [isCalendarLoading, setIsCalendarLoading] = useState(false); // Add new state
 
 
     useEffect(() => {
@@ -98,6 +99,7 @@ const WaterQualityByDate = () => {
     // Fetch data for the entire month
     const fetchMonthData = async (startDate, endDate) => {
         try {
+            setIsCalendarLoading(true); // Start loading
             // Set start date to 00:00 UTC
             const startDateTime = new Date(Date.UTC(
                 startDate.getFullYear(),
@@ -154,6 +156,8 @@ const WaterQualityByDate = () => {
         } catch (error) {
             console.error("Error fetching month data:", error);
             toast.error(`Error fetching data: ${error.message}`);
+        } finally {
+            setIsCalendarLoading(false); // End loading
         }
     };
 
@@ -588,15 +592,22 @@ const WaterQualityByDate = () => {
                         <p style={styles.selectRangeSubtitle}>Select Range to Show Data</p>
                     </div>
                     <div style={styles.calendarContainer}>
-                        <Calendar
-                            value={selectedDate}
-                            onChange={(date) => {
-                                setSelectedDate(date);
-                                setViewMode("average");
-                            }}
-                            onActiveStartDateChange={handleMonthChange}
-                            tileClassName={tileClassName} // Use tileClassName for custom styles
-                        />
+                        <div style={{ position: 'relative', width: '100%' }}>
+                            <Calendar
+                                value={selectedDate}
+                                onChange={(date) => {
+                                    setSelectedDate(date);
+                                    setViewMode("average");
+                                }}
+                                onActiveStartDateChange={handleMonthChange}
+                                tileClassName={tileClassName} // Use tileClassName for custom styles
+                            />
+                            {isCalendarLoading && (
+                                <div style={styles.calendarLoadingOverlay}>
+                                    <div style={styles.loadingSpinner}></div>
+                                </div>
+                            )}
+                        </div>
                     </div>
                     {/* Custom styles using Styled JSX */}
                     <style jsx>{`
@@ -1222,7 +1233,30 @@ const styles = {
         overflowWrap: 'break-word',
     },
 
-
+    calendarLoadingOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(255, 255, 255, 0.7)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: '20px',
+    },
+    loadingSpinner: {
+        width: '40px',
+        height: '40px',
+        border: '4px solid #f3f3f3',
+        borderTop: '4px solid #3498db',
+        borderRadius: '50%',
+        animation: 'spin 1s linear infinite',
+    },
+    '@keyframes spin': {
+        '0%': { transform: 'rotate(0deg)' },
+        '100%': { transform: 'rotate(360deg)' },
+    },
 
     // box: {
     //     backgroundColor: 'rgba(255, 255, 255, 0.8)',

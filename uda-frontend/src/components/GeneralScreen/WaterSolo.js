@@ -31,12 +31,18 @@ ChartJS.register(
 );
 
 const WaterView = () => {
-    // Get the current local date in YYYY-MM-DD format
     const getCurrentLocalDate = () => {
         const now = new Date();
         return now.toLocaleDateString('en-CA'); // Returns YYYY-MM-DD format in local timezone
     };
 
+    const getCurrentHourBlock = (hour) => {
+        // Calculate which block of 6 hours should be shown based on current hour
+        const blockStart = Math.floor(hour / 6) * 6;
+        return Array.from({ length: 6 }, (_, i) => (blockStart + i) % 24);
+    };
+
+    // Now we can use getCurrentHourBlock in our initial state
     const [hourlyData, setHourlyData] = useState([]);
     const [selectedLocation, setSelectedLocation] = useState(3); // Default to USTP-CDO
     const [loading, setLoading] = useState(true);
@@ -47,7 +53,9 @@ const WaterView = () => {
     const [currentSlide, setCurrentSlide] = useState(0);
     const [hoveredData, setHoveredData] = useState(null);
     const [selectedHourForNarrative, setSelectedHourForNarrative] = useState(new Date().getHours());
-    const [visibleHourRange, setVisibleHourRange] = useState([1, 2, 3, 4, 5, 6]); // Start from 1AM
+    const [visibleHourRange, setVisibleHourRange] = useState(() =>
+        getCurrentHourBlock(new Date().getHours())
+    );
 
     const locations = [
         { id: 1, name: 'LAPASAN' },
@@ -191,6 +199,13 @@ const WaterView = () => {
 
         return () => clearInterval(slideTimer);
     }, []);
+
+    useEffect(() => {
+        // When component mounts, show current hour block
+        const currentHour = new Date().getHours();
+        setVisibleHourRange(getCurrentHourBlock(currentHour));
+        setSelectedHourForNarrative(currentHour);
+    }, []); // Empty dependency array means this runs once on mount
 
     const fetchDayData = async () => {
         try {
@@ -885,20 +900,15 @@ const WaterView = () => {
 
     const handleHourRangeShift = (direction) => {
         setVisibleHourRange(prev => {
-            const shift = direction === 'next' ? 6 : -6;
-            return prev.map(hour => {
-                let newHour = hour + shift;
-                // Handle wraparound for 24-hour format
-                if (newHour <= 0) newHour = 24 + newHour; // Convert negative hours
-                if (newHour > 24) newHour = newHour - 24; // Convert hours > 24
-                if (newHour === 24) newHour = 0; // Convert 24 to 0 for midnight
-                return newHour;
-            }).sort((a, b) => {
-                // Special sorting that treats 0 (midnight) as 24 for ordering
-                const aSort = a === 0 ? 24 : a;
-                const bSort = b === 0 ? 24 : b;
-                return aSort - bSort;
-            });
+            const firstHour = prev[0];
+            if (direction === 'next') {
+                const nextStart = (firstHour + 6) % 24;
+                return Array.from({ length: 6 }, (_, i) => (nextStart + i) % 24);
+            } else {
+                let prevStart = firstHour - 6;
+                if (prevStart < 0) prevStart += 24;
+                return Array.from({ length: 6 }, (_, i) => (prevStart + i) % 24);
+            }
         });
     };
 
@@ -1140,6 +1150,7 @@ const WaterView = () => {
         // If we get here, something is null or undefined, return whatever status we have
         return tdsStatus || tssStatus;
     };
+
 
     return (
         <div style={styles.fullcontainer}>
