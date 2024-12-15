@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Bar } from 'react-chartjs-2';
 import { useNavigate } from 'react-router-dom';
 // import Sidebar from '../../Sidebar';
-import backgroundImage from '../../../assets/waterdash2.png';
+import backgroundImage from '../../../assets/waterdash.png';
 import {
     Chart as ChartJS,
     CategoryScale,

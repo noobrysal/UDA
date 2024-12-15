@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { supabase } from './supabaseClient';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-import backgroundImage from '../../../assets/waterdash2.png';
+import backgroundImage from '../../../assets/waterdash.png';
 import { useNavigate } from 'react-router-dom';
 // import Sidebar from '../../Sidebar';
 

@@ -5,7 +5,7 @@ import { supabase } from './supabaseClient';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Line } from 'react-chartjs-2';
-import backgroundImage from '../../../assets/waterdash2.png';
+import backgroundImage from '../../../assets/waterdash.png';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import {
