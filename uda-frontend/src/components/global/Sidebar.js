@@ -64,7 +64,7 @@ const SidebarComponent = () => {
             case "Air":
                 return "#0F0D1A";
             case "River":
-                return "#0B1A12";
+                return "#0A1B1F";
             case "Soil":
                 return "#141209";
             default:

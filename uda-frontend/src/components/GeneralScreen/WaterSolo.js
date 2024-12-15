@@ -496,18 +496,18 @@ const WaterView = () => {
             padding: "5px", // Controls inner spacing (top-bottom and left-right)
             textAlign: "center", // Aligns the text inside the input
             width: "130px", // Adjusts the width if needed
-            backgroundColor: "rgba(24, 191, 15, 0.46)", // Semi-transparent white
+            backgroundColor: "rgba(4, 184, 175, 0.46)", // Semi-transparent white
         },
-        locationSelect: {
-            borderRadius: "8px",
-            border: "none",
-            color: '#fff',
-            margin: 0,
-            padding: "5px", // Controls inner spacing (top-bottom and left-right)
-            textAlign: "center", // Aligns the text inside the input
-            width: "160px", // Adjusts the width if needed
-            backgroundColor: "rgba(0, 204, 221, 0.46)", // Semi-transparent white
-        },
+        // locationSelect: {
+        //     borderRadius: "8px",
+        //     border: "none",
+        //     color: '#fff',
+        //     margin: 0,
+        //     padding: "5px", // Controls inner spacing (top-bottom and left-right)
+        //     textAlign: "center", // Aligns the text inside the input
+        //     width: "160px", // Adjusts the width if needed
+        //     backgroundColor: "rgba(0, 204, 221, 0.46)", // Semi-transparent white
+        // },
 
         // Main Content Section Styles
         content: {
@@ -643,7 +643,7 @@ const WaterView = () => {
             textAlign: "left",
         },
         slideButton: {
-            backgroundColor: "rgba(24, 191, 15, 0.46)",
+            backgroundColor: "rgba(4, 184, 175, 0.46)",
             color: "#fff",
             border: "none",
             borderRadius: "5px",

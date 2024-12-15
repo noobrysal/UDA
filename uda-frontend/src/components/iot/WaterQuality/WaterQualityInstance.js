@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { supabase } from './supabaseClient';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-import backgroundImage from '../../../assets/waterdash.png';
+import backgroundImage from '../../../assets/waterdash2.png';
 import { useNavigate } from 'react-router-dom';
 // import Sidebar from '../../Sidebar';
 
@@ -289,7 +289,7 @@ const styles = {
         display: 'flex',
         flexDirection: 'row',
         padding: '10px 10px',
-        background: 'linear-gradient(50deg, #62b31b, #316901)', // Gradient background
+        background: 'linear-gradient(50deg, #007a74, #04403d)', // Gradient background
         color: '#fff',
         border: 'none',
         borderRadius: '15px',
