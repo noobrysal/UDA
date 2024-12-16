@@ -24,83 +24,82 @@ const GeneralScreen = () => {
 
     const thresholdsAir = {
         pm25: [
-            { min: 0, max: 25.99, label: "Good", color: "rgba(75, 192, 192)" },
-            { min: 26, max: 35.99, label: "Fair", color: "rgba(154, 205, 50)" },
-            { min: 36, max: 45.99, label: "Unhealthy", color: "rgba(255, 206, 86)" },
+            { min: 0, max: 25.99, label: "Good", color: "rgba(85, 214, 69)" },
+            { min: 26, max: 35.99, label: "Fair", color: "rgba(255, 222, 89)" },
+            { min: 36, max: 45.99, label: "Unhealthy", color: "rgba(252, 184, 45)" },
             { min: 46, max: 55.99, label: "Very Unhealthy", color: "rgba(235, 66, 61)" },
-            { min: 56, max: 90.99, label: "Acutely Unhealthy", color: "rgba(255, 99, 132)" },
-            { min: 91, max: Infinity, label: "Emergency", color: "rgba(139, 0, 0)" },
+            { min: 56, max: 90.99, label: "Acutely Unhealthy", color: "rgba(111, 41, 133)" },
+            { min: 91, max: Infinity, label: "Emergency", color: "rgba(140, 1, 4)" },
         ],
         pm10: [
-            { min: 0, max: 50.99, label: "Good", color: "rgba(75, 192, 192)" },
-            { min: 51, max: 100.99, label: "Fair", color: "rgba(154, 205, 50)" },
-            { min: 101, max: 150.99, label: "Unhealthy", color: "rgba(255, 206, 86)" },
+            { min: 0, max: 50.99, label: "Good", color: "rgba(85, 214, 69)" },
+            { min: 51, max: 100.99, label: "Fair", color: "rgba(255, 222, 89)" },
+            { min: 101, max: 150.99, label: "Unhealthy", color: "rgba(252, 184, 45)" },
             { min: 151, max: 200.99, label: "Very Unhealthy", color: "rgba(235, 66, 61)" },
-            { min: 201, max: 300.99, label: "Acutely Unhealthy", color: "rgba(255, 99, 132)" },
-            { min: 301, max: Infinity, label: "Emergency", color: "rgba(139, 0, 0)" },
+            { min: 201, max: 300.99, label: "Acutely Unhealthy", color: "rgba(111, 41, 133)" },
+            { min: 301, max: Infinity, label: "Emergency", color: "rgba(140, 1, 4)" },
         ],
         humidity: [
-            { min: 0, max: 25.99, label: "Poor", color: "rgba(255, 206, 86)" },
-            { min: 26, max: 30.99, label: "Fair", color: "rgba(154, 205, 50)" },
-            { min: 31, max: 60.99, label: "Good", color: "rgba(75, 192, 192)" },
-            { min: 61, max: 70.99, label: "Fair", color: "rgba(154, 205, 50)" },
+            { min: 0, max: 25.99, label: "Poor", color: "rgba(252, 184, 45)" },
+            { min: 26, max: 30.99, label: "Fair", color: "rgba(255, 222, 89)" },
+            { min: 31, max: 60.99, label: "Good", color: "rgba(85, 214, 69)" },
+            { min: 61, max: 70.99, label: "Fair", color: "rgba(255, 222, 89)" },
             { min: 71, max: Infinity, label: "Poor", color: "rgba(235, 66, 61)" },
         ],
         temperature: [
-            { min: 0, max: 33.99, label: "Good", color: "rgba(75, 192, 192)" },
-            { min: 34, max: 41.99, label: "Caution", color: "rgba(154, 205, 50)" },
-            { min: 42, max: 54.99, label: "Danger", color: "rgba(255, 206, 86)" },
+            { min: 0, max: 33.99, label: "Good", color: "rgba(85, 214, 69)" },
+            { min: 34, max: 41.99, label: "Caution", color: "rgba(255, 222, 89)" },
+            { min: 42, max: 54.99, label: "Danger", color: "rgba(252, 184, 45)" },
             { min: 55, max: Infinity, label: "Extreme", color: "rgba(235, 66, 61)" },
         ],
         oxygen: [
             { min: 0, max: 19.49, label: "Poor", color: "rgba(235, 66, 61)" },
-            { min: 19.5, max: Infinity, label: "Safe", color: "rgba(75, 192, 192)" },
+            { min: 19.5, max: Infinity, label: "Safe", color: "rgba(85, 214, 69)" },
         ],
     };
 
     const thresholdsWater = {
         pH: [
-            { min: 0, max: 6.49, label: "Too Acidic", color: "rgba(235, 66, 61)" },
-            { min: 6.5, max: 8.5, label: "Acceptable", color: "rgba(85, 214, 69)" },
-            { min: 8.51, max: Infinity, label: "Too Alkaline", color: "rgba(255, 140, 0)" },
+            { min: 0, max: 6.49, label: "Too Acidic", color: "rgba(199, 46, 46, 1)" },
+            { min: 6.5, max: 8.5, label: "Acceptable", color: "rgba(154, 205, 50, 1)" },
+            { min: 8.51, max: Infinity, label: "Too Alkaline", color: "rgba(230, 126, 14, 1)" },
         ],
         temperature: [
-            { min: 0, max: 25.99, label: "Too Cold", color: "rgba(255, 140, 0)" },
-            { min: 26, max: 30, label: "Acceptable", color: "rgba(85, 214, 69)" },
-            { min: 30.01, max: Infinity, label: "Too Hot", color: "rgba(235, 66, 61)" },
+            { min: 0, max: 25.99, label: "Too Cold", color: "rgba(230, 126, 14, 1)" },
+            { min: 26, max: 30, label: "Acceptable", color: "rgba(154, 205, 50, 1)" },
+            { min: 30.01, max: Infinity, label: "Too Hot", color: "rgba(199, 46, 46, 1)" },
         ],
         tss: [
-            { min: 0, max: 50, label: "Acceptable", color: "rgba(85, 214, 69)" },
-            { min: 50.01, max: Infinity, label: "Too Cloudy", color: "rgba(235, 66, 61)" },
+            { min: 0, max: 50, label: "Acceptable", color: "rgba(154, 205, 50,1)" },
+            { min: 50.01, max: Infinity, label: "Too Cloudy", color: "rgba(199, 46, 46, 1)" },
         ],
         tds_ppm: [
-            { min: 0, max: 500, label: "Acceptable", color: "rgba(85, 214, 69)" },
-            { min: 500.01, max: Infinity, label: "High Dissolved Substances", color: "rgba(235, 66, 61)" },
+            { min: 0, max: 500, label: "Acceptable", color: "rgba(154, 205, 50,1)" },
+            { min: 500.01, max: Infinity, label: "High Dissolved Substances", color: "rgba(199, 46, 46, 1)" },
         ],
     };
 
     const thresholdsSoil = {
         soil_moisture: [
-            { min: 0, max: 19.99, label: "Dry", color: "rgba(255, 99, 132, 1)" },
-            { min: 20, max: 39.99, label: "Low Moisture", color: "rgba(255, 206, 86, 1)" },
-            { min: 40, max: 70.99, label: "Optimal", color: "rgba(75, 192, 192, 1)" },
-            { min: 71, max: 100, label: "Saturated", color: "rgba(154, 205, 50, 1)" },
-            { min: 101, max: Infinity, label: "Waterlogged", color: "rgba(139, 0, 0, 1)" },
+            { min: 0, max: 19.99, label: "Dry", color: "rgba(159, 109, 199, 1)" }, // Poor
+            { min: 20, max: 39.99, label: "Low Moisture", color: "rgba(250, 196, 62, 1)" }, // Warning
+            { min: 40, max: 70.99, label: "Optimal", color: "rgba(75, 192, 192, 1)" }, // Good
+            { min: 71, max: 100, label: "Saturated", color: "rgba(154, 205, 50, 1)" }, // Caution
+            { min: 101, max: Infinity, label: "Waterlogged", color: "rgba(199, 46, 46, 1)" }, // Emergency
         ],
         temperature: [
-            { min: -Infinity, max: 4.99, label: "Cold", color: "rgba(139, 0, 0, 1)" },
-            { min: 5, max: 14.99, label: "Cool", color: "rgba(255, 206, 86, 1)" },
-            { min: 15, max: 29.99, label: "Optimal", color: "rgba(75, 192, 192, 1)" },
-            { min: 30, max: 34.99, label: "Warm", color: "rgba(255, 206, 86, 1)" },
-            { min: 35, max: Infinity, label: "Hot", color: "rgba(255, 99, 132, 1)" },
+            { min: -Infinity, max: 4.99, label: "Cold", color: "rgba(199, 46, 46, 1)" }, // Poor
+            { min: 5, max: 14.99, label: "Cool", color: "rgba(250, 196, 62, 1)" }, // Warning
+            { min: 15, max: 29.99, label: "Optimal", color: "rgba(75, 192, 192, 1)" }, // Good
+            { min: 30, max: 34.99, label: "Warm", color: "rgba(250, 196, 62, 1)" }, // Caution
+            { min: 35, max: Infinity, label: "Hot", color: "rgba(159, 109, 199, 1)" }, // Danger
         ],
-
         humidity: [
-            { min: 0, max: 29.99, label: "Dry", color: "rgba(255, 99, 132, 1)" },
-            { min: 30, max: 49.99, label: "Low Humidity", color: "rgba(255, 206, 86, 1)" },
-            { min: 50, max: 70.99, label: "Optimal", color: "rgba(75, 192, 192, 1)" },
-            { min: 71, max: 85.99, label: "High Humidity", color: "rgba(154, 205, 50, 1)" },
-            { min: 86, max: Infinity, label: "Waterlogged", color: "rgba(139, 0, 0, 1)" },
+            { min: 0, max: 29.99, label: "Dry", color: "rgba(159, 109, 199, 1)" }, // Poor
+            { min: 30, max: 49.99, label: "Low Humidity", color: "rgba(250, 196, 62, 1)" }, // Warning
+            { min: 50, max: 70.99, label: "Optimal", color: "rgba(75, 192, 192, 1)" }, // Good
+            { min: 71, max: 85.99, label: "High Humidity", color: "rgba(154, 205, 50, 1)" }, // Caution
+            { min: 86, max: Infinity, label: "Waterlogged", color: "rgba(199, 46, 46, 1)" }, // Emergency
         ],
     };
 
@@ -482,7 +481,22 @@ const GeneralScreen = () => {
                             <h2 style={styles.airHeaderTitle}>Air Quality</h2>
                         </div>
                         <div style={styles.chartContainer}>
-                            <Doughnut data={airQualityData} options={{ maintainAspectRatio: false }} />
+                            <Doughnut
+                                data={airQualityData}
+                                options={{
+                                    maintainAspectRatio: false,
+                                    plugins: {
+                                        legend: {
+                                            labels: {
+                                                color: 'white', // Set the legend text color to white
+                                                font: {
+                                                    size: 14, // Optional: Adjust font size
+                                                },
+                                            },
+                                        },
+                                    },
+                                }}
+                            />
                         </div>
                     </div>
                     <div style={styles.box2}>
@@ -576,7 +590,22 @@ const GeneralScreen = () => {
                             <h2 style={styles.soilHeaderTitle}>Soil Quality</h2>
                         </div>
                         <div style={styles.chartContainer}>
-                            <Doughnut data={soilGaugeData} options={{ maintainAspectRatio: false }} />
+                            <Doughnut
+                                data={soilGaugeData} 
+                                options={{
+                                    maintainAspectRatio: false,
+                                    plugins: {
+                                        legend: {
+                                            labels: {
+                                                color: 'white', // Set the legend text color to white
+                                                font: {
+                                                    size: 14, // Optional: Adjust font size
+                                                },
+                                            },
+                                        },
+                                    },
+                                }}
+                            />
                         </div>
                     </div>
                     <div style={styles.box8}>
@@ -822,7 +851,7 @@ const styles = {
 
     chartContainer: {
         width: '100%',
-        height: '200px',
+        height: '100%',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',

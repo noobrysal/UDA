@@ -376,6 +376,14 @@ const WaterQualityByDate = () => {
             ],
             options: {
                 plugins: {
+                    legend: {
+                        labels: {
+                            color: "white", // Set the legend text color to white
+                            font: {
+                                size: 14, // Optional: Adjust font size
+                            },
+                        },
+                    },
                     tooltip: {
                         callbacks: {
                             label: function (context) {
