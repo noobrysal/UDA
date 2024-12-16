@@ -220,6 +220,13 @@ const SoilView = () => {
         setSelectedHourForNarrative(currentHour);
     }, []); // Empty dependency array means this runs once on mount
 
+    // Add this useEffect for auto-scrolling
+    useEffect(() => {
+        window.scrollTo({
+            top: document.documentElement.scrollHeight,
+            behavior: 'smooth'
+        });
+    }, []); // Empty dependency array means this runs once on mount
 
     // Update the fetchDayData function
     const fetchDayData = async () => {
@@ -916,6 +923,69 @@ const SoilView = () => {
             fontWeight: "bold",
             color: "#fff",
         },
+        reportHeaderContainer: {
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+
+        },
+        reportHeaderLeft: {
+            display: "flex",
+            alignItems: "center",
+            gap: "20px",
+        },
+        currentStatusBadge: {
+            padding: "5px 15px",
+            borderRadius: "20px",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            fontSize: "16px",
+            fontWeight: "bold",
+            color: "#fff",
+        },
+        narrativeGrid: {
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "20px",
+            padding: "15px",
+            backgroundColor: "rgba(255, 255, 255, 0.1)",
+            borderRadius: "10px",
+            margin: "10px 0",
+        },
+        narrativeLeft: {
+            borderRight: "1px solid rgba(255, 255, 255, 0.2)",
+            paddingRight: "15px",
+        },
+        narrativeRight: {
+            paddingLeft: "15px",
+        },
+        timeHeader: {
+            fontSize: "18px",
+            fontWeight: "bold",
+            marginBottom: "10px",
+            color: "#fff",
+        },
+        irrigationStatus: {
+            fontSize: "16px",
+            color: "#fff",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            marginTop: "10px",
+            marginBottom: "10px",
+        },
+        readingsContainer: {
+            display: "flex",
+            flexDirection: "column",
+        },
+        readingItem: {
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            fontSize: "16px",
+            color: "#fff",
+        },
     };
 
     const handleHourRangeShift = (direction) => {
@@ -986,7 +1056,7 @@ const SoilView = () => {
         const humidityStatus = getAirQualityStatus(humidity, 'humidity');
 
         let narrative = `Soil Quality Report for ${time}:\n\n`;
-        narrative += `🌱 Irrigation Status: ${remarks}\n\n`;
+        narrative += `🌱 Irrigation Status: ${remarks.toUpperCase()}\n\n`;
         narrative += `Current Readings:\n`;
         narrative += `• Soil Moisture: ${soilMoisture.toFixed(1)}% (${moistureStatus?.label || 'unavailable'})\n`;
         narrative += `• Temperature: ${temperature.toFixed(1)}°C (${tempStatus?.label || 'unavailable'})\n`;
@@ -1198,17 +1268,6 @@ const SoilView = () => {
                             onChange={(e) => setSelectedDate(e.target.value)}
                             style={styles.datePicker}
                         />
-                        <select
-                            value={selectedLocation}
-                            onChange={(e) => setSelectedLocation(Number(e.target.value))}
-                            style={styles.locationSelect}
-                        >
-                            {locations.map((location) => (
-                                <option key={location.id} value={location.id}>
-                                    {location.name}
-                                </option>
-                            ))}
-                        </select>
                     </div>
                 </header>
             </div>
@@ -1387,7 +1446,7 @@ const SoilView = () => {
                     <div style={styles.lowerRightBox}>
                         {/* Narrative Report */}
                         <div style={styles.narrativeReportContainer}>
-                            <h3 style={styles.reportTitle}>Soil Quality Report</h3>
+
                             {(() => {
                                 const { text, status } = generateNarrative(selectedHourForNarrative);
                                 const thresholdData = thresholdInfo.find(t => t.level === status?.label);
@@ -1401,9 +1460,81 @@ const SoilView = () => {
                                     </div>
                                 ) : null;
                             })()}
-                            <p style={styles.narrativeContent}>
-                                {generateNarrative(selectedHourForNarrative).text}
-                            </p>
+                            <div style={styles.narrativeGrid}>
+                                <div style={styles.narrativeLeft}>
+                                    <div style={styles.timeHeader}>
+                                        Soil Quality Report for {formatHour(selectedHourForNarrative)}
+                                    </div>
+                                    <div style={styles.irrigationStatus}>
+                                        <span>🌱</span>
+                                        <span>Irrigation Status: {hourlyData[selectedHourForNarrative]?.remarks?.toUpperCase() || 'No data'}</span>
+                                    </div>
+                                    <div style={styles.reportHeaderContainer}>
+                                        <div style={styles.reportHeaderLeft}>
+                                            {(() => {
+                                                const hourData = hourlyData[selectedHourForNarrative];
+                                                const soilStatus = getSoilMoistureStatus(hourData);
+                                                return soilStatus && (
+                                                    <div style={{
+                                                        ...styles.currentStatusBadge,
+                                                        backgroundColor: soilStatus.color
+                                                    }}>
+                                                        <span>{soilStatus.icon}</span>
+                                                        <span>{soilStatus.label}</span>
+                                                    </div>
+                                                );
+                                            })()}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style={styles.narrativeRight}>
+                                    <div style={styles.readingsContainer}>
+                                        <div style={styles.timeHeader}>Current Readings</div>
+                                        {(() => {
+                                            const hourData = hourlyData[selectedHourForNarrative];
+                                            if (!hourData) return <div>No data available</div>;
+
+                                            const readings = [
+                                                {
+                                                    label: 'Soil Moisture',
+                                                    value: hourData.soil_moisture,
+                                                    unit: '%',
+                                                    status: getAirQualityStatus(hourData.soil_moisture, 'soil_moisture'),
+                                                },
+                                                {
+                                                    label: 'Temperature',
+                                                    value: hourData.temperature,
+                                                    unit: '°C',
+                                                    status: getAirQualityStatus(hourData.temperature, 'temperature'),
+                                                },
+                                                {
+                                                    label: 'Humidity',
+                                                    value: hourData.humidity,
+                                                    unit: '%',
+                                                    status: getAirQualityStatus(hourData.humidity, 'humidity'),
+                                                },
+                                            ];
+
+                                            return (
+                                                <>
+                                                    {readings.map((reading, index) => (
+                                                        <div key={index} style={{
+                                                            ...styles.readingItem,
+                                                            color: reading.status?.color || '#fff'
+                                                        }}>
+                                                            • {reading.label}: {
+                                                                reading.value !== null && reading.value !== undefined
+                                                                    ? `${reading.value.toFixed(1)}${reading.unit} (${reading.status?.label || 'unavailable'})`
+                                                                    : 'No data'
+                                                            }
+                                                        </div>
+                                                    ))}
+                                                </>
+                                            );
+                                        })()}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

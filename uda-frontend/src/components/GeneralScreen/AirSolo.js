@@ -834,6 +834,40 @@ const AirView = () => {
             fontWeight: "bold",
             color: "#fff"
         },
+        narrativeGrid: {
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "20px",
+            padding: "15px",
+            backgroundColor: "rgba(255, 255, 255, 0.1)",
+            borderRadius: "10px",
+            margin: "10px 0",
+        },
+        narrativeLeft: {
+            borderRight: "1px solid rgba(255, 255, 255, 0.2)",
+            paddingRight: "15px",
+        },
+        narrativeRight: {
+            paddingLeft: "15px",
+        },
+        timeHeader: {
+            fontSize: "18px",
+            fontWeight: "bold",
+            marginBottom: "10px",
+            color: "#fff",
+        },
+        readingsContainer: {
+            display: "flex",
+            flexDirection: "column",
+
+        },
+        readingItem: {
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            fontSize: "16px",
+            color: "#fff",
+        },
     };
 
     const renderTooltip = () => {
@@ -1250,27 +1284,82 @@ const AirView = () => {
 
 
                     <div style={styles.lowerRightBox}>
-                        {/* Narrative Report */}
                         <div style={styles.narrativeReportContainer}>
-                            <div style={styles.narrativeTitle}>
-                                <h3 style={styles.narrativeHeader}>Narrative Insight:</h3>
-                                {(() => {
-                                    const { text, status } = generateNarrative(selectedHourForNarrative);
-                                    const thresholdData = thresholdInfo.find(t => t.level === status?.label);
-                                    return status && thresholdData ? (
-                                        <div style={{
-                                            ...styles.reportStatusWrapper,
-                                            backgroundColor: status.color
-                                        }}>
-                                            <span style={styles.reportIcon}>{thresholdData.icon}</span>
-                                            <span style={styles.reportStatus}>{status.label}</span>
-                                        </div>
-                                    ) : null;
-                                })()}
+                            <div style={styles.narrativeGrid}>
+                                <div style={styles.narrativeLeft}>
+                                    <div style={styles.timeHeader}>
+                                        Air Quality Report for {formatHour(selectedHourForNarrative)}
+                                    </div>
+                                    {(() => {
+                                        const { text, status } = generateNarrative(selectedHourForNarrative);
+                                        const thresholdData = thresholdInfo.find(t => t.level === status?.label);
+                                        return status && thresholdData ? (
+                                            <div style={{
+                                                ...styles.reportStatusWrapper,
+                                                backgroundColor: status.color
+                                            }}>
+                                                <span style={styles.reportIcon}>{thresholdData.icon}</span>
+                                                <span style={styles.reportStatus}>{status.label}</span>
+                                            </div>
+                                        ) : null;
+                                    })()}
+                                    <div style={styles.reportHeaderContainer}>
+                                    </div>
+                                </div>
+                                <div style={styles.narrativeRight}>
+                                    <div style={styles.readingsContainer}>
+                                        <div style={styles.timeHeader}>Current Readings</div>
+                                        {(() => {
+                                            const hourData = hourlyData[selectedHourForNarrative];
+                                            if (!hourData) return <div>No data available</div>;
+
+                                            const readings = [
+                                                {
+                                                    label: 'PM2.5',
+                                                    value: hourData.pm25,
+                                                    unit: 'µg/m³',
+                                                    status: getAirQualityStatus(hourData.pm25, 'pm25'),
+                                                },
+                                                {
+                                                    label: 'PM10',
+                                                    value: hourData.pm10,
+                                                    unit: 'µg/m³',
+                                                    status: getAirQualityStatus(hourData.pm10, 'pm10'),
+                                                },
+                                                {
+                                                    label: 'Temperature',
+                                                    value: hourData.temperature,
+                                                    unit: '°C',
+                                                    status: getAirQualityStatus(hourData.temperature, 'temperature'),
+                                                },
+                                                {
+                                                    label: 'Humidity',
+                                                    value: hourData.humidity,
+                                                    unit: '%',
+                                                    status: getAirQualityStatus(hourData.humidity, 'humidity'),
+                                                },
+                                            ];
+
+                                            return (
+                                                <>
+                                                    {readings.map((reading, index) => (
+                                                        <div key={index} style={{
+                                                            ...styles.readingItem,
+                                                            color: reading.status?.color || '#fff'
+                                                        }}>
+                                                            • {reading.label}: {
+                                                                reading.value !== null && reading.value !== undefined
+                                                                    ? `${reading.value.toFixed(1)}${reading.unit} (${reading.status?.label || 'unavailable'})`
+                                                                    : 'No data'
+                                                            }
+                                                        </div>
+                                                    ))}
+                                                </>
+                                            );
+                                        })()}
+                                    </div>
+                                </div>
                             </div>
-                            <p style={styles.narrativeContent}>
-                                {generateNarrative(selectedHourForNarrative).text}
-                            </p>
                         </div>
                     </div>
                 </div>
