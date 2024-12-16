@@ -806,7 +806,7 @@ const WaterQualityByDate = () => {
                                         getFilteredDataForAverage(WaterData, "pH"),
                                         "pH"
                                     ).options,
-                                    onClick: handlePointClick
+                                    // Remove onClick handler for average view
                                 }}
                             />
                         ) : null}
@@ -876,7 +876,7 @@ const WaterQualityByDate = () => {
                                         getFilteredDataForAverage(WaterData, "temperature"),
                                         "temperature"
                                     ).options,
-                                    onClick: handlePointClick
+                                    // Remove onClick handler for average view
                                 }}
                             />
                         ) : null}
@@ -946,7 +946,7 @@ const WaterQualityByDate = () => {
                                         getFilteredDataForAverage(WaterData, "tss"),
                                         "tss"
                                     ).options,
-                                    onClick: handlePointClick
+                                    // Remove onClick handler for average view
                                 }}
                             />
                         ) : null}
@@ -1016,7 +1016,7 @@ const WaterQualityByDate = () => {
                                         getFilteredDataForAverage(WaterData, "tds_ppm"),
                                         "tds_ppm"
                                     ).options,
-                                    onClick: handlePointClick
+                                    // Remove onClick handler for average view
                                 }}
                             />
                         ) : null}
