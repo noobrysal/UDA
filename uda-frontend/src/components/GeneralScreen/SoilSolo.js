@@ -68,25 +68,25 @@ const SoilView = () => {
     // Update thresholds for soil quality metrics
     const thresholds = {
         soil_moisture: [
-            { min: 0, max: 19.99, label: "Dry", color: "rgba(255, 99, 132, 1)" },
-            { min: 20, max: 39.99, label: "Low Moisture", color: "rgba(255, 206, 86, 1)" },
-            { min: 40, max: 70.99, label: "Optimal", color: "rgba(75, 192, 192, 1)" },
-            { min: 71, max: 100, label: "Saturated", color: "rgba(154, 205, 50, 1)" },
-            { min: 101, max: Infinity, label: "Waterlogged", color: "rgba(139, 0, 0, 1)" },
+            { min: 0, max: 19.99, label: "Dry", color: "rgba(159, 109, 199, 1)" }, // Poor
+            { min: 20, max: 39.99, label: "Low Moisture", color: "rgba(250, 196, 62, 1)" }, // Warning
+            { min: 40, max: 70.99, label: "Optimal", color: "rgba(75, 192, 192, 1)" }, // Good
+            { min: 71, max: 100, label: "Saturated", color: "rgba(154, 205, 50, 1)" }, // Caution
+            { min: 101, max: Infinity, label: "Waterlogged", color: "rgba(199, 46, 46, 1)" }, // Emergency
         ],
         temperature: [
-            { min: -Infinity, max: 4.99, label: "Cold", color: "rgba(139, 0, 0, 1)" },
-            { min: 5, max: 14.99, label: "Cool", color: "rgba(255, 206, 86, 1)" },
-            { min: 15, max: 29.99, label: "Optimal", color: "rgba(75, 192, 192, 1)" },
-            { min: 30, max: 34.99, label: "Warm", color: "rgba(255, 206, 86, 1)" },
-            { min: 35, max: Infinity, label: "Hot", color: "rgba(255, 99, 132, 1)" },
+            { min: -Infinity, max: 4.99, label: "Cold", color: "rgba(199, 46, 46, 1)" }, // Poor
+            { min: 5, max: 14.99, label: "Cool", color: "rgba(250, 196, 62, 1)" }, // Warning
+            { min: 15, max: 29.99, label: "Optimal", color: "rgba(75, 192, 192, 1)" }, // Good
+            { min: 30, max: 34.99, label: "Warm", color: "rgba(250, 196, 62, 1)" }, // Caution
+            { min: 35, max: Infinity, label: "Hot", color: "rgba(159, 109, 199, 1)" }, // Danger
         ],
         humidity: [
-            { min: 0, max: 29.99, label: "Dry", color: "rgba(255, 99, 132, 1)" },
-            { min: 30, max: 49.99, label: "Low Humidity", color: "rgba(255, 206, 86, 1)" },
-            { min: 50, max: 70.99, label: "Optimal", color: "rgba(75, 192, 192, 1)" },
-            { min: 71, max: 85.99, label: "High Humidity", color: "rgba(154, 205, 50, 1)" },
-            { min: 86, max: Infinity, label: "Waterlogged", color: "rgba(139, 0, 0, 1)" },
+            { min: 0, max: 29.99, label: "Dry", color: "rgba(159, 109, 199, 1)" }, // Poor
+            { min: 30, max: 49.99, label: "Low Humidity", color: "rgba(250, 196, 62, 1)" }, // Warning
+            { min: 50, max: 70.99, label: "Optimal", color: "rgba(75, 192, 192, 1)" }, // Good
+            { min: 71, max: 85.99, label: "High Humidity", color: "rgba(154, 205, 50, 1)" }, // Caution
+            { min: 86, max: Infinity, label: "Waterlogged", color: "rgba(199, 46, 46, 1)" }, // Emergency
         ],
     };
 
@@ -105,7 +105,7 @@ const SoilView = () => {
         },
         {
             level: "Low Moisture",
-            color: "rgba(255, 206, 86, 1)",
+            color: "rgba(250, 196, 62, 1)",
             description: "Soil moisture is between 20-39%. Plants may start experiencing mild water stress, affecting their growth and development.",
             icon: "💧",
             recommendations: [
@@ -116,7 +116,7 @@ const SoilView = () => {
         },
         {
             level: "Dry",
-            color: "rgba(255, 99, 132, 1)",
+            color: "rgba(159, 109, 199, 1)",
             description: "Soil moisture is below 20%. Plants are at risk of severe water stress and wilting. Immediate action is required.",
             icon: "🏜️",
             recommendations: [
@@ -138,7 +138,7 @@ const SoilView = () => {
         },
         {
             level: "Waterlogged",
-            color: "rgba(139, 0, 0, 1)",
+            color: "rgba(199, 46, 46, 1)",
             description: "Soil moisture exceeds 100%. Plants are at risk of root rot and other water-related diseases due to oxygen deficiency in the soil.",
             icon: "🌊",
             recommendations: [
@@ -530,7 +530,7 @@ const SoilView = () => {
             padding: "5px", // Controls inner spacing (top-bottom and left-right)
             textAlign: "center", // Aligns the text inside the input
             width: "130px", // Adjusts the width if needed
-            backgroundColor: "rgba(0, 204, 221, 0.46)", // Semi-transparent white
+            backgroundColor: "rgba(145, 137, 39, 0.5)", // Semi-transparent white
         },
         locationSelect: {
             borderRadius: "8px",
@@ -677,7 +677,7 @@ const SoilView = () => {
             textAlign: "left",
         },
         slideButton: {
-            backgroundColor: "rgba(0, 204, 221, 0.46)",
+            backgroundColor: "rgba(145, 137, 39, 0.5)",
             color: "#fff",
             border: "none",
             borderRadius: "5px",
@@ -714,7 +714,7 @@ const SoilView = () => {
             fontWeight: 'bold',
             color: '#fff',
             textAlign: 'center',
-            marginBottom: '15px',
+            marginBottom: '10px',   
         },
         hourSelector: {
             display: "flex",
@@ -729,6 +729,7 @@ const SoilView = () => {
             flex: 1,
             gap: "10px",
             transition: "all 0.3s ease",
+            marginBottom: '10px',   
         },
         selectedHourCard: {
             backgroundColor: "rgba(0, 204, 221, 0.46)",
@@ -775,7 +776,8 @@ const SoilView = () => {
             alignItems: "center",
             justifyContent: "center", // Updated to center the metrics
             gap: "20px", // Add gap between metric boxes
-            marginBottom: "8px",
+            // marginBottom: "3px",
+            marginTop: "8px",
         },
 
         metricBoxWrapper: {
@@ -817,7 +819,7 @@ const SoilView = () => {
         noDataLabel: {
             fontSize: "15px",
             fontWeight: "bold",
-            color: "#ffce56",
+            color: "#02bd49",
             height: "80px",
             width: "63px",
             display: "inline-flex",
@@ -862,6 +864,7 @@ const SoilView = () => {
             color: "#fff",
             display: "flex",
             flexDirection: "column",
+            justifyContent: "center",
             gap: "15px",
         },
 
@@ -949,7 +952,8 @@ const SoilView = () => {
             gridTemplateColumns: "1fr 1fr",
             gap: "20px",
             padding: "15px",
-            backgroundColor: "rgba(255, 255, 255, 0.1)",
+            backgroundColor: 'rgb(73, 67, 13, 0.46)',
+            boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
             borderRadius: "10px",
             margin: "10px 0",
         },

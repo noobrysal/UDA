@@ -68,22 +68,22 @@ const WaterView = () => {
     // Update thresholds 
     const thresholds = {
         pH: [
-            { min: 0, max: 6.49, label: "Too Acidic", color: "rgba(242, 53, 53)" },
-            { min: 6.5, max: 8.5, label: "Acceptable", color: "rgba(75, 192, 192)" },
-            { min: 8.51, max: Infinity, label: "Too Alkaline", color: "rgba(255, 140, 0)" },
+            { min: 0, max: 6.49, label: "Too Acidic", color: "rgba(199, 46, 46)" },
+            { min: 6.5, max: 8.5, label: "Acceptable", color: "rgba(154, 205, 50)" },
+            { min: 8.51, max: Infinity, label: "Too Alkaline", color: "rgba(230, 126, 14)" },
         ],
         temperature: [
-            { min: 0, max: 25.99, label: "Too Cold", color: "rgba(255, 140, 0)" },
-            { min: 26, max: 30, label: "Acceptable", color: "rgba(75, 192, 192)" },
-            { min: 30.01, max: Infinity, label: "Too Hot", color: "rgba(242, 53, 53)" },
+            { min: 0, max: 25.99, label: "Too Cold", color: "rgba(230, 126, 14)" },
+            { min: 26, max: 30, label: "Acceptable", color: "rgba(154, 205, 50)" },
+            { min: 30.01, max: Infinity, label: "Too Hot", color: "rgba(199, 46, 46)" },
         ],
         tss: [
-            { min: 0, max: 50, label: "Acceptable", color: "rgba(75, 192, 192)" },
-            { min: 50.01, max: Infinity, label: "Too Cloudy", color: "rgba(242, 53, 53)" },
+            { min: 0, max: 50, label: "Acceptable", color: "rgba(154, 205, 50)" },
+            { min: 50.01, max: Infinity, label: "Too Cloudy", color: "rgba(199, 46, 46)" },
         ],
         tds_ppm: [
-            { min: 0, max: 500, label: "Acceptable", color: "rgba(75, 192, 192)" },
-            { min: 500.01, max: Infinity, label: "High Dissolved Substances", color: "rgba(242, 53, 53)" },
+            { min: 0, max: 500, label: "Acceptable", color: "rgba(154, 205, 50)" },
+            { min: 500.01, max: Infinity, label: "High Dissolved Substances", color: "rgba(199, 46, 46)" },
         ],
     };
 
@@ -91,7 +91,7 @@ const WaterView = () => {
     const thresholdInfo = [
         {
             level: "Acceptable",
-            color: "rgba(75, 192, 192)",
+            color: "rgba(154, 205, 50)",
             description: "The water quality is within safe limits. Both TSS and TDS levels are within acceptable ranges, indicating good water clarity and mineral content.",
             icon: "✅",
             recommendations: [
@@ -102,7 +102,7 @@ const WaterView = () => {
         },
         {
             level: "Too Cloudy",
-            color: "rgba(242, 53, 53)",
+            color: "rgba(199, 46, 46)",
             description: "Total Suspended Solids (TSS) are too high, making the water cloudy. This affects water clarity and may indicate contamination.",
             icon: "🌫️",
             recommendations: [
@@ -113,7 +113,7 @@ const WaterView = () => {
         },
         {
             level: "High Dissolved Substances",
-            color: "rgba(242, 53, 53)",
+            color: "rgba(199, 46, 46)",
             description: "Total Dissolved Solids (TDS) exceed recommended levels. This may affect water taste and quality.",
             icon: "💧",
             recommendations: [
@@ -836,11 +836,13 @@ const WaterView = () => {
         },
         // NARRATIVE REPORT
         narrativeReportContainer: {
-            borderRadius: "8px",
-            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+            height: "100%",
             padding: "20px",
-            overflowY: "auto", // Adds scrolling if content overflows
-            height: "100%", // Ensures it fits the allocated height
+            color: "#fff",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            gap: "15px",
         },
         narrativeTitle: {
             display: "flex",
@@ -901,7 +903,8 @@ const WaterView = () => {
             gridTemplateColumns: "1fr 1fr",
             gap: "20px",
             padding: "15px",
-            backgroundColor: "rgba(255, 255, 255, 0.1)",
+            backgroundColor: 'rgb(6, 71, 68, 0.46)',
+            boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
             borderRadius: "10px",
             margin: "10px 0",
         },

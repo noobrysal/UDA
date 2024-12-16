@@ -92,16 +92,12 @@ const AppContent = () => {
           <Route path="/carousel" element={<Carousel />} />
           <Route path="/profile" element={<ProfilePage />} />
 
-
           {/* Routes with Sidebar */}
           <Route path="/air" element={<AirSolo />} />
           <Route path="/air-dashboard" element={<AirDashboard />} />
           <Route path="/air-quality" element={<AirQualityByDate />} />
           <Route path="/air-quality/id/:id" element={<AirQualityInstance />} />
-          <Route path="/soil" element={<SoilSolo />} />
-          <Route path="/soil-quality" element={<SoilQualityByDate />} />
-          <Route path="/soil-quality/id/:id" element={<SoilQualityInstance />} />
-          <Route path="/soil-dashboard" element={<SoilDashboard />} />
+
           <Route path="/water-quality" element={<WaterQualityByDate />} />
           <Route path="/water-quality/id/:id" element={<WaterQualityInstance />} />
           <Route path="/water-dashboard" element={<WaterDashboard />} />
