@@ -1036,52 +1036,46 @@ const WaterView = () => {
 
     // Update the calculatePercentageValue function
     const calculatePercentageValue = (value, metricId) => {
-        if (value === null || value === undefined) {
-            // Return 0 for undefined TDS and TSS values
-            return 0;
-        }
+        if (value === null || value === undefined) return 0;
 
         const metricThresholds = thresholds[metricId];
         if (!metricThresholds) return 0;
 
         switch (metricId) {
             case 'pH':
-                if (value >= 6.5 && value <= 8.5) return 100;
-                if (value < 6.5) return (value / 6.5) * 100;
-                return ((14 - value) / (14 - 8.5)) * 100;
+                // For pH, we want to show 0% if it's too acidic (< 6.5) or too alkaline (> 8.5)
+                if (value < 6.5) return Math.max(0, (value / 6.5) * 100);
+                if (value > 8.5) return Math.max(0, ((14 - value) / (14 - 8.5)) * 100);
+                return 100;
 
             case 'tss':
-                // If value is undefined or null, return 0
-                if (value === undefined || value === null) return 0;
-                // Rest of TSS calculation
-                const tssMaxThreshold = 50;
-                if (value <= tssMaxThreshold) {
-                    return 100 - ((value / tssMaxThreshold) * 50);
-                } else {
-                    const excessTSS = value - tssMaxThreshold;
-                    const maxExcessTSS = 50;
-                    return Math.max(0, 50 - ((excessTSS / maxExcessTSS) * 50));
-                }
+                const tssMaxSafe = 50;
+                const tssCritical = 100; // Example critical value
+
+                if (value >= tssCritical) return 0;
+                if (value <= tssMaxSafe) return 100;
+
+                return Math.max(0, ((tssCritical - value) / (tssCritical - tssMaxSafe)) * 100);
 
             case 'temperature':
-                const idealMin = 26;
-                const idealMax = 30;
-                if (value >= idealMin && value <= idealMax) return 100;
-                if (value < idealMin) return (value / idealMin) * 100;
-                return Math.max(0, (40 - value) / (40 - idealMax) * 100);
+                const tempOptimalMin = 26;
+                const tempOptimalMax = 30;
+                const tempCritical = 35; // Example critical value
+
+                if (value >= tempCritical) return 0;
+                if (value >= tempOptimalMin && value <= tempOptimalMax) return 100;
+                if (value < tempOptimalMin) return Math.max(0, (value / tempOptimalMin) * 100);
+
+                return Math.max(0, ((tempCritical - value) / (tempCritical - tempOptimalMax)) * 100);
 
             case 'tds_ppm':
-                // If value is undefined or null, return 0
-                if (value === undefined || value === null) return 0;
-                // Rest of TDS calculation
-                const tdsMaxThreshold = 500;
-                if (value <= tdsMaxThreshold) {
-                    return 100 - ((value / tdsMaxThreshold) * 50);
-                } else {
-                    const excessTDS = value - tdsMaxThreshold;
-                    const maxExcessTDS = 500;
-                    return Math.max(0, 50 - ((excessTDS / maxExcessTDS) * 50));
-                }
+                const tdsMaxSafe = 500;
+                const tdsCritical = 1000; // Example critical value
+
+                if (value >= tdsCritical) return 0;
+                if (value <= tdsMaxSafe) return 100;
+
+                return Math.max(0, ((tdsCritical - value) / (tdsCritical - tdsMaxSafe)) * 100);
 
             default:
                 return 0;

@@ -51,6 +51,7 @@ const WaterQualityByDate = () => {
     // const navigate = useNavigate(); 
     const [viewMode, setViewMode] = useState("average"); // 'hourly' or 'average'
     const [isCalendarLoading, setIsCalendarLoading] = useState(false); // Add new state
+    const [expandedChart, setExpandedChart] = useState(null); // Add new state
 
 
     useEffect(() => {
@@ -257,8 +258,10 @@ const WaterQualityByDate = () => {
             // Use UTC hours to match database timezone
             const hour = new Date(item.timestamp).getUTCHours();
             if (!acc[hour]) acc[hour] = { sum: 0, count: 0 };
-            if (item[metric] !== null) {  // Check for null values
-                acc[hour].sum += item[metric];
+            // Convert null to 0 for tss and tds_ppm
+            const value = (metric === 'tss' || metric === 'tds_ppm') && item[metric] === null ? 0 : item[metric];
+            if (value !== null) {  // Check for null values
+                acc[hour].sum += value;
                 acc[hour].count++;
             }
             return acc;
@@ -296,7 +299,11 @@ const WaterQualityByDate = () => {
 
     const createChartConfig = (label, data, metric) => {
         // Calculate the average value of the total data inside filteredData
-        const totalValue = filteredData.reduce((acc, item) => acc + item[metric], 0);
+        const totalValue = filteredData.reduce((acc, item) => {
+            // Convert null to 0 for tss and tds_ppm
+            const value = (metric === 'tss' || metric === 'tds_ppm') && item[metric] === null ? 0 : item[metric];
+            return acc + value;
+        }, 0);
         const averageValue = totalValue / filteredData.length;
         const averageColor = getColor(averageValue, metric);
 
@@ -315,11 +322,19 @@ const WaterQualityByDate = () => {
             datasets: [
                 {
                     label: label + " Level",  // Removed "Average" since this is for hourly data
-                    data: filteredData.map((item) => Number(item[metric].toFixed(2))),  // Changed data mapping to use direct metric access
+                    data: filteredData.map((item) => {
+                        // Convert null to 0 for tss and tds_ppm
+                        const value = (metric === 'tss' || metric === 'tds_ppm') && item[metric] === null ? 0 : item[metric];
+                        return Number(value.toFixed(2));
+                    }),  // Changed data mapping to use direct metric access
                     borderColor: "white",
                     borderWidth: 2,
                     backgroundColor: averageColor,
-                    pointBackgroundColor: filteredData.map((item) => getColor(item[metric], metric)),  // Changed to use direct metric access
+                    pointBackgroundColor: filteredData.map((item) => {
+                        // Convert null to 0 for tss and tds_ppm when getting color
+                        const value = (metric === 'tss' || metric === 'tds_ppm') && item[metric] === null ? 0 : item[metric];
+                        return getColor(value, metric);
+                    }),  // Changed to use direct metric access
                     pointBorderColor: "white",
                     fill: false,
                     pointRadius: 8,
@@ -493,7 +508,7 @@ const WaterQualityByDate = () => {
                             {"Average " + metric.toUpperCase()} level for this hour is{" "}
                             {value !== null && value !== undefined && filteredData.length > 0 ? (
                                 <>
-                                    {value.toFixed(2)}
+                                    {Number(value.toFixed(2))}
                                     <br></br>
                                     <span
                                         style={{
@@ -538,7 +553,7 @@ const WaterQualityByDate = () => {
                             {"Average " + metric.toUpperCase()} level for this day is{" "}
                             {dailyAverageValue !== null && value !== undefined ? (
                                 <>
-                                    {dailyAverageValue.toFixed(2)}
+                                    {Number(dailyAverageValue.toFixed(2))}
                                     <br></br>
                                     <span
                                         style={{
@@ -581,6 +596,81 @@ const WaterQualityByDate = () => {
         return getColor(averageValue, metric);
     };
 
+    const ChartExpandButton = ({ onClick }) => (
+        <button
+            onClick={onClick}
+            style={{
+                position: 'absolute',
+                top: '10px',
+                right: '10px',
+                backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                border: '1px solid white',
+                borderRadius: '4px',
+                color: 'white',
+                padding: '5px 10px',
+                cursor: 'pointer',
+                zIndex: 10,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px'
+            }}
+        >
+            <span style={{ fontSize: '16px' }}>⤢</span>
+            Expand
+        </button>
+    );
+
+    const ChartContainer = ({ children, onExpand, hasData }) => (
+        <div style={{ position: 'relative' }}>
+            {hasData && <ChartExpandButton onClick={onExpand} />}
+            {children}
+        </div>
+    );
+
+    const Modal = ({ isOpen, onClose, children }) => {
+        if (!isOpen) return null;
+
+        return (
+            <div style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                zIndex: 1000
+            }}>
+                <div style={{
+                    backgroundColor: 'rgba(98, 103, 108, 0.95)', // Gray background
+                    padding: '20px',
+                    borderRadius: '10px',
+                    width: '90%',
+                    height: '90%',
+                    position: 'relative'
+                }}>
+                    <button
+                        onClick={onClose}
+                        style={{
+                            position: 'absolute',
+                            right: '10px',
+                            top: '10px',
+                            background: 'none',
+                            border: 'none',
+                            color: 'white',
+                            fontSize: '24px',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        ×
+                    </button>
+                    {children}
+                </div>
+            </div>
+        );
+    };
 
     return (
         <div style={styles.fullContainer}>
@@ -761,7 +851,53 @@ const WaterQualityByDate = () => {
 
                 {/* Div 2 - pH */}
                 <div style={styles.div2}>
-                    <div className="chart-container">
+                    <ChartContainer
+                        hasData={viewMode === "hourly" ? filteredData.length > 0 : WaterData.length > 0}
+                        onExpand={() => {
+                            const config = viewMode === "hourly"
+                                ? createChartConfig("pH", filteredData.map(item => ({
+                                    value: item.pH,
+                                    id: item.id
+                                })), "pH")
+                                : createChartConfigForAverage("pH", getFilteredDataForAverage(WaterData, "pH"), "pH");
+
+                            const expandedOptions = {
+                                ...config.options,
+                                scales: {
+                                    x: {
+                                        ticks: { color: 'white' },
+                                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                                    },
+                                    y: {
+                                        ticks: { color: 'white' },
+                                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                                    }
+                                },
+                                plugins: {
+                                    ...config.options.plugins,
+                                    legend: {
+                                        labels: { color: 'white' }
+                                    }
+                                },
+                                maintainAspectRatio: false
+                            };
+
+                            // Update the dataset style for expanded view
+                            const expandedConfig = {
+                                ...config,
+                                datasets: [{
+                                    ...config.datasets[0],
+                                    borderColor: 'white',
+                                    pointBorderColor: 'white'
+                                }]
+                            };
+
+                            setExpandedChart({
+                                data: expandedConfig,
+                                options: expandedOptions
+                            });
+                        }}
+                    >
                         {viewMode === "hourly" ? (
                             filteredData.length > 0 ? (
                                 <Line
@@ -826,12 +962,58 @@ const WaterQualityByDate = () => {
                             metric="pH"
                             data={WaterData}
                         />
-                    </div>
+                    </ChartContainer>
                 </div>
 
                 {/* Div 3 - Temperature */}
                 <div style={styles.div3}>
-                    <div className="chart-container">
+                    <ChartContainer
+                        hasData={viewMode === "hourly" ? filteredData.length > 0 : WaterData.length > 0}
+                        onExpand={() => {
+                            const config = viewMode === "hourly"
+                                ? createChartConfig("Temperature", filteredData.map(item => ({
+                                    value: item.temperature,
+                                    id: item.id
+                                })), "temperature")
+                                : createChartConfigForAverage("Temperature", getFilteredDataForAverage(WaterData, "temperature"), "temperature");
+
+                            const expandedOptions = {
+                                ...config.options,
+                                scales: {
+                                    x: {
+                                        ticks: { color: 'white' },
+                                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                                    },
+                                    y: {
+                                        ticks: { color: 'white' },
+                                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                                    }
+                                },
+                                plugins: {
+                                    ...config.options.plugins,
+                                    legend: {
+                                        labels: { color: 'white' }
+                                    }
+                                },
+                                maintainAspectRatio: false
+                            };
+
+                            // Update the dataset style for expanded view
+                            const expandedConfig = {
+                                ...config,
+                                datasets: [{
+                                    ...config.datasets[0],
+                                    borderColor: 'white',
+                                    pointBorderColor: 'white'
+                                }]
+                            };
+
+                            setExpandedChart({
+                                data: expandedConfig,
+                                options: expandedOptions
+                            });
+                        }}
+                    >
                         {viewMode === "hourly" ? (
                             filteredData.length > 0 ? (
                                 <Line
@@ -896,12 +1078,58 @@ const WaterQualityByDate = () => {
                             metric="temperature"
                             data={WaterData}
                         />
-                    </div>
+                    </ChartContainer>
                 </div>
 
                 {/* Div 4 - TSS */}
                 <div style={styles.div4}>
-                    <div className="chart-container">
+                    <ChartContainer
+                        hasData={viewMode === "hourly" ? filteredData.length > 0 : WaterData.length > 0}
+                        onExpand={() => {
+                            const config = viewMode === "hourly"
+                                ? createChartConfig("TSS", filteredData.map(item => ({
+                                    value: item.tss,
+                                    id: item.id
+                                })), "tss")
+                                : createChartConfigForAverage("TSS", getFilteredDataForAverage(WaterData, "tss"), "tss");
+
+                            const expandedOptions = {
+                                ...config.options,
+                                scales: {
+                                    x: {
+                                        ticks: { color: 'white' },
+                                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                                    },
+                                    y: {
+                                        ticks: { color: 'white' },
+                                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                                    }
+                                },
+                                plugins: {
+                                    ...config.options.plugins,
+                                    legend: {
+                                        labels: { color: 'white' }
+                                    }
+                                },
+                                maintainAspectRatio: false
+                            };
+
+                            // Update the dataset style for expanded view
+                            const expandedConfig = {
+                                ...config,
+                                datasets: [{
+                                    ...config.datasets[0],
+                                    borderColor: 'white',
+                                    pointBorderColor: 'white'
+                                }]
+                            };
+
+                            setExpandedChart({
+                                data: expandedConfig,
+                                options: expandedOptions
+                            });
+                        }}
+                    >
                         {viewMode === "hourly" ? (
                             filteredData.length > 0 ? (
                                 <Line
@@ -966,12 +1194,46 @@ const WaterQualityByDate = () => {
                             metric="tss"
                             data={WaterData}
                         />
-                    </div>
+                    </ChartContainer>
                 </div>
 
                 {/* Div 5 - TDS */}
                 <div style={styles.div5}>
-                    <div className="chart-container">
+                    <ChartContainer
+                        hasData={viewMode === "hourly" ? filteredData.length > 0 : WaterData.length > 0}
+                        onExpand={() => {
+                            const config = viewMode === "hourly"
+                                ? createChartConfig("TDS", filteredData.map(item => ({
+                                    value: item.tds_ppm,
+                                    id: item.id
+                                })), "tds_ppm")
+                                : createChartConfigForAverage("TDS", getFilteredDataForAverage(WaterData, "tds_ppm"), "tds_ppm");
+
+                            const expandedOptions = {
+                                ...config.options,
+                                backgroundColor: 'black',
+                                Legend: {
+                                    labels: { color: 'black' }
+                                },
+                                scales: {
+                                    x: {
+                                        ticks: { color: 'black' },
+                                        grid: { color: 'rgba(0, 0, 0, 0.1)' }
+                                    },
+                                    y: {
+                                        ticks: { color: 'black' },
+                                        grid: { color: 'rgba(0, 0, 0, 0.1)' }
+                                    }
+                                },
+                                maintainAspectRatio: false
+                            };
+
+                            setExpandedChart({
+                                data: config,
+                                options: expandedOptions
+                            });
+                        }}
+                    >
                         {viewMode === "hourly" ? (
                             filteredData.length > 0 ? (
                                 <Line
@@ -1036,11 +1298,25 @@ const WaterQualityByDate = () => {
                             metric="tds_ppm"
                             data={WaterData}
                         />
-                    </div>
+                    </ChartContainer>
                 </div>
 
                 <ToastContainer />
             </div>
+            <Modal
+                isOpen={expandedChart !== null}
+                onClose={() => setExpandedChart(null)}
+            >
+                <div style={{ width: '100%', height: '100%' }}>
+                    {expandedChart && (
+                        <Line
+                            data={expandedChart.data}
+                            options={expandedChart.options}
+                            style={{ width: '100%', height: '100%' }}
+                        />
+                    )}
+                </div>
+            </Modal>
         </div>
     );
 };
