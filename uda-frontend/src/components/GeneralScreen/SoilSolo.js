@@ -810,7 +810,7 @@ const SoilView = () => {
         noDataLabel: {
             fontSize: "15px",
             fontWeight: "bold",
-            color: "#ffce56",
+            color: "#02bd49",
             height: "80px",
             width: "63px",
             display: "inline-flex",
@@ -1387,7 +1387,7 @@ const SoilView = () => {
                     <div style={styles.lowerRightBox}>
                         {/* Narrative Report */}
                         <div style={styles.narrativeReportContainer}>
-                            <h3 style={styles.reportTitle}>Soil Quality Report</h3>
+                            <h3 style={styles.reportTitle}>Narrative Insight:</h3>
                             {(() => {
                                 const { text, status } = generateNarrative(selectedHourForNarrative);
                                 const thresholdData = thresholdInfo.find(t => t.level === status?.label);

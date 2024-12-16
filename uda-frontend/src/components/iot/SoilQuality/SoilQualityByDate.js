@@ -254,69 +254,70 @@ const SoilQualityByDate = () => {
 
 
     const createChartConfig = (label, data, metric) => {
-        const totalValue = filteredData.reduce((acc, item) => acc + parseFloat(item[metric]), 0);
-        const averageValue = totalValue / filteredData.length;
-        const averageColor = getColor(averageValue, metric);
+    const totalValue = filteredData.reduce((acc, item) => acc + parseFloat(item[metric]), 0);
+    const averageValue = totalValue / filteredData.length;
+    const averageColor = getColor(averageValue, metric);
 
-        // Sort the filtered data chronologically by timestamp
-        const sortedData = [...filteredData].sort((a, b) =>
-            new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-        );
+    // Sort the filtered data chronologically by timestamp
+    const sortedData = [...filteredData].sort((a, b) =>
+        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+    );
 
-        return {
-            labels: sortedData.map((item) => {
-                const date = new Date(item.timestamp);
-                return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;
-            }),
-            datasets: [
-                {
-                    label: label + " Average Level",
-                    data: data.map((item) => Number(item.value).toFixed(2)), // Format to 2 decimal places
-                    borderColor: "rgba(0, 0, 0, 1)",
-                    borderWidth: 1,
-                    backgroundColor: averageColor,
-                    pointBackgroundColor: data.map((item) => getColor(item.value, metric)),
-                    pointBorderColor: "rgba(0, 0, 0, 1)",
-                    fill: false,
-                    pointRadius: 8,
-                    pointHoverRadius: 10,
-                },
-            ],
-        };
+    return {
+        labels: sortedData.map((item) => {
+            const date = new Date(item.timestamp);
+            return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;
+        }),
+        datasets: [
+            {
+                label: label + " Average Level",
+                data: data.map((item) => Number(item.value).toFixed(2)), // Format to 2 decimal places
+                borderColor: "white", // Set line color to white
+                borderWidth: 2,
+                backgroundColor: averageColor,
+                pointBackgroundColor: data.map((item) => getColor(item.value, metric)),
+                pointBorderColor: "white", // Set point border color to white
+                fill: false,
+                pointRadius: 8,
+                pointHoverRadius: 10,
+                tension: 0.4, // Set line tension
+            },
+        ],
     };
+};
 
+const createChartConfigForAverage = (label, data, metric) => {
+    // Calculate the average value of the total data inside data
+    const totalValue = data.reduce((acc, item) => acc + item.average, 0);
+    const averageValue = totalValue / data.length;
+    const averageColor = getColor(averageValue, metric);
 
-    // Create the chart config for hourly averages (for the 'average' view mode)
-    const createChartConfigForAverage = (label, data, metric) => {
-        // Calculate the average value of the total data inside data
-        const totalValue = data.reduce((acc, item) => acc + item.average, 0);
-        const averageValue = totalValue / data.length;
-        const averageColor = getColor(averageValue, metric);
-
-        return {
-            labels: data.map((item) => {
-                // Format the hour as "6 AM", "7 AM", etc.
-                const hour = item.hour;
-                const ampm = hour < 12 ? "AM" : "PM";
-                const displayHour = hour % 12 === 0 ? 12 : hour % 12;
-                return `${displayHour} ${ampm}`;
-            }),
-            datasets: [
-                {
-                    label: `${label} Hourly Average Level`,
-                    data: data.map((item) => item.average?.toFixed(2)), // Use the average values
-                    borderColor: "rgba(0, 0, 0, 1)",
-                    borderWidth: 1,
-                    backgroundColor: averageColor, // Use the average color for the background
-                    pointBackgroundColor: data.map((item) => getColor(item.average, metric)),
-                    pointBorderColor: "rgba(0, 0, 0, 1)",
-                    fill: false,
-                    pointRadius: 8,
-                    pointHoverRadius: 10,
-                },
-            ],
-        };
+    return {
+        labels: data.map((item) => {
+            // Format the hour as "6 AM", "7 AM", etc.
+            const hour = item.hour;
+            const ampm = hour < 12 ? "AM" : "PM";
+            const displayHour = hour % 12 === 0 ? 12 : hour % 12;
+            return `${displayHour} ${ampm}`;
+        }),
+        datasets: [
+            {
+                label: `${label} Hourly Average Level`,
+                data: data.map((item) => item.average?.toFixed(2)), // Use the average values
+                borderColor: "white", // Set line color to white
+                borderWidth: 2,
+                backgroundColor: averageColor, // Use the average color for the background
+                pointBackgroundColor: data.map((item) => getColor(item.average, metric)),
+                pointBorderColor: "white", // Set point border color to white
+                fill: false,
+                pointRadius: 8,
+                pointHoverRadius: 10,
+                tension: 0.4, // Set line tension
+            },
+        ],
     };
+};
+
 
     const Legend = ({ thresholds, filteredData, metric, data }) => {
         // Ensure filteredData is defined and has length

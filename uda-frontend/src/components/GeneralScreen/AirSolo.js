@@ -67,7 +67,7 @@ const AirView = () => {
             { min: 26, max: 35.99, label: "Fair", color: "rgba(154, 205, 50)" },
             { min: 36, max: 45.99, label: "Unhealthy", color: "rgba(255, 206, 86)" },
             { min: 46, max: 55.99, label: "Very Unhealthy", color: "rgba(235, 66, 61)" },
-            { min: 56, max: 90.99, label: "Acutely Unhealthy", color: "rgba(255, 99, 132)" },
+            { min: 56, max: 90.99, label: "Acutely Unhealthy", color: "rgba(185, 99, 255)" },
             { min: 91, max: Infinity, label: "Emergency", color: "rgba(139, 0, 0)" },
         ],
         pm10: [
