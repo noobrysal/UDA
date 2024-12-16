@@ -942,30 +942,33 @@ const AirView = () => {
 
         // Special handling for PM2.5 and PM10
         if (['pm25', 'pm10'].includes(metricId)) {
-            const emergencyThreshold = metricThresholds[metricThresholds.length - 1].min; // Get emergency level threshold
+            const emergencyThreshold = metricThresholds[metricThresholds.length - 1].min;
             const goodThreshold = metricThresholds[0].max;
 
             // If value is at emergency level or higher, return 0%
             if (value >= emergencyThreshold) return 0;
 
             // Calculate percentage based on position between good and emergency levels
-            let percentage = ((emergencyThreshold - value) / (emergencyThreshold - goodThreshold)) * 100;
-            return Math.min(Math.max(percentage, 0), 100);
+            return Math.max(0, Math.min(100, ((emergencyThreshold - value) / (emergencyThreshold - goodThreshold)) * 100));
         }
 
-        // For temperature (keep the reversed calculation)
+        // For temperature
         if (metricId === 'temperature') {
             const maxGoodValue = metricThresholds[0].max;
-            let percentage = ((maxGoodValue - value) / maxGoodValue) * 100;
-            percentage = Math.min(Math.max(percentage + 100, 0), 100);
-            return percentage;
+            const criticalValue = metricThresholds[metricThresholds.length - 1].min;
+
+            if (value >= criticalValue) return 0;
+
+            return Math.max(0, Math.min(100, (criticalValue - value) / (criticalValue - maxGoodValue) * 100));
         }
 
-        // For other metrics (humidity, oxygen) - keep original calculation
-        const maxGoodValue = metricThresholds[0].max;
-        let percentage = (maxGoodValue / value) * 100;
-        percentage = Math.min(percentage, 100);
-        return percentage;
+        // For other metrics (humidity, oxygen)
+        const optimalMax = metricThresholds.find(t => t.label === 'Good')?.max || 100;
+        const criticalValue = metricThresholds[metricThresholds.length - 1].min;
+
+        if (value >= criticalValue) return 0;
+
+        return Math.max(0, Math.min(100, (criticalValue - value) / (criticalValue - optimalMax) * 100));
     };
 
     // Update the getBarChartData function

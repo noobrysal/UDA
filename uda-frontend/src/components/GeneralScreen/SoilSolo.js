@@ -1078,32 +1078,41 @@ const SoilView = () => {
 
     // Update the calculatePercentageValue function
     const calculatePercentageValue = (value, metricId) => {
-        if (value === null || value === undefined) {
-            return 0;
-        }
+        if (value === null || value === undefined) return 0;
 
         const metricThresholds = thresholds[metricId];
         if (!metricThresholds) return 0;
 
         switch (metricId) {
             case 'soil_moisture':
-                if (value >= 40 && value <= 70.99) return 100;
-                if (value < 40) return (value / 40) * 100;
-                return Math.max(0, (100 - value) / (100 - 70.99) * 100);
+                const moistureOptimal = { min: 40, max: 70.99 };
+                const moistureCritical = 120; // Example critical value
+
+                if (value >= moistureCritical) return 0;
+                if (value >= moistureOptimal.min && value <= moistureOptimal.max) return 100;
+                if (value < moistureOptimal.min) return Math.max(0, (value / moistureOptimal.min) * 100);
+
+                return Math.max(0, ((moistureCritical - value) / (moistureCritical - moistureOptimal.max)) * 100);
 
             case 'temperature':
-                const idealMinTemp = 15;
-                const idealMaxTemp = 29.99;
-                if (value >= idealMinTemp && value <= idealMaxTemp) return 100;
-                if (value < idealMinTemp) return (value / idealMinTemp) * 100;
-                return Math.max(0, (40 - value) / (40 - idealMaxTemp) * 100);
+                const tempOptimal = { min: 15, max: 29.99 };
+                const tempCritical = 40; // Example critical value
+
+                if (value >= tempCritical) return 0;
+                if (value >= tempOptimal.min && value <= tempOptimal.max) return 100;
+                if (value < tempOptimal.min) return Math.max(0, (value / tempOptimal.min) * 100);
+
+                return Math.max(0, ((tempCritical - value) / (tempCritical - tempOptimal.max)) * 100);
 
             case 'humidity':
-                const idealMinHumidity = 50;
-                const idealMaxHumidity = 70.99;
-                if (value >= idealMinHumidity && value <= idealMaxHumidity) return 100;
-                if (value < idealMinHumidity) return (value / idealMinHumidity) * 100;
-                return Math.max(0, (100 - value) / (100 - idealMaxHumidity) * 100);
+                const humidityOptimal = { min: 50, max: 70.99 };
+                const humidityCritical = 100; // Example critical value
+
+                if (value >= humidityCritical) return 0;
+                if (value >= humidityOptimal.min && value <= humidityOptimal.max) return 100;
+                if (value < humidityOptimal.min) return Math.max(0, (value / humidityOptimal.min) * 100);
+
+                return Math.max(0, ((humidityCritical - value) / (humidityCritical - humidityOptimal.max)) * 100);
 
             default:
                 return 0;

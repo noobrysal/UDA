@@ -52,6 +52,7 @@ const AirQualityByDate = () => {
     // const navigate = useNavigate(); 
     const [viewMode, setViewMode] = useState("average"); // 'hourly' or 'average'
     const [isCalendarLoading, setIsCalendarLoading] = useState(false); // Add new state
+    const [expandedChart, setExpandedChart] = useState(null);
 
 
     useEffect(() => {
@@ -540,6 +541,84 @@ const AirQualityByDate = () => {
         return getColor(averageValue, metric);
     };
 
+    // Add ChartExpandButton component
+    const ChartExpandButton = ({ onClick }) => (
+        <button
+            onClick={onClick}
+            style={{
+                position: 'absolute',
+                top: '10px',
+                right: '10px',
+                backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                border: '1px solid white',
+                borderRadius: '4px',
+                color: 'white',
+                padding: '5px 10px',
+                cursor: 'pointer',
+                zIndex: 10,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px'
+            }}
+        >
+            <span style={{ fontSize: '16px' }}>⤢</span>
+            Expand
+        </button>
+    );
+
+    // Add ChartContainer component
+    const ChartContainer = ({ children, onExpand, hasData }) => (
+        <div style={{ position: 'relative' }}>
+            {hasData && <ChartExpandButton onClick={onExpand} />}
+            {children}
+        </div>
+    );
+
+    // Add Modal component
+    const Modal = ({ isOpen, onClose, children }) => {
+        if (!isOpen) return null;
+
+        return (
+            <div style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                zIndex: 1000
+            }}>
+                <div style={{
+                    backgroundColor: 'rgba(98, 103, 108, 0.95)',
+                    padding: '20px',
+                    borderRadius: '10px',
+                    width: '90%',
+                    height: '90%',
+                    position: 'relative'
+                }}>
+                    <button
+                        onClick={onClose}
+                        style={{
+                            position: 'absolute',
+                            right: '10px',
+                            top: '10px',
+                            background: 'none',
+                            border: 'none',
+                            color: 'white',
+                            fontSize: '24px',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        ×
+                    </button>
+                    {children}
+                </div>
+            </div>
+        );
+    };
 
     return (
         <div style={styles.fullContainer}>
@@ -719,7 +798,51 @@ const AirQualityByDate = () => {
 
                 {/* Div 2 - PM2.5 */}
                 <div style={styles.div2}>
-                    <div className="chart-container">
+                    <ChartContainer
+                        hasData={viewMode === "hourly" ? filteredData.length > 0 : airData.length > 0}
+                        onExpand={() => {
+                            const config = viewMode === "hourly"
+                                ? createChartConfig(
+                                    "PM25",
+                                    filteredData.map(item => ({
+                                        value: item.pm25,
+                                        id: item.id
+                                    })),
+                                    "pm25"
+                                )
+                                : createChartConfigForAverage(
+                                    "PM25",
+                                    getFilteredDataForAverage(airData, "pm25"),
+                                    "pm25"
+                                );
+
+                            const expandedOptions = {
+                                ...config.options,
+                                scales: {
+                                    x: {
+                                        ticks: { color: 'white' },
+                                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                                    },
+                                    y: {
+                                        ticks: { color: 'white' },
+                                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                                    }
+                                },
+                                plugins: {
+                                    ...config.options?.plugins,
+                                    legend: {
+                                        labels: { color: 'white' }
+                                    }
+                                },
+                                maintainAspectRatio: false
+                            };
+
+                            setExpandedChart({
+                                data: config,
+                                options: expandedOptions
+                            });
+                        }}
+                    >
                         {/* Render Hourly Data Chart */}
                         {viewMode === "hourly" && filteredData.length > 0 ? (
                             <Line
@@ -843,7 +966,6 @@ const AirQualityByDate = () => {
                                             color: 'white',
                                         },
                                     },
-                                    onClick: handlePointClick,
                                 }}
                             />
                         ) : null}
@@ -860,12 +982,56 @@ const AirQualityByDate = () => {
                             metric="pm25"
                             data={airData}
                         />
-                    </div>
+                    </ChartContainer>
                 </div>
 
                 {/* Div 3 - PM10 */}
                 <div style={styles.div3}>
-                    <div className="chart-container">
+                    <ChartContainer
+                        hasData={viewMode === "hourly" ? filteredData.length > 0 : airData.length > 0}
+                        onExpand={() => {
+                            const config = viewMode === "hourly"
+                                ? createChartConfig(
+                                    "PM10",
+                                    filteredData.map(item => ({
+                                        value: item.pm10,
+                                        id: item.id
+                                    })),
+                                    "pm10"
+                                )
+                                : createChartConfigForAverage(
+                                    "PM10",
+                                    getFilteredDataForAverage(airData, "pm10"),
+                                    "pm10"
+                                );
+
+                            const expandedOptions = {
+                                ...config.options,
+                                scales: {
+                                    x: {
+                                        ticks: { color: 'white' },
+                                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                                    },
+                                    y: {
+                                        ticks: { color: 'white' },
+                                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                                    }
+                                },
+                                plugins: {
+                                    ...config.options?.plugins,
+                                    legend: {
+                                        labels: { color: 'white' }
+                                    }
+                                },
+                                maintainAspectRatio: false
+                            };
+
+                            setExpandedChart({
+                                data: config,
+                                options: expandedOptions
+                            });
+                        }}
+                    >
                         {/* Render Hourly Data Chart for PM10 */}
                         {viewMode === "hourly" && filteredData.length > 0 ? (
                             <Line
@@ -986,7 +1152,6 @@ const AirQualityByDate = () => {
                                             },
                                         },
                                     },
-                                    onClick: handlePointClick,
                                 }}
                             />
                         ) : null}
@@ -1003,12 +1168,56 @@ const AirQualityByDate = () => {
                             metric="pm10"
                             data={airData}
                         />
-                    </div>
+                    </ChartContainer>
                 </div>
 
                 {/* Div 4 - Humidity */}
                 <div style={styles.div4}>
-                    <div className="chart-container">
+                    <ChartContainer
+                        hasData={viewMode === "hourly" ? filteredData.length > 0 : airData.length > 0}
+                        onExpand={() => {
+                            const config = viewMode === "hourly"
+                                ? createChartConfig(
+                                    "Humidity",
+                                    filteredData.map(item => ({
+                                        value: item.humidity,
+                                        id: item.id
+                                    })),
+                                    "humidity"
+                                )
+                                : createChartConfigForAverage(
+                                    "Humidity",
+                                    getFilteredDataForAverage(airData, "humidity"),
+                                    "humidity"
+                                );
+
+                            const expandedOptions = {
+                                ...config.options,
+                                scales: {
+                                    x: {
+                                        ticks: { color: 'white' },
+                                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                                    },
+                                    y: {
+                                        ticks: { color: 'white' },
+                                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                                    }
+                                },
+                                plugins: {
+                                    ...config.options?.plugins,
+                                    legend: {
+                                        labels: { color: 'white' }
+                                    }
+                                },
+                                maintainAspectRatio: false
+                            };
+
+                            setExpandedChart({
+                                data: config,
+                                options: expandedOptions
+                            });
+                        }}
+                    >
                         {/* Render Hourly Data Chart for Humidity */}
                         {viewMode === "hourly" && filteredData.length > 0 ? (
                             <Line
@@ -1129,7 +1338,6 @@ const AirQualityByDate = () => {
                                             },
                                         },
                                     },
-                                    onClick: handlePointClick,
                                 }}
                             />
                         ) : null}
@@ -1146,12 +1354,56 @@ const AirQualityByDate = () => {
                             metric="humidity"
                             data={airData}
                         />
-                    </div>
+                    </ChartContainer>
                 </div>
 
                 {/* Div 5 - Temperature */}
                 <div style={styles.div5}>
-                    <div className="chart-container">
+                    <ChartContainer
+                        hasData={viewMode === "hourly" ? filteredData.length > 0 : airData.length > 0}
+                        onExpand={() => {
+                            const config = viewMode === "hourly"
+                                ? createChartConfig(
+                                    "Temperature",
+                                    filteredData.map(item => ({
+                                        value: item.temperature,
+                                        id: item.id
+                                    })),
+                                    "temperature"
+                                )
+                                : createChartConfigForAverage(
+                                    "Temperature",
+                                    getFilteredDataForAverage(airData, "temperature"),
+                                    "temperature"
+                                );
+
+                            const expandedOptions = {
+                                ...config.options,
+                                scales: {
+                                    x: {
+                                        ticks: { color: 'white' },
+                                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                                    },
+                                    y: {
+                                        ticks: { color: 'white' },
+                                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                                    }
+                                },
+                                plugins: {
+                                    ...config.options?.plugins,
+                                    legend: {
+                                        labels: { color: 'white' }
+                                    }
+                                },
+                                maintainAspectRatio: false
+                            };
+
+                            setExpandedChart({
+                                data: config,
+                                options: expandedOptions
+                            });
+                        }}
+                    >
                         {/* Render Hourly Data Chart for Temperature */}
                         {viewMode === "hourly" && filteredData.length > 0 ? (
                             <Line
@@ -1272,7 +1524,6 @@ const AirQualityByDate = () => {
                                             },
                                         },
                                     },
-                                    onClick: handlePointClick,
                                 }}
                             />
                         ) : null}
@@ -1289,12 +1540,56 @@ const AirQualityByDate = () => {
                             metric="temperature"
                             data={airData}
                         />
-                    </div>
+                    </ChartContainer>
                 </div>
 
                 {/* Div 6 - Oxygen */}
                 <div style={styles.div6}>
-                    <div className="chart-container">
+                    <ChartContainer
+                        hasData={viewMode === "hourly" ? filteredData.length > 0 : airData.length > 0}
+                        onExpand={() => {
+                            const config = viewMode === "hourly"
+                                ? createChartConfig(
+                                    "Oxygen",
+                                    filteredData.map(item => ({
+                                        value: item.oxygen,
+                                        id: item.id
+                                    })),
+                                    "oxygen"
+                                )
+                                : createChartConfigForAverage(
+                                    "Oxygen",
+                                    getFilteredDataForAverage(airData, "oxygen"),
+                                    "oxygen"
+                                );
+
+                            const expandedOptions = {
+                                ...config.options,
+                                scales: {
+                                    x: {
+                                        ticks: { color: 'white' },
+                                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                                    },
+                                    y: {
+                                        ticks: { color: 'white' },
+                                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                                    }
+                                },
+                                plugins: {
+                                    ...config.options?.plugins,
+                                    legend: {
+                                        labels: { color: 'white' }
+                                    }
+                                },
+                                maintainAspectRatio: false
+                            };
+
+                            setExpandedChart({
+                                data: config,
+                                options: expandedOptions
+                            });
+                        }}
+                    >
                         {/* Render Hourly Data Chart for Oxygen */}
                         {viewMode === "hourly" && filteredData.length > 0 ? (
                             <Line
@@ -1415,7 +1710,6 @@ const AirQualityByDate = () => {
                                             },
                                         },
                                     },
-                                    onClick: handlePointClick,
                                 }}
                             />
                         ) : null}
@@ -1432,10 +1726,24 @@ const AirQualityByDate = () => {
                             metric="oxygen"
                             data={airData}
                         />
-                    </div>
+                    </ChartContainer>
                 </div>
                 <ToastContainer />
             </div>
+            <Modal
+                isOpen={expandedChart !== null}
+                onClose={() => setExpandedChart(null)}
+            >
+                <div style={{ width: '100%', height: '100%' }}>
+                    {expandedChart && (
+                        <Line
+                            data={expandedChart.data}
+                            options={expandedChart.options}
+                            style={{ width: '100%', height: '100%' }}
+                        />
+                    )}
+                </div>
+            </Modal>
         </div>
     );
 };

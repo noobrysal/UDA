@@ -50,6 +50,7 @@ const SoilQualityByDate = () => {
     const [viewMode, setViewMode] = useState("average");
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const [isCalendarLoading, setIsCalendarLoading] = useState(false);
+    const [expandedChart, setExpandedChart] = useState(null);
 
 
     useEffect(() => {
@@ -272,14 +273,15 @@ const SoilQualityByDate = () => {
                 {
                     label: label + " Average Level",
                     data: data.map((item) => Number(item.value).toFixed(2)), // Format to 2 decimal places
-                    borderColor: "rgba(0, 0, 0, 1)",
+                    borderColor: "white",
                     borderWidth: 1,
                     backgroundColor: averageColor,
                     pointBackgroundColor: data.map((item) => getColor(item.value, metric)),
-                    pointBorderColor: "rgba(0, 0, 0, 1)",
+                    pointBorderColor: "white",
                     fill: false,
                     pointRadius: 8,
                     pointHoverRadius: 10,
+                    tension: 0.4,
                 },
             ],
         };
@@ -305,14 +307,16 @@ const SoilQualityByDate = () => {
                 {
                     label: `${label} Hourly Average Level`,
                     data: data.map((item) => item.average?.toFixed(2)), // Use the average values
-                    borderColor: "rgba(0, 0, 0, 1)",
+                    borderColor: "white",
                     borderWidth: 1,
                     backgroundColor: averageColor, // Use the average color for the background
                     pointBackgroundColor: data.map((item) => getColor(item.average, metric)),
-                    pointBorderColor: "rgba(0, 0, 0, 1)",
+                    pointBorderColor: "white",
                     fill: false,
                     pointRadius: 8,
                     pointHoverRadius: 10,
+                    tension: 0.4,
+
                 },
             ],
         };
@@ -478,36 +482,164 @@ const SoilQualityByDate = () => {
         );
     };
 
+    const ChartExpandButton = ({ onClick }) => (
+        <button
+            onClick={onClick}
+            style={{
+                position: 'absolute',
+                top: '10px',
+                right: '10px',
+                backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                border: '1px solid white',
+                borderRadius: '4px',
+                color: 'white',
+                padding: '5px 10px',
+                cursor: 'pointer',
+                zIndex: 10,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px'
+            }}
+        >
+            <span style={{ fontSize: '16px' }}>⤢</span>
+            Expand
+        </button>
+    );
+
+    const ChartContainer = ({ children, onExpand, hasData }) => (
+        <div style={{ position: 'relative' }}>
+            {hasData && <ChartExpandButton onClick={onExpand} />}
+            {children}
+        </div>
+    );
+
+    const Modal = ({ isOpen, onClose, children }) => {
+        if (!isOpen) return null;
+
+        return (
+            <div style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                zIndex: 1000
+            }}>
+                <div style={{
+                    backgroundColor: 'rgba(98, 103, 108, 0.95)',
+                    padding: '20px',
+                    borderRadius: '10px',
+                    width: '90%',
+                    height: '90%',
+                    position: 'relative'
+                }}>
+                    <button
+                        onClick={onClose}
+                        style={{
+                            position: 'absolute',
+                            right: '10px',
+                            top: '10px',
+                            background: 'none',
+                            border: 'none',
+                            color: 'white',
+                            fontSize: '24px',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        ×
+                    </button>
+                    {children}
+                </div>
+            </div>
+        );
+    };
+
     const renderChart = (label, metric) => {
-        if (viewMode === "hourly" && filteredData.length > 0) {
-            return (
-                <Line
-                    data={createChartConfig(
-                        label,
-                        filteredData.map((item) => ({
-                            value: item[metric],
-                            id: item.id,
-                        })),
-                        metric
-                    )}
-                    height={250}
-                    options={getChartOptions(label, metric)}
-                />
-            );
-        } else if (viewMode === "average" && soilData.length > 0) {
-            return (
-                <Line
-                    data={createChartConfigForAverage(
-                        label,
-                        getFilteredDataForAverage(soilData, metric),
-                        metric
-                    )}
-                    height={250}
-                    options={getChartOptions(label, metric)}
-                />
-            );
-        }
-        return <p>No data found for this hour.</p>;
+        const hasData = viewMode === "hourly" ? filteredData.length > 0 : soilData.length > 0;
+
+        return (
+            <ChartContainer
+                hasData={hasData}
+                onExpand={() => {
+                    const config = viewMode === "hourly"
+                        ? createChartConfig(
+                            label,
+                            filteredData.map(item => ({
+                                value: item[metric],
+                                id: item.id
+                            })),
+                            metric
+                        )
+                        : createChartConfigForAverage(
+                            label,
+                            getFilteredDataForAverage(soilData, metric),
+                            metric
+                        );
+
+                    const expandedOptions = {
+                        ...getChartOptions(label, metric),
+                        scales: {
+                            x: {
+                                ticks: { color: 'white' },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            },
+                            y: {
+                                ticks: { color: 'white' },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            }
+                        },
+                        plugins: {
+                            ...getChartOptions(label, metric).plugins,
+                            legend: {
+                                labels: { color: 'white' }
+                            }
+                        },
+                        maintainAspectRatio: false
+                    };
+
+                    setExpandedChart({
+                        data: config,
+                        options: expandedOptions
+                    });
+                }}
+            >
+                {hasData ? (
+                    <Line
+                        data={viewMode === "hourly"
+                            ? createChartConfig(
+                                label,
+                                filteredData.map((item) => ({
+                                    value: item[metric],
+                                    id: item.id,
+                                })),
+                                metric
+                            )
+                            : createChartConfigForAverage(
+                                label,
+                                getFilteredDataForAverage(soilData, metric),
+                                metric
+                            )}
+                        height={250}
+                        options={getChartOptions(label, metric)}
+                    />
+                ) : (
+                    <div style={{
+                        height: '250px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: 'white',
+                        fontSize: '1.2rem'
+                    }}>
+                        No Data found at this hour.
+                    </div>
+                )}
+            </ChartContainer>
+        );
     };
 
     const getChartOptions = (title, metric) => ({
@@ -545,7 +677,8 @@ const SoilQualityByDate = () => {
                 color: 'white',
             },
         },
-        onClick: handlePointClick,
+        // Only add onClick handler for hourly view
+        onClick: viewMode === "hourly" ? handlePointClick : undefined,
     });
 
     return (
@@ -708,6 +841,20 @@ const SoilQualityByDate = () => {
                 {renderCharts()}
                 <ToastContainer />
             </div>
+            <Modal
+                isOpen={expandedChart !== null}
+                onClose={() => setExpandedChart(null)}
+            >
+                <div style={{ width: '100%', height: '100%' }}>
+                    {expandedChart && (
+                        <Line
+                            data={expandedChart.data}
+                            options={expandedChart.options}
+                            style={{ width: '100%', height: '100%' }}
+                        />
+                    )}
+                </div>
+            </Modal>
         </div>
     );
 };
