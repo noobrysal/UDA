@@ -274,13 +274,28 @@ const GeneralScreen = () => {
         }]
     };
 
-    // Add helper function to calculate safety percentage
+    // Update the calculateSafetyPercentage function
     const calculateSafetyPercentage = (value, metric) => {
-        if (!value || value === 0) return 100; // Full safety when no contaminants
+        if (value === null || value === undefined || value === 0) {
+            return 100; // Full safety when no contaminants
+        }
 
-        const maxSafeValue = metric === 'tss' ? 50 : 500; // Max threshold values
-        const percentage = Math.max(0, 100 - ((value / maxSafeValue) * 100));
-        return Math.min(100, percentage); // Ensure we don't exceed 100%
+        const thresholds = {
+            'tss': { acceptable: 50 },
+            'tds_ppm': { acceptable: 500 }
+        };
+
+        const threshold = thresholds[metric].acceptable;
+
+        if (value <= threshold) {
+            // Scale from 100% to 50% within acceptable range
+            return 100 - ((value / threshold) * 50);
+        } else {
+            // Scale from 50% to 0% after exceeding threshold
+            const excess = value - threshold;
+            const maxExcess = threshold; // Same range for scaling down
+            return Math.max(0, 50 - ((excess / maxExcess) * 50));
+        }
     };
 
     // Modified Water Quality Chart Configuration

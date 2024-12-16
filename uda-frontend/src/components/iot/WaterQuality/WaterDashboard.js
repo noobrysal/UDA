@@ -56,22 +56,22 @@ const WaterDashboard = () => {
 
     const thresholds = {
         pH: [
-            { min: 0, max: 6.49, label: "Too Acidic", color: "rgba(235, 66, 61)" },
-            { min: 6.5, max: 8.5, label: "Acceptable", color: "rgba(85, 214, 69)" },
-            { min: 8.51, max: Infinity, label: "Too Alkaline", color: "rgba(255, 140, 0)" },
+            { min: 0, max: 6.49, label: "Too Acidic", color: "rgba(199, 46, 46)" },
+            { min: 6.5, max: 8.5, label: "Acceptable", color: "rgba(154, 205, 50)" },
+            { min: 8.51, max: Infinity, label: "Too Alkaline", color: "rgba(230, 126, 14)" },
         ],
         temperature: [
-            { min: 0, max: 25.99, label: "Too Cold", color: "rgba(255, 140, 0)" },
-            { min: 26, max: 30, label: "Acceptable", color: "rgba(85, 214, 69)" },
-            { min: 30.01, max: Infinity, label: "Too Hot", color: "rgba(235, 66, 61)" },
+            { min: 0, max: 25.99, label: "Too Cold", color: "rgba(230, 126, 14)" },
+            { min: 26, max: 30, label: "Acceptable", color: "rgba(154, 205, 50)" },
+            { min: 30.01, max: Infinity, label: "Too Hot", color: "rgba(199, 46, 46)" },
         ],
         tss: [
-            { min: 0, max: 50, label: "Acceptable", color: "rgba(85, 214, 69)" },
-            { min: 50.01, max: Infinity, label: "Too Cloudy", color: "rgba(235, 66, 61)" },
+            { min: 0, max: 50, label: "Acceptable", color: "rgba(154, 205, 50)" },
+            { min: 50.01, max: Infinity, label: "Too Cloudy", color: "rgba(199, 46, 46)" },
         ],
         tds_ppm: [
-            { min: 0, max: 500, label: "Acceptable", color: "rgba(85, 214, 69)" },
-            { min: 500.01, max: Infinity, label: "High Dissolved Substances", color: "rgba(235, 66, 61)" },
+            { min: 0, max: 500, label: "Acceptable", color: "rgba(154, 205, 50)" },
+            { min: 500.01, max: Infinity, label: "High Dissolved Substances", color: "rgba(199, 46, 46)" },
         ],
     };
 
@@ -528,22 +528,22 @@ const WaterDashboard = () => {
 
     const thresholds1 = {
         pH: [
-            { min: 0, max: 6.49, label: "Too Acidic", color: "rgba(235, 66, 61)" },
-            { min: 6.5, max: 8.5, label: "Acceptable", color: "rgba(85, 214, 69)" },
-            { min: 8.51, max: Infinity, label: "Too Alkaline", color: "rgba(255, 140, 0)" },
+            { min: 0, max: 6.49, label: "Too Acidic", color: "rgba(199, 46, 46)" },
+            { min: 6.5, max: 8.5, label: "Acceptable", color: "rgba(154, 205, 50)" },
+            { min: 8.51, max: Infinity, label: "Too Alkaline", color: "rgba(230, 126, 14)" },
         ],
         temperature: [
-            { min: 0, max: 25.99, label: "Too Cold", color: "rgba(255, 140, 0)" },
-            { min: 26, max: 30, label: "Acceptable", color: "rgba(85, 214, 69)" },
-            { min: 30.01, max: Infinity, label: "Too Hot", color: "rgba(235, 66, 61)" },
+            { min: 0, max: 25.99, label: "Too Cold", color: "rgba(230, 126, 14)" },
+            { min: 26, max: 30, label: "Acceptable", color: "rgba(154, 205, 50)" },
+            { min: 30.01, max: Infinity, label: "Too Hot", color: "rgba(199, 46, 46)" },
         ],
         tss: [
-            { min: 0, max: 50, label: "Acceptable", color: "rgba(85, 214, 69)" },
-            { min: 50.01, max: Infinity, label: "Too Cloudy", color: "rgba(235, 66, 61)" },
+            { min: 0, max: 50, label: "Acceptable", color: "rgba(154, 205, 50)" },
+            { min: 50.01, max: Infinity, label: "Too Cloudy", color: "rgba(199, 46, 46)" },
         ],
         tds_ppm: [
-            { min: 0, max: 500, label: "Acceptable", color: "rgba(85, 214, 69)" },
-            { min: 500.01, max: Infinity, label: "High Dissolved Substances", color: "rgba(235, 66, 61)" },
+            { min: 0, max: 500, label: "Acceptable", color: "rgba(154, 205, 50)" },
+            { min: 500.01, max: Infinity, label: "High Dissolved Substances", color: "rgba(199, 46, 46)" },
         ],
     };
 

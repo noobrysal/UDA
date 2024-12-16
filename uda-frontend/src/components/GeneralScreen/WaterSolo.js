@@ -68,22 +68,22 @@ const WaterView = () => {
     // Update thresholds 
     const thresholds = {
         pH: [
-            { min: 0, max: 6.49, label: "Too Acidic", color: "rgba(242, 53, 53)" },
-            { min: 6.5, max: 8.5, label: "Acceptable", color: "rgba(75, 192, 192)" },
-            { min: 8.51, max: Infinity, label: "Too Alkaline", color: "rgba(255, 140, 0)" },
+            { min: 0, max: 6.49, label: "Too Acidic", color: "rgba(199, 46, 46)" },
+            { min: 6.5, max: 8.5, label: "Acceptable", color: "rgba(154, 205, 50)" },
+            { min: 8.51, max: Infinity, label: "Too Alkaline", color: "rgba(230, 126, 14)" },
         ],
         temperature: [
-            { min: 0, max: 25.99, label: "Too Cold", color: "rgba(255, 140, 0)" },
-            { min: 26, max: 30, label: "Acceptable", color: "rgba(75, 192, 192)" },
-            { min: 30.01, max: Infinity, label: "Too Hot", color: "rgba(242, 53, 53)" },
+            { min: 0, max: 25.99, label: "Too Cold", color: "rgba(230, 126, 14)" },
+            { min: 26, max: 30, label: "Acceptable", color: "rgba(154, 205, 50)" },
+            { min: 30.01, max: Infinity, label: "Too Hot", color: "rgba(199, 46, 46)" },
         ],
         tss: [
-            { min: 0, max: 50, label: "Acceptable", color: "rgba(75, 192, 192)" },
-            { min: 50.01, max: Infinity, label: "Too Cloudy", color: "rgba(242, 53, 53)" },
+            { min: 0, max: 50, label: "Acceptable", color: "rgba(154, 205, 50)" },
+            { min: 50.01, max: Infinity, label: "Too Cloudy", color: "rgba(199, 46, 46)" },
         ],
         tds_ppm: [
-            { min: 0, max: 500, label: "Acceptable", color: "rgba(75, 192, 192)" },
-            { min: 500.01, max: Infinity, label: "High Dissolved Substances", color: "rgba(242, 53, 53)" },
+            { min: 0, max: 500, label: "Acceptable", color: "rgba(154, 205, 50)" },
+            { min: 500.01, max: Infinity, label: "High Dissolved Substances", color: "rgba(199, 46, 46)" },
         ],
     };
 
@@ -91,7 +91,7 @@ const WaterView = () => {
     const thresholdInfo = [
         {
             level: "Acceptable",
-            color: "rgba(75, 192, 192)",
+            color: "rgba(154, 205, 50)",
             description: "The water quality is within safe limits. Both TSS and TDS levels are within acceptable ranges, indicating good water clarity and mineral content.",
             icon: "✅",
             recommendations: [
@@ -102,7 +102,7 @@ const WaterView = () => {
         },
         {
             level: "Too Cloudy",
-            color: "rgba(242, 53, 53)",
+            color: "rgba(199, 46, 46)",
             description: "Total Suspended Solids (TSS) are too high, making the water cloudy. This affects water clarity and may indicate contamination.",
             icon: "🌫️",
             recommendations: [
@@ -113,7 +113,7 @@ const WaterView = () => {
         },
         {
             level: "High Dissolved Substances",
-            color: "rgba(242, 53, 53)",
+            color: "rgba(199, 46, 46)",
             description: "Total Dissolved Solids (TDS) exceed recommended levels. This may affect water taste and quality.",
             icon: "💧",
             recommendations: [
@@ -836,11 +836,13 @@ const WaterView = () => {
         },
         // NARRATIVE REPORT
         narrativeReportContainer: {
-            borderRadius: "8px",
-            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+            height: "100%",
             padding: "20px",
-            overflowY: "auto", // Adds scrolling if content overflows
-            height: "100%", // Ensures it fits the allocated height
+            color: "#fff",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            gap: "15px",
         },
         narrativeTitle: {
             display: "flex",
@@ -896,8 +898,39 @@ const WaterView = () => {
             fontWeight: "bold",
             color: "#fff"
         },
-
-
+        narrativeGrid: {
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "20px",
+            padding: "15px",
+            backgroundColor: 'rgb(6, 71, 68, 0.46)',
+            boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
+            borderRadius: "10px",
+            margin: "10px 0",
+        },
+        narrativeLeft: {
+            borderRight: "1px solid rgba(255, 255, 255, 0.2)",
+            paddingRight: "15px",
+        },
+        narrativeRight: {
+            paddingLeft: "15px",
+        },
+        timeHeader: {
+            fontSize: "18px",
+            fontWeight: "bold",
+            color: "#fff",
+        },
+        readingsContainer: {
+            display: "flex",
+            flexDirection: "column",
+        },
+        readingItem: {
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            fontSize: "16px",
+            color: "#fff",
+        },
     };
 
     const handleHourRangeShift = (direction) => {
@@ -980,9 +1013,7 @@ const WaterView = () => {
     // Update the calculatePercentageValue function
     const calculatePercentageValue = (value, metricId) => {
         if (value === null || value === undefined) {
-            if (metricId === 'tds_ppm' || metricId === 'tss') {
-                return 100; // Return 100% for null TDS and TSS values
-            }
+            // Return 0 for undefined TDS and TSS values
             return 0;
         }
 
@@ -996,14 +1027,15 @@ const WaterView = () => {
                 return ((14 - value) / (14 - 8.5)) * 100;
 
             case 'tss':
-                // For TSS, scale based on threshold of 50 mg/L
+                // If value is undefined or null, return 0
+                if (value === undefined || value === null) return 0;
+                // Rest of TSS calculation
                 const tssMaxThreshold = 50;
                 if (value <= tssMaxThreshold) {
-                    return 100 - ((value / tssMaxThreshold) * 50); // Linear decrease from 100% to 50%
+                    return 100 - ((value / tssMaxThreshold) * 50);
                 } else {
-                    // For values above threshold, scale from 50% to 0%
                     const excessTSS = value - tssMaxThreshold;
-                    const maxExcessTSS = 50; // Additional 50 mg/L brings it to 0%
+                    const maxExcessTSS = 50;
                     return Math.max(0, 50 - ((excessTSS / maxExcessTSS) * 50));
                 }
 
@@ -1015,14 +1047,15 @@ const WaterView = () => {
                 return Math.max(0, (40 - value) / (40 - idealMax) * 100);
 
             case 'tds_ppm':
-                // For TDS, scale based on threshold of 500 ppm
+                // If value is undefined or null, return 0
+                if (value === undefined || value === null) return 0;
+                // Rest of TDS calculation
                 const tdsMaxThreshold = 500;
                 if (value <= tdsMaxThreshold) {
-                    return 100 - ((value / tdsMaxThreshold) * 50); // Linear decrease from 100% to 50%
+                    return 100 - ((value / tdsMaxThreshold) * 50);
                 } else {
-                    // For values above threshold, scale from 50% to 0%
                     const excessTDS = value - tdsMaxThreshold;
-                    const maxExcessTDS = 500; // Additional 500 ppm brings it to 0%
+                    const maxExcessTDS = 500;
                     return Math.max(0, 50 - ((excessTDS / maxExcessTDS) * 50));
                 }
 
@@ -1361,27 +1394,81 @@ const WaterView = () => {
 
 
                     <div style={styles.lowerRightBox}>
-                        {/* Narrative Report */}
                         <div style={styles.narrativeReportContainer}>
-                            <div style={styles.narrativeTitle}>
-                                <h3 style={styles.narrativeHeader}>Narrative Insight:</h3>
-                                {(() => {
-                                    const { text, status } = generateNarrative(selectedHourForNarrative);
-                                    const thresholdData = thresholdInfo.find(t => t.level === status?.label);
-                                    return status && thresholdData ? (
-                                        <div style={{
-                                            ...styles.reportStatusWrapper,
-                                            backgroundColor: status.color
-                                        }}>
-                                            <span style={styles.reportIcon}>{thresholdData.icon}</span>
-                                            <span style={styles.reportStatus}>{status.label}</span>
-                                        </div>
-                                    ) : null;
-                                })()}
+                            <div style={styles.narrativeGrid}>
+                                <div style={styles.narrativeLeft}>
+                                    <div style={styles.timeHeader}>
+                                        Water Quality Report for {formatHour(selectedHourForNarrative)}
+                                    </div>
+                                    {(() => {
+                                        const { text, status } = generateNarrative(selectedHourForNarrative);
+                                        const thresholdData = thresholdInfo.find(t => t.level === status?.label);
+                                        return status && thresholdData ? (
+                                            <div style={{
+                                                ...styles.reportStatusWrapper,
+                                                backgroundColor: status.color,
+                                                marginTop: '10px',
+                                            }}>
+                                                <span style={styles.reportIcon}>{thresholdData.icon}</span>
+                                                <span style={styles.reportStatus}>{status.label}</span>
+                                            </div>
+                                        ) : null;
+                                    })()}
+                                </div>
+                                <div style={styles.narrativeRight}>
+                                    <div style={styles.readingsContainer}>
+                                        <div style={styles.timeHeader}>Current Readings</div>
+                                        {(() => {
+                                            const hourData = hourlyData[selectedHourForNarrative];
+                                            if (!hourData) return <div>No data available</div>;
+
+                                            const readings = [
+                                                {
+                                                    label: 'TSS',
+                                                    value: hourData.tss,
+                                                    unit: 'mg/L',
+                                                    status: getAirQualityStatus(hourData.tss, 'tss'),
+                                                },
+                                                {
+                                                    label: 'TDS',
+                                                    value: hourData.tds_ppm,
+                                                    unit: 'ppm',
+                                                    status: getAirQualityStatus(hourData.tds_ppm, 'tds_ppm'),
+                                                },
+                                                {
+                                                    label: 'pH Level',
+                                                    value: hourData.pH,
+                                                    unit: '',
+                                                    status: getAirQualityStatus(hourData.pH, 'pH'),
+                                                },
+                                                {
+                                                    label: 'Temperature',
+                                                    value: hourData.temperature,
+                                                    unit: '°C',
+                                                    status: getAirQualityStatus(hourData.temperature, 'temperature'),
+                                                },
+                                            ];
+
+                                            return (
+                                                <>
+                                                    {readings.map((reading, index) => (
+                                                        <div key={index} style={{
+                                                            ...styles.readingItem,
+                                                            color: reading.status?.color || '#fff'
+                                                        }}>
+                                                            • {reading.label}: {
+                                                                reading.value !== null && reading.value !== undefined
+                                                                    ? `${reading.value.toFixed(1)}${reading.unit} (${reading.status?.label || 'unavailable'})`
+                                                                    : 'No data'
+                                                            }
+                                                        </div>
+                                                    ))}
+                                                </>
+                                            );
+                                        })()}
+                                    </div>
+                                </div>
                             </div>
-                            <p style={styles.narrativeContent}>
-                                {generateNarrative(selectedHourForNarrative).text}
-                            </p>
                         </div>
                     </div>
                 </div>
