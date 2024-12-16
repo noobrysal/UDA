@@ -692,8 +692,8 @@ const AirView = () => {
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
-            flexWrap: "wrap",
-            justifyContent: "space-between",
+            justifyContent: "center", // Updated to center the metrics
+            gap: "10px", // Add gap between metric boxes
             marginBottom: "8px",
         },
         metricBoxWrapper: {

@@ -631,8 +631,8 @@ const WaterQualityByDate = () => {
                     }
 
                     .highlight-tile {
-                        background-color: #ffde59 !important; /* Ensure the highlight covers the whole tile */
-                        color: black !important; /* Make text stand out */
+                        background-color: #00732f !important; /* Ensure the highlight covers the whole tile */
+                        color: white !important; /* Make text stand out */
                         border-radius: 10px; /* Optional: Rounded corners */
                     }
 
@@ -644,27 +644,27 @@ const WaterQualityByDate = () => {
 
                     /* Active (clicked) tile - turn blue */
                     .react-calendar__tile--active {
-                        background-color: rgba(0, 115, 47, 0.7) !important; /* Blue tile */
+                        background-color: rgba(0, 123, 255, 0.7) !important; /* Blue tile */
                         color: white;
                         border-radius: 10px; /* Optional: Rounded corners */
                     }
 
                     /* Active state after clicking */
                     .react-calendar__tile--active:focus {
-                        background-color: rgba(0, 115, 47, 0.7) !important; /* Blue when clicked */
+                        background-color: rgba(0, 123, 255, 0.7) !important; /* Blue when clicked */
                         color: white;
                     }
 
                     /* "Today" tile style */
                     .react-calendar__tile--now {
-                        background-color: rgb(0, 123, 255) !important; /* Highlight today with yellow */
-                        color: white !important; /* Make text color black for better contrast */
+                        background-color: rgb(255, 222, 89) !important; /* Highlight today with yellow */
+                        color: black !important; /* Make text color black for better contrast */
                         border-radius: 10px; /* Optional: Rounded corners */
                     }
 
                     /* Make "today" tile turn blue when clicked */
                     .react-calendar__tile--now.react-calendar__tile--active {
-                        background-color: rgba(0, 115, 47, 0.7) !important; /* Blue when clicked */
+                        background-color: rgba(0, 123, 255, 0.7) !important; /* Blue when clicked */
                         color: white;
                     }
 

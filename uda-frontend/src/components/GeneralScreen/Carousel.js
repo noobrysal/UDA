@@ -5,7 +5,6 @@ import AirSolo from "./AirSolo";
 import WaterSolo from "./WaterSolo";
 import SoilSolo from "./SoilSolo";
 
-
 const Carousel = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isAnimating, setIsAnimating] = useState(false);

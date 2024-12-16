@@ -56,6 +56,7 @@ const AppContent = () => {
 
   // Define paths that require the Sidebar
   const sidebarPaths = [
+    '/general-screen',
     '/air-dashboard',
     '/air-quality',
     '/air-quality/id/:id',
@@ -105,6 +106,11 @@ const AppContent = () => {
           <Route path="/water-quality/id/:id" element={<WaterQualityInstance />} />
           <Route path="/water-dashboard" element={<WaterDashboard />} />
           <Route path="/water" element={<WaterSolo />} />
+
+          <Route path="/soil-quality" element={<SoilQualityByDate />} />
+          <Route path="/soil-quality/id/:id" element={<SoilQualityInstance />} />
+          <Route path="/soil-dashboard" element={<SoilDashboard />} />
+          <Route path="/soil" element={<SoilSolo />} />
 
 
           {/* <Route path="/airview" element={<AirView />} /> */}

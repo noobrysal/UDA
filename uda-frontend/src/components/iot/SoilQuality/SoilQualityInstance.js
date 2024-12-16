@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import axiosClient from './axiosClient';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-import backgroundImage from '../../../assets/airdash.png';
+import backgroundImage from '../../../assets/soildash.png';
 import { useNavigate } from 'react-router-dom';
 // import Sidebar from '../../Sidebar';
 
@@ -332,7 +332,7 @@ const styles = {
         display: 'flex',
         flexDirection: 'row',
         padding: '10px 10px',
-        background: 'linear-gradient(50deg, #00CCDD, #006E77)', // Gradient background
+        background: 'linear-gradient(50deg, #d3c740, #524d18)', // Gradient background
         color: '#fff',
         border: 'none',
         borderRadius: '15px',

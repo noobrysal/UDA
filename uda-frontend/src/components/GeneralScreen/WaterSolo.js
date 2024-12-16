@@ -754,15 +754,15 @@ const WaterView = () => {
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
-            flexWrap: "wrap",
-            justifyContent: "space-between",
+            justifyContent: "center",
+            gap: "20px", // Add gap between metric boxes
             marginBottom: "8px",
         },
         metricBoxWrapper: {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            width: "19%",
+            width: "30%",
             marginBottom: "10px",
         },
         metricBox: {
