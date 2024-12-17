@@ -261,7 +261,7 @@ const SidebarComponent = () => {
                                 setSelected={setSelected}
                                 isCollapsed={isCollapsed}
                             />
-                            <Box paddingLeft={isCollapsed ? undefined : "0%"} display="flex" flexDirection="column" gap="0px">
+                            <Box paddingLeft={isCollapsed ? undefined : "0%"} display="flex" flexDirection="column" gap="0px" marginBottom={"7px"}>
                                 <MenuItem
                                     className="dashboard-menu" // Add this className
                                     style={{ color: colors.grey[100] }}
