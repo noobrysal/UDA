@@ -870,6 +870,7 @@ const styles = {
         boxSizing: 'border-box',
         overflow: 'hidden',
         color: '#333',
+        width: '100%',
     },
     header: {
         textAlign: 'left',
@@ -887,9 +888,10 @@ const styles = {
     divGrid: {
         marginLeft: '70px',
         display: 'grid',
+        width: '100%',
         gridTemplateColumns: 'repeat(3, 1fr)', // Default for larger screens
         gap: '20px',
-        maxWidth: '1600px',
+        // maxWidth: '1600px',
         margin: '0 auto',
         overflow: 'hidden',
         // backgroundColor: 'rgba(255, 255, 255, 0.9)',

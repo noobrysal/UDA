@@ -1756,9 +1756,10 @@ const styles = {
         backgroundRepeat: 'no-repeat',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed', // Prevent background from scrolling with content
-        minHeight: '100vh', // Ensures full height
+        // minHeight: '100vh', // Ensures full height
         height: '100%', // Ensures it covers the viewport height
         boxSizing: 'border-box',
+        width: '100%',
         overflow: 'hidden',
         color: '#333',
     },
@@ -1780,7 +1781,8 @@ const styles = {
         display: 'grid',
         gridTemplateColumns: 'repeat(3, 1fr)', // Default for larger screens
         gap: '20px',
-        maxWidth: '1600px',
+        width: '100%',
+        // maxWidth: '1600px',
         margin: '0 auto',
         overflow: 'hidden',
         // backgroundColor: 'rgba(255, 255, 255, 0.9)',
