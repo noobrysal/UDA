@@ -129,14 +129,14 @@ const SidebarComponent = () => {
     // Dynamic background color for the sidebar based on the selected page
     const getBackgroundColor = () => {
         switch (selected) {
-            case "Air":
+            case "Air Dashboard":
                 return "#0F0D1A";
-            case "River":
+            case "Water Dashboard":
                 return "#0A1B1F";
-            case "Soil":
+            case "Soil Dashboard":
                 return "#141209";
             default:
-                return "#061715";
+                return "#101010";
         }
     };
 
@@ -185,6 +185,8 @@ const SidebarComponent = () => {
                         color: colors.teal[800] + " !important",
                     },
                 }}
+                onMouseEnter={() => setIsCollapsed(false)}    // Added Hover Effect
+                onMouseLeave={() => setIsCollapsed(true)}     // Just Remove if not Satisfied
             >
                 <ProSidebar
                     collapsed={isCollapsed}
