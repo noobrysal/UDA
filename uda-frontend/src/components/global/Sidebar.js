@@ -394,7 +394,7 @@ const SidebarComponent = () => {
                             )}
                         </Box>
 
-                        <Box paddingBottom="140px" />
+                        <Box paddingBottom="90px" />
 
                         <Box paddingLeft={isCollapsed ? undefined : "0%"} display="flex" flexDirection="column" gap="8px">
                             <Item
