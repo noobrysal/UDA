@@ -80,13 +80,6 @@ const AppContent = () => {
 
     } else if (path === "/carousel") {
       title = "General Dashboard - UDA";
-    } else if (path === "/air-dashboard") {
-      title = "Air Quality Dashboard - UDA";
-    } else if (path === "/water-dashboard") {
-      title = "Water Quality Dashboard - UDA";
-    } else if (path === "/soil-dashboard") {
-      title = "Soil Quality Dashboard - UDA";
-    
     } else if (path === "/air") {
       title = "Air Dashboard - UDA";
     } else if (path === "/water") {
@@ -94,16 +87,23 @@ const AppContent = () => {
     } else if (path === "/soil") {
       title = "Soil Dashboard - UDA";
 
+    } else if (path === "/air-dashboard") {
+      title = "Air Quality - UDA";
+    } else if (path === "/water-dashboard") {
+      title = "Water Quality - UDA";
+    } else if (path === "/soil-dashboard") {
+      title = "Soil Quality - UDA";
+
 
     } else if (path === "/air-water") {
       title = "Air & Water - UDA";
     
     } else if (path.includes("/air-quality")) {
-      title = "Air Quality - UDA";
+      title = "Air Calendar - UDA";
     } else if (path.includes("/water-quality")) {
-      title = "Water Quality - UDA";
+      title = "Water Calendar - UDA";
     } else if (path.includes("/soil-quality")) {
-      title = "Soil Quality - UDA";
+      title = "Soil Calendar - UDA";
 
     } else if (path === "/profile") {
       title = "Profile - UDA";

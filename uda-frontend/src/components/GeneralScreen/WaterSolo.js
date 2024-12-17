@@ -187,7 +187,7 @@ const WaterView = () => {
     useEffect(() => {
         const slideTimer = setInterval(() => {
             setCurrentSlide((prev) => (prev + 1) % thresholdInfo.length);
-        }, 10000); // Change slide every 10 seconds
+        }, 12000); // Change slide every 12 seconds
 
         return () => clearInterval(slideTimer);
     }, []);

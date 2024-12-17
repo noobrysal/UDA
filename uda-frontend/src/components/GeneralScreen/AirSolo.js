@@ -224,7 +224,7 @@ const AirView = () => {
     useEffect(() => {
         const slideTimer = setInterval(() => {
             setCurrentSlide((prev) => (prev + 1) % thresholdInfo.length);
-        }, 10000); // Change slide every 10 seconds
+        }, 8200); // Change slide every 10 seconds
 
         return () => clearInterval(slideTimer);
     }, []);

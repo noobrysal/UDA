@@ -230,7 +230,7 @@ const SidebarComponent = () => {
 
                         <Box paddingLeft={isCollapsed ? undefined : "0%"} display="flex" flexDirection="column" gap="8px">
                             <Item
-                                title="Dashboard"
+                                title="General Screen"
                                 to="/carousel"
                                 icon={<DashboardIcon />}
                                 selected={selected}
@@ -238,24 +238,24 @@ const SidebarComponent = () => {
                                 isCollapsed={isCollapsed}
                             />
                             <Item
-                                title="Air"
-                                to="/air-dashboard"
+                                title="Air Dashboard"
+                                to="/air"
                                 icon={<AirOutlinedIcon />}
                                 selected={selected}
                                 setSelected={setSelected}
                                 isCollapsed={isCollapsed}
                             />
                             <Item
-                                title="Water"
-                                to="/water-dashboard"
+                                title="Water Dashboard"
+                                to="/water"
                                 icon={<WaterOutlinedIcon />}
                                 selected={selected}
                                 setSelected={setSelected}
                                 isCollapsed={isCollapsed}
                             />
                             <Item
-                                title="Soil"
-                                to="/soil-dashboard"
+                                title="Soil Dashboard"
+                                to="/soil"
                                 icon={<TerrainRoundedIcon />}
                                 selected={selected}
                                 setSelected={setSelected}
@@ -274,7 +274,7 @@ const SidebarComponent = () => {
                                     icon={
                                         <Box
                                             sx={{
-                                                backgroundColor: selected === "Solo Dashboard" ? colors.white[900] : "transparent",
+                                                backgroundColor: selected === "IOTs" ? colors.white[900] : "transparent",
                                                 padding: "6px",
                                                 borderRadius: "6px",
                                                 display: "flex",
@@ -293,7 +293,7 @@ const SidebarComponent = () => {
                                 >
                                     {!isCollapsed && (
                                         <Box display="flex" alignItems="center" width="100%">
-                                            <Typography variant="caption">Solo Dashboard</Typography>
+                                            <Typography variant="caption">View Comparison</Typography>
                                             {dashOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                                         </Box>
                                     )}
@@ -303,22 +303,22 @@ const SidebarComponent = () => {
                                 {!isCollapsed && dashOpen && (
                                     <div className="dashboard-subitems"> {/* Add this wrapper */}
                                         <SubMenuItem
-                                            title="Air Solo"
-                                            to="/air"
+                                            title="Air Quality"
+                                            to="/air-dashboard"
                                             selected={selected}
                                             setSelected={setSelected}
                                             isCollapsed={isCollapsed}
                                         />
                                         <SubMenuItem
-                                            title="Water Solo"
-                                            to="/water"
+                                            title="Water Quality"
+                                            to="/water-dashboard"
                                             selected={selected}
                                             setSelected={setSelected}
                                             isCollapsed={isCollapsed}
                                         />
                                         <SubMenuItem
-                                            title="Soil Solo"
-                                            to="/soil"
+                                            title="Soil Quality"
+                                            to="/soil-dashboard"
                                             selected={selected}
                                             setSelected={setSelected}
                                             isCollapsed={isCollapsed}

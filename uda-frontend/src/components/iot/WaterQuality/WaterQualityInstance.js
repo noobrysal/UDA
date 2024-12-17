@@ -190,7 +190,7 @@ const WaterQualityInstance = () => {
         <div style={styles.waterQualityInstance}>
             {/* <Sidebar /> */}
             <div>
-                <h2 style={styles.h2}>water Quality Data (ID: {id})</h2>
+                <h2 style={styles.h2}>Water Quality Data (ID: {id})</h2>
                 <h2 style={{
                     ...styles.h2,
                     display: waterData.location ? 'block' : 'none'

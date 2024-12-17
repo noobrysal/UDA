@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement } from 'chart.js';
 import { Doughnut, Bar } from 'react-chartjs-2';
-import backgroundImage from '../../assets/udabackg4.png';
+import backgroundImage from '../../assets/airwater.png';
 import { supabaseAir } from '../iot/AirQuality/supabaseClient';
 import { supabaseWater } from '../iot/WaterQuality/supabaseClient';
 import axiosClient from '../iot/SoilQuality/axiosClient';
