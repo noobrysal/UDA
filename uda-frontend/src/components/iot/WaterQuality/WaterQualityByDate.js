@@ -17,7 +17,8 @@ import {
     Tooltip,
     Legend,
 } from "chart.js";
-// import { colors } from "@mui/material";
+import { Tooltip as MuiTooltip, IconButton } from '@mui/material';
+import InfoIcon from '@mui/icons-material/Info';
 
 const plugin = {
     id: "increase-legend-spacing",
@@ -179,15 +180,10 @@ const WaterQualityByDate = () => {
 
     const tileClassName = ({ date, view }) => {
         if (view === "month") {
-            const tileDate = new Date(Date.UTC(
-                date.getFullYear(),
-                date.getMonth(),
-                date.getDate()
-            )).toISOString().split('T')[0];
-
-            if (highlightedDates.includes(tileDate)) {
-                return "highlight-tile";
-            }
+            const adjustedDate = new Date(date);
+            adjustedDate.setDate(adjustedDate.getDate() + 1);
+            const formattedDate = adjustedDate.toISOString().split('T')[0];
+            return highlightedDates.includes(formattedDate) ? 'has-data' : 'no-data';
         }
         return null;
     };
@@ -620,12 +616,58 @@ const WaterQualityByDate = () => {
         </button>
     );
 
-    const ChartContainer = ({ children, onExpand, hasData }) => (
-        <div style={{ position: 'relative' }}>
-            {hasData && <ChartExpandButton onClick={onExpand} />}
-            {children}
-        </div>
-    );
+    const ChartContainer = ({ children, onExpand, hasData, metric }) => {
+        const getTooltipText = (metric) => {
+            const tooltips = {
+                pH: "Indicates the acidity or alkalinity of water on a scale of 0-14. Neutral pH (7.0) is ideal for most aquatic life.",
+                temperature: "A critical factor in water quality that affects the solubility of gases like oxygen and the metabolic rates of aquatic organisms.",
+                tss: "Represents the particles suspended in water, such as silt, organic matter, and debris. High TSS can reduce water clarity and affect aquatic life.",
+                tds_ppm: "Measures the concentration of dissolved substances in water, including salts, minerals, and metals. Indicates water purity and salinity."
+            };
+            return tooltips[metric] || "No description available";
+        };
+
+        return (
+            <div style={{ position: 'relative' }}>
+                <div style={{
+                    position: 'absolute',
+                    top: '10px',
+                    width: '100%',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    zIndex: 10,
+                    padding: '0 10px',
+                    boxSizing: 'border-box'
+                }}>
+                    <MuiTooltip title={getTooltipText(metric)} placement="top">
+                        <IconButton size="small" style={{ color: 'white' }}>
+                            <InfoIcon />
+                        </IconButton>
+                    </MuiTooltip>
+                    {hasData && (
+                        <button
+                            onClick={onExpand}
+                            style={{
+                                backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                                border: '1px solid white',
+                                borderRadius: '4px',
+                                color: 'white',
+                                padding: '5px 10px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '5px'
+                            }}
+                        >
+                            <span style={{ fontSize: '16px' }}>⤢</span>
+                            Expand
+                        </button>
+                    )}
+                </div>
+                {children}
+            </div>
+        );
+    };
 
     const Modal = ({ isOpen, onClose, children }) => {
         if (!isOpen) return null;
@@ -779,6 +821,29 @@ const WaterQualityByDate = () => {
                     .react-calendar__navigation button:hover {
                         background: rgba(5, 218, 255, 0.8); /* Darker blue when hovering */
                     }
+
+                    .has-data {
+                        background-color: rgba(255, 255, 255, 0.6) !important;
+                        color: black !important;
+                        cursor: pointer !important;
+                    }
+
+                    .no-data {
+                        background-color: rgba(128, 128, 128, 0.3) !important;
+                        color: #666 !important;
+                        cursor: not-allowed !important;
+                        pointer-events: none;
+                    }
+
+                    .react-calendar__tile:hover.has-data {
+                        background-color: #00732f !important;
+                        color: white !important;
+                    }
+
+                    .react-calendar__tile--active.has-data {
+                        background-color: rgba(0, 123, 255, 0.7) !important;
+                        color: white !important;
+                    }
                 `}</style>
 
                     {/* Added Button and Dropdowns Below */}
@@ -897,6 +962,7 @@ const WaterQualityByDate = () => {
                                 options: expandedOptions
                             });
                         }}
+                        metric="pH"
                     >
                         {viewMode === "hourly" ? (
                             filteredData.length > 0 ? (
@@ -1013,6 +1079,7 @@ const WaterQualityByDate = () => {
                                 options: expandedOptions
                             });
                         }}
+                        metric="temperature"
                     >
                         {viewMode === "hourly" ? (
                             filteredData.length > 0 ? (
@@ -1129,6 +1196,7 @@ const WaterQualityByDate = () => {
                                 options: expandedOptions
                             });
                         }}
+                        metric="tss"
                     >
                         {viewMode === "hourly" ? (
                             filteredData.length > 0 ? (
@@ -1233,6 +1301,7 @@ const WaterQualityByDate = () => {
                                 options: expandedOptions
                             });
                         }}
+                        metric="tds_ppm"
                     >
                         {viewMode === "hourly" ? (
                             filteredData.length > 0 ? (
@@ -1355,7 +1424,7 @@ const styles = {
         gridTemplateColumns: 'repeat(3, 1fr)', // Default for larger screens
         gap: '20px',
         // maxWidth: '1600px',
-        width: '100%',  
+        width: '100%',
         margin: '0 auto',
         overflow: 'hidden',
         // backgroundColor: 'rgba(255, 255, 255, 0.9)',

@@ -217,12 +217,29 @@ const GeneralScreen = () => {
         }
     };
 
+    // Function to get current date in YYYY-MM-DD format
+    const formatDate = (date) => {
+        return date.toISOString().split('T')[0];
+    };
+
     // Function to get latest water quality data
     const fetchLatestWaterData = async () => {
         try {
+            // Get current date in UTC
+            const today = new Date();
+            today.setDate(today.getDate() + 1);
+            const tomorrow = new Date(today);
+            tomorrow.setDate(today.getDate() + 1);
+
+            // Format dates as YYYY-MM-DDT00:00:00Z
+            const todayStr = `${formatDate(today)}T00:00:00Z`;
+            const tomorrowStr = `${formatDate(tomorrow)}T00:00:00Z`;
+
             const { data, error } = await supabaseWater
                 .from('sensor_data')
                 .select('*')
+                .gte('timestamp', todayStr)
+                .lt('timestamp', tomorrowStr)
                 .order('id', { ascending: false })
                 .limit(1)
                 .single();
@@ -597,7 +614,7 @@ const GeneralScreen = () => {
                         </div>
                         <div style={styles.chartContainer}>
                             <Doughnut
-                                data={soilGaugeData} 
+                                data={soilGaugeData}
                                 options={{
                                     maintainAspectRatio: false,
                                     plugins: {

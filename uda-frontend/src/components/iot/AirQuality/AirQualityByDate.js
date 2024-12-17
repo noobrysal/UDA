@@ -18,6 +18,8 @@ import {
     Tooltip,
     Legend,
 } from "chart.js";
+import { IconButton, Tooltip as MuiTooltip } from '@mui/material';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 // import { colors } from "@mui/material";
 
 const plugin = {
@@ -204,6 +206,16 @@ const AirQualityByDate = () => {
             if (highlightedDates.includes(formattedDate)) {
                 return "highlight-tile"; // Apply custom class for highlighted dates
             }
+        }
+        return null;
+    };
+
+    const tileClassName = ({ date, view }) => {
+        if (view === "month") {
+            const nextDay = new Date(date);
+            nextDay.setDate(nextDay.getDate() + 1);
+            const formattedDate = nextDay.toISOString().split('T')[0];
+            return highlightedDates.includes(formattedDate) ? 'has-data' : 'no-data';
         }
         return null;
     };
@@ -566,10 +578,26 @@ const AirQualityByDate = () => {
         </button>
     );
 
+    // Add metric descriptions
+    const metricDescriptions = {
+        pm25: "Fine particulate matter smaller than 2.5 micrometers. Can penetrate deep into the lungs and affect health. Monitored for pollution levels.",
+        pm10: "Coarser particulate matter up to 10 micrometers. Can irritate the respiratory system and is used to assess air quality.",
+        humidity: "The amount of moisture in the air. High levels can worsen air pollution impacts, while very low levels can cause dryness.",
+        temperature: "Air temperature affects pollutant dispersion and chemical reactions in the atmosphere, influencing air quality.",
+        oxygen: "Essential for respiration. Low oxygen levels in the air can indicate poor ventilation or enclosed environments."
+    };
+
     // Add ChartContainer component
-    const ChartContainer = ({ children, onExpand, hasData }) => (
+    const ChartContainer = ({ children, onExpand, hasData, metricType }) => (
         <div style={{ position: 'relative' }}>
-            {hasData && <ChartExpandButton onClick={onExpand} />}
+            <div style={{ position: 'absolute', top: '10px', width: '100%', display: 'flex', justifyContent: 'space-between', zIndex: 10, padding: '0 10px' }}>
+                <MuiTooltip title={metricDescriptions[metricType] || ""} arrow placement="top">
+                    <IconButton size="small" style={{ color: 'white' }}>
+                        <HelpOutlineIcon />
+                    </IconButton>
+                </MuiTooltip>
+                {hasData && <ChartExpandButton onClick={onExpand} />}
+            </div>
             {children}
         </div>
     );
@@ -645,7 +673,7 @@ const AirQualityByDate = () => {
                                     setViewMode("average");
                                 }}
                                 onActiveStartDateChange={handleMonthChange}
-                                tileClassName={tileContent} // Use tileClassName for custom styles
+                                tileClassName={tileClassName} // Use tileClassName for custom styles
                             />
                             {isCalendarLoading && (
                                 <div style={styles.calendarLoadingOverlay}>
@@ -726,6 +754,29 @@ const AirQualityByDate = () => {
 
                     .react-calendar__navigation button:hover {
                         background: rgba(5, 218, 255, 0.8); /* Darker blue when hovering */
+                    }
+
+                    .has-data {
+                        background-color: rgba(255, 255, 255, 0.6) !important;
+                        color: black !important;
+                        cursor: pointer !important;
+                    }
+
+                    .no-data {
+                        background-color: rgba(128, 128, 128, 0.3) !important;
+                        color: #666 !important;
+                        cursor: not-allowed !important;
+                        pointer-events: none;
+                    }
+
+                    .react-calendar__tile:hover.has-data {
+                        background-color: #007bff !important;
+                        color: white !important;
+                    }
+
+                    .react-calendar__tile--active.has-data {
+                        background-color: rgba(255, 222, 89, 0.7) !important;
+                        color: black !important;
                     }
                 `}</style>
 
@@ -842,6 +893,7 @@ const AirQualityByDate = () => {
                                 options: expandedOptions
                             });
                         }}
+                        metricType="pm25"
                     >
                         {/* Render Hourly Data Chart */}
                         {viewMode === "hourly" && filteredData.length > 0 ? (
@@ -1031,6 +1083,7 @@ const AirQualityByDate = () => {
                                 options: expandedOptions
                             });
                         }}
+                        metricType="pm10"
                     >
                         {/* Render Hourly Data Chart for PM10 */}
                         {viewMode === "hourly" && filteredData.length > 0 ? (
@@ -1217,6 +1270,7 @@ const AirQualityByDate = () => {
                                 options: expandedOptions
                             });
                         }}
+                        metricType="humidity"
                     >
                         {/* Render Hourly Data Chart for Humidity */}
                         {viewMode === "hourly" && filteredData.length > 0 ? (
@@ -1403,6 +1457,7 @@ const AirQualityByDate = () => {
                                 options: expandedOptions
                             });
                         }}
+                        metricType="temperature"
                     >
                         {/* Render Hourly Data Chart for Temperature */}
                         {viewMode === "hourly" && filteredData.length > 0 ? (
@@ -1589,6 +1644,7 @@ const AirQualityByDate = () => {
                                 options: expandedOptions
                             });
                         }}
+                        metricType="oxygen"
                     >
                         {/* Render Hourly Data Chart for Oxygen */}
                         {viewMode === "hourly" && filteredData.length > 0 ? (

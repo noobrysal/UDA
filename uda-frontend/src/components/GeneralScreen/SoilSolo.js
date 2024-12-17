@@ -68,26 +68,26 @@ const SoilView = () => {
     // Update thresholds for soil quality metrics
     const thresholds = {
         soil_moisture: [
-                { min: 0, max: 19.99, label: "Dry", color: "rgba(232, 44, 4, 1)" }, // Poor
-                { min: 20, max: 39.99, label: "Low Moisture", color: "rgba(250, 196, 62, 1)" }, // Warning
-                { min: 40, max: 70.99, label: "Optimal", color: "rgba(154, 205, 50, 1)" }, // Good
-                { min: 71, max: 100, label: "Saturated", color: "rgba(230, 126, 14, 1)" }, // Caution
-                { min: 101, max: Infinity, label: "Waterlogged", color: "rgba(140, 1, 4, 1)" }, // Emergency
-            ],
-            temperature: [
-                { min: -Infinity, max: 4.99, label: "Cold", color: "rgba(140, 1, 4, 1)" }, // Poor
-                { min: 5, max: 14.99, label: "Cool", color: "rgba(250, 196, 62, 1)" }, // Warning
-                { min: 15, max: 29.99, label: "Optimal", color: "rgba(154, 205, 50, 1)" }, // Good
-                { min: 30, max: 34.99, label: "Warm", color: "rgba(250, 196, 62, 1)" }, // Caution
-                { min: 35, max: Infinity, label: "Hot", color: "rgba(232, 44, 4, 1)" }, // Danger
-            ],
-            humidity: [
-                { min: 0, max: 29.99, label: "Dry", color: "rgba(232, 44, 4, 1)" }, // Poor
-                { min: 30, max: 49.99, label: "Low Humidity", color: "rgba(250, 196, 62, 1)" }, // Warning
-                { min: 50, max: 70.99, label: "Optimal", color: "rgba(154, 205, 50, 1)" }, // Good
-                { min: 71, max: 85.99, label: "High Humidity", color: "rgba(230, 126, 14, 1)" }, // Caution
-                { min: 86, max: Infinity, label: "Waterlogged", color: "rgba(140, 1, 4, 1)" }, // Emergency
-            ],
+            { min: 0, max: 19.99, label: "Dry", color: "rgba(232, 44, 4, 1)" }, // Poor
+            { min: 20, max: 39.99, label: "Low Moisture", color: "rgba(250, 196, 62, 1)" }, // Warning
+            { min: 40, max: 70.99, label: "Optimal", color: "rgba(154, 205, 50, 1)" }, // Good
+            { min: 71, max: 100, label: "Saturated", color: "rgba(230, 126, 14, 1)" }, // Caution
+            { min: 101, max: Infinity, label: "Waterlogged", color: "rgba(140, 1, 4, 1)" }, // Emergency
+        ],
+        temperature: [
+            { min: -Infinity, max: 4.99, label: "Cold", color: "rgba(140, 1, 4, 1)" }, // Poor
+            { min: 5, max: 14.99, label: "Cool", color: "rgba(250, 196, 62, 1)" }, // Warning
+            { min: 15, max: 29.99, label: "Optimal", color: "rgba(154, 205, 50, 1)" }, // Good
+            { min: 30, max: 34.99, label: "Warm", color: "rgba(250, 196, 62, 1)" }, // Caution
+            { min: 35, max: Infinity, label: "Hot", color: "rgba(232, 44, 4, 1)" }, // Danger
+        ],
+        humidity: [
+            { min: 0, max: 29.99, label: "Dry", color: "rgba(232, 44, 4, 1)" }, // Poor
+            { min: 30, max: 49.99, label: "Low Humidity", color: "rgba(250, 196, 62, 1)" }, // Warning
+            { min: 50, max: 70.99, label: "Optimal", color: "rgba(154, 205, 50, 1)" }, // Good
+            { min: 71, max: 85.99, label: "High Humidity", color: "rgba(230, 126, 14, 1)" }, // Caution
+            { min: 86, max: Infinity, label: "Waterlogged", color: "rgba(140, 1, 4, 1)" }, // Emergency
+        ],
     };
 
     // Update thresholdInfo for soil quality
@@ -300,8 +300,8 @@ const SoilView = () => {
         }
     };
 
-    // Update getAirQualityStatus function to handle all metrics
-    const getAirQualityStatus = (value, metricId) => {
+    // Update getSoilQualityStatus function to handle all metrics
+    const getSoilQualityStatus = (value, metricId) => {
         if (value === null || value === undefined) return null;
 
         const metricThresholds = thresholds[metricId];
@@ -821,7 +821,7 @@ const SoilView = () => {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            marginTop: "10px", 
+            marginTop: "10px",
         },
         circularProgressContainer: {
             width: "50%",
@@ -878,13 +878,13 @@ const SoilView = () => {
         narrativeReportContainer: {
             height: "100%",
             // width: "80%",
-            padding: "20px" ,
+            padding: "20px",
             color: "#fff",
             display: "flex",
             // flexDirection: "column",
             // marginTop: "200px",
             justifyContent: "center",
-            
+
         },
 
         narrativeTitle: {
@@ -1027,7 +1027,7 @@ const SoilView = () => {
     const renderTooltip = () => {
         if (!hoveredData || !hoveredData.value) return null;
         const { hour, value, metric, trend, position } = hoveredData;
-        const status = getAirQualityStatus(value, metric.id);
+        const status = getSoilQualityStatus(value, metric.id);
 
         return (
             <div style={{
@@ -1073,9 +1073,9 @@ const SoilView = () => {
         const humidity = parseFloat(hourData.humidity) || 0;
         const remarks = hourData.remarks || 'No remarks available';
 
-        const moistureStatus = getAirQualityStatus(soilMoisture, 'soil_moisture');
-        const tempStatus = getAirQualityStatus(temperature, 'temperature');
-        const humidityStatus = getAirQualityStatus(humidity, 'humidity');
+        const moistureStatus = getSoilQualityStatus(soilMoisture, 'soil_moisture');
+        const tempStatus = getSoilQualityStatus(temperature, 'temperature');
+        const humidityStatus = getSoilQualityStatus(humidity, 'humidity');
 
         let narrative = `Soil Quality Report for ${time}:\n\n`;
         narrative += `🌱 Irrigation Status: ${remarks.toUpperCase()}\n\n`;
@@ -1164,7 +1164,7 @@ const SoilView = () => {
                 }),
                 backgroundColor: relevantMetrics.map(metric => {
                     const value = hourData ? parseFloat(hourData[metric.id]) : null;
-                    const status = getAirQualityStatus(value, metric.id);
+                    const status = getSoilQualityStatus(value, metric.id);
                     return status?.color || 'rgba(75, 192, 192, 0.6)';
                 }),
                 borderRadius: 25,
@@ -1254,8 +1254,8 @@ const SoilView = () => {
     const getAverageSoilQualityStatus = (hourData) => {
         if (!hourData || (!hourData.tds_ppm && !hourData.tss)) return null;
 
-        const tdsStatus = getAirQualityStatus(hourData.tds_ppm ?? 0, 'tds_ppm');
-        const tssStatus = getAirQualityStatus(hourData.tss ?? 0, 'tss');
+        const tdsStatus = getSoilQualityStatus(hourData.tds_ppm ?? 0, 'tds_ppm');
+        const tssStatus = getSoilQualityStatus(hourData.tss ?? 0, 'tss');
 
         // Return "High Dissolved Substances" if TDS is high, regardless of TSS
         if (tdsStatus?.label === "High Dissolved Substances") {
@@ -1279,7 +1279,7 @@ const SoilView = () => {
     // Add function to get soil moisture status
     const getSoilMoistureStatus = (hourData) => {
         if (!hourData || !hourData.soil_moisture) return null;
-        return getAirQualityStatus(parseFloat(hourData.soil_moisture), 'soil_moisture');
+        return getSoilQualityStatus(parseFloat(hourData.soil_moisture), 'soil_moisture');
     };
 
 
@@ -1423,7 +1423,7 @@ const SoilView = () => {
                             .map((metric) => {
                                 const hourData = hourlyData[selectedHourForNarrative];
                                 const value = hourData?.[metric.id];
-                                const status = getAirQualityStatus(value, metric.id);
+                                const status = getSoilQualityStatus(value, metric.id);
                                 const maxValue = getMaxValue(metric.id);
 
                                 return (
@@ -1530,19 +1530,19 @@ const SoilView = () => {
                                                     label: 'Soil Moisture',
                                                     value: hourData.soil_moisture,
                                                     unit: '%',
-                                                    status: getAirQualityStatus(hourData.soil_moisture, 'soil_moisture'),
+                                                    status: getSoilQualityStatus(hourData.soil_moisture, 'soil_moisture'),
                                                 },
                                                 {
                                                     label: 'Temperature',
                                                     value: hourData.temperature,
                                                     unit: '°C',
-                                                    status: getAirQualityStatus(hourData.temperature, 'temperature'),
+                                                    status: getSoilQualityStatus(hourData.temperature, 'temperature'),
                                                 },
                                                 {
                                                     label: 'Humidity',
                                                     value: hourData.humidity,
                                                     unit: '%',
-                                                    status: getAirQualityStatus(hourData.humidity, 'humidity'),
+                                                    status: getSoilQualityStatus(hourData.humidity, 'humidity'),
                                                 },
                                             ];
 
