@@ -273,8 +273,8 @@ const WaterView = () => {
         }
     };
 
-    // Update getAirQualityStatus function to handle all metrics
-    const getAirQualityStatus = (value, metricId) => {
+    // Update getWaterQualityStatus function to handle all metrics
+    const getWaterQualityStatus = (value, metricId) => {
         if (value === null || value === undefined) return null;
 
         const metricThresholds = thresholds[metricId];
@@ -791,7 +791,7 @@ const WaterView = () => {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            marginTop: "10px", 
+            marginTop: "10px",
         },
         circularProgressContainer: {
             width: "70%",
@@ -848,13 +848,13 @@ const WaterView = () => {
         narrativeReportContainer: {
             height: "100%",
             // width: "80%",
-            padding: "20px" ,
+            padding: "20px",
             color: "#fff",
             display: "flex",
             // flexDirection: "column",
             // marginTop: "200px",
             justifyContent: "center",
-            
+
         },
         // narrativeTitle: {
         //     display: "flex",
@@ -965,7 +965,7 @@ const WaterView = () => {
     const renderTooltip = () => {
         if (!hoveredData || !hoveredData.value) return null;
         const { hour, value, metric, trend, position } = hoveredData;
-        const status = getAirQualityStatus(value, metric.id);
+        const status = getWaterQualityStatus(value, metric.id);
 
         return (
             <div style={{
@@ -1002,9 +1002,9 @@ const WaterView = () => {
         const tss = hourData.tss ?? 0;
         const pH = hourData.pH;
 
-        const tdsStatus = getAirQualityStatus(tds, 'tds_ppm');
-        const tssStatus = getAirQualityStatus(tss, 'tss');
-        const pHStatus = getAirQualityStatus(pH, 'pH');
+        const tdsStatus = getWaterQualityStatus(tds, 'tds_ppm');
+        const tssStatus = getWaterQualityStatus(tss, 'tss');
+        const pHStatus = getWaterQualityStatus(pH, 'pH');
 
         let narrative = `Water Quality Report for ${time}:\n\n`;
         narrative += `Current Readings: TDS: ${tds.toFixed(1)} ppm (${tdsStatus?.label || 'unavailable'}), `;
@@ -1090,7 +1090,7 @@ const WaterView = () => {
                 }),
                 backgroundColor: relevantMetrics.map(metric => {
                     const value = hourData?.[metric.id];
-                    const status = getAirQualityStatus(value, metric.id);
+                    const status = getWaterQualityStatus(value, metric.id);
                     return status?.color || 'rgba(24, 191, 15, 0.6)';
                 }),
                 borderRadius: 25,
@@ -1171,10 +1171,10 @@ const WaterView = () => {
 
     // Add this helper function near your other utility functions
     const getAverageWaterQualityStatus = (hourData) => {
-        if (!hourData || (!hourData.tds_ppm && !hourData.tss)) return null;
+        if (!hourData || (!hourData.tds_ppm && !hourData.tss && !hourData.pH && !hourData.temperature)) return null;
 
-        const tdsStatus = getAirQualityStatus(hourData.tds_ppm ?? 0, 'tds_ppm');
-        const tssStatus = getAirQualityStatus(hourData.tss ?? 0, 'tss');
+        const tdsStatus = getWaterQualityStatus(hourData.tds_ppm ?? 0, 'tds_ppm');
+        const tssStatus = getWaterQualityStatus(hourData.tss ?? 0, 'tss');
 
         // Return "High Dissolved Substances" if TDS is high, regardless of TSS
         if (tdsStatus?.label === "High Dissolved Substances") {
@@ -1340,7 +1340,7 @@ const WaterView = () => {
                             .map((metric) => {
                                 const hourData = hourlyData[selectedHourForNarrative];
                                 const value = hourData?.[metric.id];
-                                const status = getAirQualityStatus(value, metric.id);
+                                const status = getWaterQualityStatus(value, metric.id);
                                 const maxValue = getMaxValue(metric.id);
 
                                 return (
@@ -1406,7 +1406,7 @@ const WaterView = () => {
                                                 ...styles.reportStatusWrapper,
                                                 backgroundColor: status.color,
                                                 marginTop: '10px',
-                                                
+
                                             }}>
                                                 <span style={styles.reportIcon}>{thresholdData.icon}</span>
                                                 <span style={styles.reportStatus}>{status.label}</span>
@@ -1426,25 +1426,25 @@ const WaterView = () => {
                                                     label: 'TSS',
                                                     value: hourData.tss,
                                                     unit: 'mg/L',
-                                                    status: getAirQualityStatus(hourData.tss, 'tss'),
+                                                    status: getWaterQualityStatus(hourData.tss, 'tss'),
                                                 },
                                                 {
                                                     label: 'TDS',
                                                     value: hourData.tds_ppm,
                                                     unit: 'ppm',
-                                                    status: getAirQualityStatus(hourData.tds_ppm, 'tds_ppm'),
+                                                    status: getWaterQualityStatus(hourData.tds_ppm, 'tds_ppm'),
                                                 },
                                                 {
                                                     label: 'pH Level',
                                                     value: hourData.pH,
                                                     unit: '',
-                                                    status: getAirQualityStatus(hourData.pH, 'pH'),
+                                                    status: getWaterQualityStatus(hourData.pH, 'pH'),
                                                 },
                                                 {
                                                     label: 'Temperature',
                                                     value: hourData.temperature,
                                                     unit: '°C',
-                                                    status: getAirQualityStatus(hourData.temperature, 'temperature'),
+                                                    status: getWaterQualityStatus(hourData.temperature, 'temperature'),
                                                 },
                                             ];
 

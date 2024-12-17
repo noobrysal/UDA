@@ -43,7 +43,11 @@ const AirView = () => {
     const [hourlyData, setHourlyData] = useState([]);
     const [selectedLocation, setSelectedLocation] = useState(3); // Default to USTP-CDO
     const [loading, setLoading] = useState(true);
-    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+    const [selectedDate, setSelectedDate] = useState(() => {
+        const today = new Date();
+        today.setDate(today.getDate() + 1); // Add 1 day
+        return today.toISOString().split('T')[0]; // Format to YYYY-MM-DD
+    });
     const [visibleHours, setVisibleHours] = useState([0]); // Show 9 hours
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [slideDirection, setSlideDirection] = useState('left');
@@ -615,7 +619,7 @@ const AirView = () => {
         // Right Container
         rightContainer: {
             // flex: 0.6, // Slightly larger than the left container
-            width: "100vw", 
+            width: "100vw",
             height: "100%",
             display: "flex",
             flexDirection: "column",
@@ -737,7 +741,7 @@ const AirView = () => {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            marginTop: "10px", 
+            marginTop: "10px",
         },
         circularProgressContainer: {
             width: "80%",
@@ -793,7 +797,7 @@ const AirView = () => {
         narrativeReportContainer: {
             height: "100%",
             // width: "80%",
-            padding: "20px" ,
+            padding: "20px",
             color: "#fff",
             display: "flex",
             // flexDirection: "column",

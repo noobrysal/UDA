@@ -17,7 +17,8 @@ import {
     Tooltip,
     Legend,
 } from "chart.js";
-// import { colors } from "@mui/material";
+import { IconButton, Tooltip as MuiTooltip } from '@mui/material';
+import InfoIcon from '@mui/icons-material/Info';
 
 const plugin = {
     id: "increase-legend-spacing",
@@ -148,14 +149,10 @@ const SoilQualityByDate = () => {
 
     const tileClassName = ({ date, view }) => {
         if (view === "month") {
-            // Add one day to match the database dates
             const adjustedDate = new Date(date);
             adjustedDate.setDate(adjustedDate.getDate() + 1);
             const formattedDate = adjustedDate.toISOString().split('T')[0];
-
-            if (highlightedDates.includes(formattedDate)) {
-                return 'highlight-tile';
-            }
+            return highlightedDates.includes(formattedDate) ? 'has-data' : 'no-data';
         }
         return null;
     };
@@ -480,33 +477,57 @@ const SoilQualityByDate = () => {
         );
     };
 
-    const ChartExpandButton = ({ onClick }) => (
-        <button
-            onClick={onClick}
-            style={{
-                position: 'absolute',
-                top: '10px',
-                right: '10px',
-                backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                border: '1px solid white',
-                borderRadius: '4px',
-                color: 'white',
-                padding: '5px 10px',
-                cursor: 'pointer',
-                zIndex: 10,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '5px'
-            }}
-        >
-            <span style={{ fontSize: '16px' }}>⤢</span>
-            Expand
-        </button>
+    const chartDescriptions = {
+        soil_moisture: "Indicates the amount of water present in the soil. Critical for plant growth and nutrient absorption, and helps assess irrigation needs.",
+        humidity: "Reflects the moisture in the air around the soil, which can influence soil evaporation rates and overall water retention.",
+        temperature: "Affects soil microbial activity, nutrient availability, and plant root development. Critical for understanding soil health and crop growth conditions."
+    };
+
+    const ChartHeader = ({ title, onExpand, hasData, metric }) => (
+        <div style={{
+            position: 'absolute',
+            top: '10px',
+            right: '10px',
+            left: '10px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            zIndex: 10
+        }}>
+            <MuiTooltip title={chartDescriptions[metric]} arrow placement="top">
+                <IconButton size="small" style={{ color: 'white' }}>
+                    <InfoIcon />
+                </IconButton>
+            </MuiTooltip>
+            {hasData && (
+                <button
+                    onClick={onExpand}
+                    style={{
+                        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                        border: '1px solid white',
+                        borderRadius: '4px',
+                        color: 'white',
+                        padding: '5px 10px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '5px'
+                    }}
+                >
+                    <span style={{ fontSize: '16px' }}>⤢</span>
+                    Expand
+                </button>
+            )}
+        </div>
     );
 
-    const ChartContainer = ({ children, onExpand, hasData }) => (
+    const ChartContainer = ({ children, onExpand, hasData, metric }) => (
         <div style={{ position: 'relative' }}>
-            {hasData && <ChartExpandButton onClick={onExpand} />}
+            <ChartHeader
+                onExpand={onExpand}
+                hasData={hasData}
+                metric={metric}
+            />
             {children}
         </div>
     );
@@ -604,6 +625,7 @@ const SoilQualityByDate = () => {
                         options: expandedOptions
                     });
                 }}
+                metric={metric.toLowerCase()}
             >
                 {hasData ? (
                     <Line
@@ -785,6 +807,29 @@ const SoilQualityByDate = () => {
 
                     .react-calendar__navigation button:hover {
                         background: rgba(5, 218, 255, 0.8); /* Darker blue when hovering */
+                    }
+
+                    .has-data {
+                        background-color: rgba(255, 255, 255, 0.6) !important;
+                        color: black !important;
+                        cursor: pointer !important;
+                    }
+
+                    .no-data {
+                        background-color: rgba(128, 128, 128, 0.3) !important;
+                        color: #666 !important;
+                        cursor: not-allowed !important;
+                        pointer-events: none;
+                    }
+
+                    .react-calendar__tile:hover.has-data {
+                        background-color: #ffde59 !important;
+                        color: black !important;
+                    }
+
+                    .react-calendar__tile--active.has-data {
+                        background-color: rgba(0, 115, 47, 0.7) !important;
+                        color: white !important;
                     }
                 `}</style>
 
