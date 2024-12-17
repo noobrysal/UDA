@@ -246,7 +246,7 @@ const SidebarComponent = () => {
                                 isCollapsed={isCollapsed}
                             />
                             <Item
-                                title="River"
+                                title="Water"
                                 to="/water-dashboard"
                                 icon={<WaterOutlinedIcon />}
                                 selected={selected}
