@@ -73,7 +73,7 @@ const Carousel = () => {
                         setIsAnimating(false);
                     }, 50);
                 }, 750);
-            }, 50000);
+            }, 15000);
 
             return () => clearInterval(interval);
         }
