@@ -17,8 +17,8 @@ const Carousel = () => {
         { id: "general", Component: GeneralScreen },
         { id: "air", Component: AirSolo },
         { id: "water", Component: WaterSolo },
-        { id: "soil", Component: SoilSolo },
         { id: "air-water", Component: AirWater },
+        { id: "soil", Component: SoilSolo },
     ];
 
     useEffect(() => {
@@ -73,7 +73,7 @@ const Carousel = () => {
                         setIsAnimating(false);
                     }, 50);
                 }, 750);
-            }, 5000);
+            }, 50000);
 
             return () => clearInterval(interval);
         }

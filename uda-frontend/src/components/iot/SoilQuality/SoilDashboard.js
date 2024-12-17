@@ -975,7 +975,7 @@ const SoilDashboard = () => {
                         }}
                         onClick={handleButtonClick} // Trigger navigation on button click
                     >
-                        Detailed Data
+                        Calendar Data Tracker
                     </button>
                 </div>
                 <h2 style={styles.dashboardTitle2}>Unified Dashboard Analytics</h2>
@@ -1112,18 +1112,6 @@ const SoilDashboard = () => {
                                     <p style={styles.paragraph}>No summary available for the selected filters.</p>
                                 )}
                             </div>
-                        </div>
-
-                        {/* Alert Filters */}
-                        <div style={styles.alertFiltersContainer}>
-                            {/* Header Row */}
-                            <div style={styles.alertHeaderRow}>
-                                <h2 style={styles.alertSectionTitle}>Alert Log</h2>
-                                <p style={styles.alertSectionSubtitle}>Select data range to show metrics log</p>
-                            </div>
-
-                            {/* Filters Row */}
-                            <AlertFilters />
                         </div>
                     </div>
                 </div>
@@ -1343,6 +1331,18 @@ const SoilDashboard = () => {
                     {renderLegend()}
                 </div>
 
+                {/* Alert Filters */}
+                <div style={styles.alertFiltersContainer}>
+                    {/* Header Row */}
+                    <div style={styles.alertHeaderRow}>
+                        <h2 style={styles.alertSectionTitle}>Alert Log</h2>
+                        <p style={styles.alertSectionSubtitle}>Select data range to show metrics log</p>
+                    </div>
+
+                    {/* Filters Row */}
+                    <AlertFilters />
+                </div>
+                    
                 {/* Alert Log with Time Log Container */}
                 <div
                     ref={logsContainerRef}
@@ -1527,7 +1527,7 @@ const styles = {
         justifyContent: 'left',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: '5px',
+        gap: '10px',
         flexWrap: 'wrap', // Wrap content on smaller screens
     },
     summaryRangeText: {

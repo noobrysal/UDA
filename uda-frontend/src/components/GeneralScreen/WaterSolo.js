@@ -3,7 +3,7 @@ import { supabaseWater } from '../iot/WaterQuality/supabaseClient';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Bar } from 'react-chartjs-2'; // Add Bar import
-import backgroundImage from '../../assets/waterdash.png';
+import backgroundImage from '../../assets/waterdash2.png';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import {
@@ -187,7 +187,7 @@ const WaterView = () => {
     useEffect(() => {
         const slideTimer = setInterval(() => {
             setCurrentSlide((prev) => (prev + 1) % thresholdInfo.length);
-        }, 10000); // Change slide every 10 seconds
+        }, 12000); // Change slide every 12 seconds
 
         return () => clearInterval(slideTimer);
     }, []);

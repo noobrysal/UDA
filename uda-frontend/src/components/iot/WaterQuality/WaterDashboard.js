@@ -994,7 +994,7 @@ const WaterDashboard = () => {
                         }}
                         onClick={handleButtonClick} // Trigger navigation on button click
                     >
-                        Detailed Data
+                        Calendar Data Tracker
                     </button>
                 </div>
                 <h2 style={styles.dashboardTitle2}>Unified Dashboard Analytics</h2>
@@ -1130,63 +1130,6 @@ const WaterDashboard = () => {
                                 ) : (
                                     <p style={styles.paragraph}>No summary available for the selected filters.</p>
                                 )}
-                            </div>
-                        </div>
-
-                        {/* Alert Filters */}
-                        <div style={styles.alertFiltersContainer}>
-                            {/* Header Row */}
-                            <div style={styles.alertHeaderRow}>
-                                <h2 style={styles.alertSectionTitle}>Alert Log</h2>
-                                <p style={styles.alertSectionSubtitle}>Select data range to show metrics log</p>
-                            </div>
-
-                            {/* Filters Row */}
-                            <div style={styles.filtersRow}>
-                                <label style={styles.alertRangeText}>
-                                    Range:
-                                    <select
-                                        name="range"
-                                        value={logFilters.range}
-                                        onChange={handleLogFiltersChange}
-                                        style={styles.alertRangeSelect2}
-                                    >
-                                        <option value="day">Days</option>
-                                        <option value="week">Week</option>
-                                        <option value="month">Month</option>
-                                    </select>
-                                </label>
-                                <label style={styles.alertRangeText}>
-                                    Date:
-                                    <input
-                                        type="date"
-                                        name="date"
-                                        value={logFilters.date}
-                                        onChange={handleLogFiltersChange}
-                                        style={styles.alertRangeSelect}
-                                    />
-                                </label>
-                                {/* <label style={styles.alertRangeText}>
-                                    Location:
-                                    <select
-                                        name="locationId"
-                                        value={logFilters.locationId || ""}
-                                        onChange={handleLogFiltersChange}
-                                        style={styles.alertRangeSelect}
-                                    >
-                                        <option value="" disabled>
-                                            Select area
-                                        </option>
-                                        {locations.map((location) => (
-                                            <option key={location.id} value={location.id}>
-                                                {location.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </label> */}
-                                <button style={styles.fetchButton} onClick={fetchLogs}>
-                                    Fetch Logs
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -1425,6 +1368,63 @@ const WaterDashboard = () => {
                         </p>
                     </div>
                     {renderLegend()}
+                </div>
+
+                {/* Alert Filters */}
+                <div style={styles.alertFiltersContainer}>
+                    {/* Header Row */}
+                    <div style={styles.alertHeaderRow}>
+                        <h2 style={styles.alertSectionTitle}>Alert Log</h2>
+                        <p style={styles.alertSectionSubtitle}>Select data range to show metrics log</p>
+                    </div>
+
+                    {/* Filters Row */}
+                    <div style={styles.filtersRow}>
+                        <label style={styles.alertRangeText}>
+                            Range:
+                            <select
+                                name="range"
+                                value={logFilters.range}
+                                onChange={handleLogFiltersChange}
+                                style={styles.alertRangeSelect2}
+                            >
+                                <option value="day">Days</option>
+                                <option value="week">Week</option>
+                                <option value="month">Month</option>
+                            </select>
+                        </label>
+                        <label style={styles.alertRangeText}>
+                            Date:
+                            <input
+                                type="date"
+                                name="date"
+                                value={logFilters.date}
+                                onChange={handleLogFiltersChange}
+                                style={styles.alertRangeSelect}
+                            />
+                        </label>
+                        {/* <label style={styles.alertRangeText}>
+                            Location:
+                            <select
+                                name="locationId"
+                                value={logFilters.locationId || ""}
+                                onChange={handleLogFiltersChange}
+                                style={styles.alertRangeSelect}
+                            >
+                                <option value="" disabled>
+                                    Select area
+                                </option>
+                                {locations.map((location) => (
+                                    <option key={location.id} value={location.id}>
+                                        {location.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </label> */}
+                        <button style={styles.fetchButton} onClick={fetchLogs}>
+                            Fetch Logs
+                        </button>
+                    </div>
                 </div>
 
                 {/* Alert Log with Time Log Container */}
