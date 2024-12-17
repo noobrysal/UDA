@@ -27,8 +27,22 @@ import { useAuth } from './components/auth/AuthContext'; // Add this import
 import GlobalToast from './components/common/GlobalToast'; // <-- Import GlobalToast
 import AirWater from './components/GeneralScreen/AirWater';
 
+// Add route title mapping
+const ROUTE_TITLES = {
+  '/': 'Landing Page - UDA',
+  '/login': 'Login - UDA',
+  '/register': 'Register - UDA',
+  '/carousel': 'General Dashboard - UDA',
+  '/air': 'Air Dashboard - UDA',
+  '/water': 'Water Dashboard - UDA',
+  '/soil': 'Soil Dashboard - UDA',
+  '/air-dashboard': 'Air Quality - UDA',
+  '/water-dashboard': 'Water Quality - UDA',
+  '/soil-dashboard': 'Soil Quality - UDA',
+  '/air-water': 'Air & Water - UDA',
+  '/profile': 'Profile - UDA'
+};
 
-// Define global styles for scrollbar
 const GlobalStyle = createGlobalStyle`
     /* Custom Scrollbar Styling */
     ::-webkit-scrollbar {
@@ -59,60 +73,31 @@ const GlobalStyle = createGlobalStyle`
 const AppContent = () => {
   const location = useLocation();
   const { user } = useAuth();
-
-  // Define public paths that don't need authentication or sidebar
   const publicPaths = ['/', '/login', '/register'];
   const isPublicPath = publicPaths.includes(location.pathname);
-
-  // Only show sidebar for authenticated routes
   const showSidebar = !isPublicPath && user;
 
   useEffect(() => {
-    const path = location.pathname;
-    let title = "UDA"; // Default title
+    // Get base title from mapping or use pattern matching for dynamic routes
+    let title = ROUTE_TITLES[location.pathname] || 'UDA';
 
-    if (path === "/") {
-      title = "Landing Page - UDA";
-    } else if (path === "/login") {
-      title = "Login - UDA";
-    } else if (path === "/register") {
-      title = "Register - UDA";
-
-    } else if (path === "/carousel") {
-      title = "General Dashboard - UDA";
-    } else if (path === "/air") {
-      title = "Air Dashboard - UDA";
-    } else if (path === "/water") {
-      title = "Water Dashboard - UDA";
-    } else if (path === "/soil") {
-      title = "Soil Dashboard - UDA";
-
-    } else if (path === "/air-dashboard") {
-      title = "Air Quality - UDA";
-    } else if (path === "/water-dashboard") {
-      title = "Water Quality - UDA";
-    } else if (path === "/soil-dashboard") {
-      title = "Soil Quality - UDA";
-
-
-    } else if (path === "/air-water") {
-      title = "Air & Water - UDA";
-    
-    } else if (path.includes("/air-quality")) {
-      title = "Air Calendar - UDA";
-    } else if (path.includes("/water-quality")) {
-      title = "Water Calendar - UDA";
-    } else if (path.includes("/soil-quality")) {
-      title = "Soil Calendar - UDA";
-
-    } else if (path === "/profile") {
-      title = "Profile - UDA";
-    } else if (path === "/login") {
-      title = "Login - UDA";
+    // Handle dynamic routes
+    if (location.pathname.includes('/air-quality')) {
+      title = 'Air Calendar - UDA';
+    } else if (location.pathname.includes('/water-quality')) {
+      title = 'Water Calendar - UDA';
+    } else if (location.pathname.includes('/soil-quality')) {
+      title = 'Soil Calendar - UDA';
     }
 
+    // Set the document title using single operation
     document.title = title;
-  }, [location]);
+
+    // Cleanup function to reset title on unmount
+    return () => {
+      document.title = 'UDA';
+    };
+  }, [location.pathname]);
 
   return (
     <div className="app-layout" style={{ display: 'flex' }}>
