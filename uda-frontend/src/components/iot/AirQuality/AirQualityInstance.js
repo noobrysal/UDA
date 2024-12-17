@@ -2,14 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { supabase } from './supabaseClient';
+import { supabaseAir } from './supabaseClient';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
+import backgroundImage from '../../../assets/airdash.png';
+import { useNavigate } from 'react-router-dom';
 // import Sidebar from '../../Sidebar';
 
 // Function to fetch air quality data by ID
 const getAirQualityById = async (id) => {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAir
         .from('sensors')
         .select('*')
         .eq('id', id)
@@ -23,6 +25,7 @@ const getAirQualityById = async (id) => {
     return data;
 };
 
+
 const locations = [
     { id: 1, name: 'Lapasan' },
     { id: 2, name: 'Agusan' },
@@ -34,82 +37,37 @@ const locations = [
 // Updated thresholds for air quality metrics
 const thresholds1 = {
     pm25: [
-        { min: 0, max: 25, label: "Good", color: "rgba(75, 192, 192, 1)" },
-        { min: 25, max: 35, label: "Fair", color: "rgba(154, 205, 50, 1)" },
-        { min: 35, max: 45, label: "Unhealthy", color: "rgba(255, 206, 86, 1)" },
-        {
-            min: 45,
-            max: 55,
-            label: "Very Unhealthy",
-            color: "rgba(255, 140, 0, 1)",
-        },
-        {
-            min: 55,
-            max: 90,
-            label: "Severely Unhealthy",
-            color: "rgba(255, 99, 132, 1)",
-        },
-        {
-            min: 90,
-            max: Infinity,
-            label: "Emergency",
-            color: "rgba(139, 0, 0, 1)",
-        },
+        { min: 0, max: 25.99, label: "Good", color: "rgba(154, 205, 50)" },
+        { min: 26, max: 35.99, label: "Fair", color: "rgba(250, 196, 62)" },
+        { min: 36, max: 45.99, label: "Unhealthy", color: "rgba(230, 126, 14)" },
+        { min: 46, max: 55.99, label: "Very Unhealthy", color: "rgba(232, 44, 48)" },
+        { min: 56, max: 90.99, label: "Acutely Unhealthy", color: "rgba(159, 109, 199)" },
+        { min: 91, max: Infinity, label: "Emergency", color: "rgba(140, 1, 4)" },
     ],
     pm10: [
-        { min: 0, max: 50, label: "Good", color: "rgba(75, 192, 192, 1)" },
-        { min: 50, max: 100, label: "Fair", color: "rgba(154, 205, 50, 1)" },
-        {
-            min: 100,
-            max: 150,
-            label: "Unhealthy",
-            color: "rgba(255, 206, 86, 1)",
-        },
-        {
-            min: 150,
-            max: 200,
-            label: "Very Unhealthy",
-            color: "rgba(255, 140, 0, 1)",
-        },
-        {
-            min: 200,
-            max: 300,
-            label: "Severely Unhealthy",
-            color: "rgba(255, 99, 132, 1)",
-        },
-        {
-            min: 300,
-            max: Infinity,
-            label: "Emergency",
-            color: "rgba(139, 0, 0, 1)",
-        },
+        { min: 0, max: 50.99, label: "Good", color: "rgba(154, 205, 50)" },
+        { min: 51, max: 100.99, label: "Fair", color: "rgba(250, 196, 62)" },
+        { min: 101, max: 150.99, label: "Unhealthy", color: "rgba(230, 126, 14)" },
+        { min: 151, max: 200.99, label: "Very Unhealthy", color: "rgba(232, 44, 48)" },
+        { min: 201, max: 300.99, label: "Acutely Unhealthy", color: "rgba(159, 109, 199)" },
+        { min: 301, max: Infinity, label: "Emergency", color: "rgba(140, 1, 4)" },
     ],
     humidity: [
-        { min: 0, max: 24, label: "Poor", color: "rgba(139, 0, 0, 1)" },
-        { min: 24, max: 30, label: "Fair", color: "rgba(255, 206, 86, 1)" },
-        { min: 30, max: 60, label: "Good", color: "rgba(75, 192, 192, 1)" },
-        { min: 60, max: 70, label: "Fair", color: "rgba(154, 205, 50, 1)" },
-        { min: 70, max: Infinity, label: "Poor", color: "rgba(255, 99, 132, 1)" },
+        { min: 0, max: 25.99, label: "Poor", color: "rgba(230, 126, 14)" },
+        { min: 26, max: 30.99, label: "Fair", color: "rgba(250, 196, 62)" },
+        { min: 31, max: 60.99, label: "Good", color: "rgba(154, 205, 50)" },
+        { min: 61, max: 70.99, label: "Fair", color: "rgba(250, 196, 62)" },
+        { min: 71, max: Infinity, label: "Poor", color: "rgba(232, 44, 48)" },
     ],
     temperature: [
-        { min: 0, max: 33, label: "Good", color: "rgba(75, 192, 192, 1)" },
-        { min: 33, max: 41, label: "Caution", color: "rgba(255, 206, 86, 1)" },
-        { min: 41, max: 54, label: "Danger", color: "rgba(255, 140, 0, 1)" },
-        {
-            min: 54,
-            max: Infinity,
-            label: "Extreme Danger",
-            color: "rgba(139, 0, 0, 1)",
-        },
+        { min: 0, max: 33.99, label: "Good", color: "rgba(154, 205, 50)" },
+        { min: 34, max: 41.99, label: "Caution", color: "rgba(250, 196, 62)" },
+        { min: 42, max: 54.99, label: "Danger", color: "rgba(230, 126, 14)" },
+        { min: 55, max: Infinity, label: "Extreme", color: "rgba(232, 44, 48)" },
     ],
     oxygen: [
-        { min: 0, max: 19.5, label: "Poor", color: "rgba(255, 206, 86, 1)" },
-        {
-            min: 19.5,
-            max: Infinity,
-            label: "Safe",
-            color: "rgba(75, 192, 192, 1)",
-        },
+        { min: 0, max: 19.49, label: "Poor", color: "rgba(232, 44, 48)" },
+        { min: 19.5, max: Infinity, label: "Safe", color: "rgba(154, 205, 50)" },
     ],
 };
 
@@ -137,6 +95,8 @@ const AirQualityInstance = () => {
     const [hoveredMetric, setHoveredMetric] = useState(null);
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
+    const navigate = useNavigate();
+
     useEffect(() => {
         let mounted = true;
         getAirQualityById(id)
@@ -152,6 +112,11 @@ const AirQualityInstance = () => {
 
         return () => mounted = false;
     }, [id]);
+
+    const handleButtonClick = () => {
+        // Navigate to the desired route when the button is clicked
+        navigate('/air-quality');
+    };
 
     const handleMouseMove = (e) => {
         setMousePosition({ x: e.clientX, y: e.clientY });
@@ -171,10 +136,11 @@ const AirQualityInstance = () => {
                 <CircularProgressbar
                     value={value}
                     text={`${value}`}
+                    strokeWidth={20}
                     styles={buildStyles({
                         pathColor: color,
                         textColor: color,
-                        trailColor: '#ababab',
+                        trailColor: '#fff',
                         backgroundColor: '#3e98c7',
                     })}
                 />
@@ -229,11 +195,11 @@ const AirQualityInstance = () => {
     return (
         <div style={styles.airQualityInstance}>
             {/* <Sidebar /> */}
-            <div style={styles.mainContent}>
-                <h1>Air Quality Data (ID: {id})</h1>
-                <h2><strong>Recorded at:</strong>{' '}{getLocationName(airData.locationId)}</h2>
-                <h2>
-                    <strong>Recorded on:</strong>{' '}
+            <div>
+                <h2 style={styles.h2}>Air Quality Data (ID: {id})</h2>
+                <h2 style={styles.h2}>Recorded at:{' '}{getLocationName(airData.locationId)}</h2>
+                <h2 style={styles.h2}>Recorded on:{' '}
+
                     {new Date(airData.date).toLocaleString("en-US", {
                         year: "numeric",
                         month: "2-digit",
@@ -253,6 +219,11 @@ const AirQualityInstance = () => {
                 </div>
                 {renderHoverMiniWindow()}
             </div>
+            <button style={styles.button}
+                onClick={handleButtonClick}
+            >
+                Detailed Data
+            </button>
             <ToastContainer />
         </div>
     );
@@ -260,55 +231,100 @@ const AirQualityInstance = () => {
 
 const styles = {
     airQualityInstance: {
+        backgroundColor: '#000000',
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
+        // minHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
         minHeight: '100vh',
-        fontFamily: "'Arial', sans-serif",
-        backgroundColor: '#f5f5f5',
+        alignItems: 'center', // Align items horizontally in the center
+        // justifyContent: 'center', // Align items vertically in the center
     },
-    mainContent: {
-        padding: '20px',
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    h1: {
-        fontSize: '24px',
-        fontWeight: 600,
-        color: '#333',
+    // mainContent: {
+    //     padding: '20px',
+    //     flex: 1,
+    //     display: 'flex',
+    //     flexDirection: 'column',
+    //     alignItems: 'center',
+    //     justifyContent: 'center',
+    // },
+    // h1: {
+    //     fontSize: '24px',
+    //     fontWeight: 600,
+    //     color: '#333',
+    //     marginBottom: '20px',
+    // },
+    h2: {
+        fontSize: '2rem',
+        fontWeight: 200,
+        color: '#fff',
         marginBottom: '20px',
+        justifyContent: 'center',
+        marginTop: '20px',
+        textAlign: 'center',
+        lineHeight: '20px',
     },
     metrics: {
         display: 'flex',
-        flexWrap: 'wrap',
+        flexWrap: 'nowwrap',
         justifyContent: 'center',
-        gap: '20px',
+        width: '1300px', // Adjust width as needed
+        height: 'auto', // Automatically adjust based on content
+        paddingLeft: '10px', // Add some padding for better spacing
+        backgroundColor: 'rgba(255, 255, 255, 0.1)', // Transparent white background
+        borderRadius: '8px', // Optional: add rounded corners
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // Optional: subtle shadow for better visuals
+        margin: '30px',
+        // marginLeft: '160px', //NARA TAN MARGIN
+        padding: '35px',
+        paddingTop: '10px',
+        paddingBottom: '10px',
+        marginTop: '-5px'
     },
     progressContainer: {
-        width: '150px',
-        height: 'auto',
+        width: '200px',
+        height: '430px',
         textAlign: 'center',
         transition: 'transform 0.3s ease',
-        margin: '20px',
-        padding: '15px',
+        backgroundColor: 'rgba(255, 255, 255, 0.3)',
+        margin: '13px',
+        paddingTop: '50px',
+        padding: '20px',
         borderRadius: '10px',
-        backgroundColor: '#f0f0f0', // Light gray background
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Subtle shadow for depth    
-
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Subtle shadow for depth   
+        color: 'white',
+    },
+    button: {
+        display: 'flex',
+        flexDirection: 'row',
+        padding: '10px 10px',
+        background: 'linear-gradient(50deg, #00CCDD, #006E77)', // Gradient background
+        color: '#fff',
+        border: 'none',
+        borderRadius: '15px',
+        cursor: 'pointer',
+        fontSize: '1rem',
+        width: '300px',
+        justifyContent: 'center', // Center the content horizontally
+        alignItems: 'center',     // Center the content vertically
+        textAlign: 'center',      // Make sure the text is centered
+        margin: '0px 500px 0px 500px'
     },
     progressContainerHover: {
         transform: 'scale(1.05)',
     },
     p: {
         marginTop: '10px',
-        fontSize: '14px',
+        fontSize: '20px',
         fontWeight: 'bold',
     },
     legend: {
         marginTop: '10px',
-        fontSize: '12px',
+        fontSize: '15px',
         textAlign: 'left',
         lineHeight: '1.5',
     },
@@ -323,7 +339,8 @@ const styles = {
         borderRadius: '50%',
     },
     circularBar: {
-        margin: '0 auto',
+        // margin: '0 auto',
+        marginTop: '20px'
     },
     tooltip: {
         position: 'absolute',

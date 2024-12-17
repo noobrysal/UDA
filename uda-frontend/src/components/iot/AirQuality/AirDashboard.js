@@ -1,5 +1,5 @@
-import React, { useEffect, useState, } from 'react';
-import { supabase } from './supabaseClient';
+import React, { useEffect, useState, useRef } from 'react';
+import { supabaseAir } from './supabaseClient';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Bar } from 'react-chartjs-2';
@@ -15,6 +15,7 @@ import {
     Tooltip,
     Legend,
 } from 'chart.js';
+import { color, height, width } from '@mui/system';
 
 // Register chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -55,37 +56,37 @@ const AirDashboard = () => {
 
     const thresholds = {
         pm25: [
-            { min: 0, max: 24.99, status: "Good", color: "rgba(75, 192, 192, 1)" },
-            { min: 25, max: 34.99, status: "Fair", color: "rgba(154, 205, 50, 1)" },
-            { min: 34.9, max: 44.99, status: "Unhealthy", color: "rgba(255, 206, 86, 1)" },
-            { min: 45, max: 54.99, status: "Very Unhealthy", color: "rgba(255, 140, 0, 1)" },
-            { min: 55, max: 89.99, status: "Severely Unhealthy", color: "rgba(255, 99, 132, 1)" },
-            { min: 90, max: Infinity, status: "Emergency", color: "rgba(139, 0, 0, 1)" },
+            { min: 0, max: 25.99, label: "Good", color: "rgba(154, 205, 50)" },
+            { min: 26, max: 35.99, label: "Fair", color: "rgba(250, 196, 62)" },
+            { min: 36, max: 45.99, label: "Unhealthy", color: "rgba(230, 126, 14)" },
+            { min: 46, max: 55.99, label: "Very Unhealthy", color: "rgba(232, 44, 48)" },
+            { min: 56, max: 90.99, label: "Acutely Unhealthy", color: "rgba(159, 109, 199)" },
+            { min: 91, max: Infinity, label: "Emergency", color: "rgba(140, 1, 4)" },
         ],
         pm10: [
-            { min: 0, max: 49.99, status: "Good", color: "rgba(75, 192, 192, 1)" },
-            { min: 50, max: 99.99, status: "Fair", color: "rgba(154, 205, 50, 1)" },
-            { min: 100, max: 149.99, status: "Unhealthy", color: "rgba(255, 206, 86, 1)" },
-            { min: 150, max: 199.99, status: "Very Unhealthy", color: "rgba(255, 140, 0, 1)" },
-            { min: 200, max: 299.99, status: "Severely Unhealthy", color: "rgba(255, 99, 132, 1)" },
-            { min: 300, max: Infinity, status: "Emergency", color: "rgba(139, 0, 0, 1)" },
+            { min: 0, max: 50.99, label: "Good", color: "rgba(154, 205, 50)" },
+            { min: 51, max: 100.99, label: "Fair", color: "rgba(250, 196, 62)" },
+            { min: 101, max: 150.99, label: "Unhealthy", color: "rgba(230, 126, 14)" },
+            { min: 151, max: 200.99, label: "Very Unhealthy", color: "rgba(232, 44, 48)" },
+            { min: 201, max: 300.99, label: "Acutely Unhealthy", color: "rgba(159, 109, 199)" },
+            { min: 301, max: Infinity, label: "Emergency", color: "rgba(140, 1, 4)" },
         ],
         humidity: [
-            { min: 0, max: 23.99, status: "Poor", color: "rgba(139, 0, 0, 1)" },
-            { min: 24, max: 29.99, status: "Fair", color: "rgba(255, 206, 86, 1)" },
-            { min: 30, max: 59.99, status: "Good", color: "rgba(75, 192, 192, 1)" },
-            { min: 60, max: 69.99, status: "Fair", color: "rgba(154, 205, 50, 1)" },
-            { min: 70, max: Infinity, status: "Poor", color: "rgba(255, 99, 132, 1)" },
+            { min: 0, max: 25.99, label: "Poor", color: "rgba(230, 126, 14)" },
+            { min: 26, max: 30.99, label: "Fair", color: "rgba(250, 196, 62)" },
+            { min: 31, max: 60.99, label: "Good", color: "rgba(154, 205, 50)" },
+            { min: 61, max: 70.99, label: "Fair", color: "rgba(250, 196, 62)" },
+            { min: 71, max: Infinity, label: "Poor", color: "rgba(232, 44, 48)" },
         ],
         temperature: [
-            { min: 0, max: 32.99, status: "Good", color: "rgba(75, 192, 192, 1)" },
-            { min: 33, max: 40.99, status: "Caution", color: "rgba(255, 206, 86, 1)" },
-            { min: 41, max: 53.99, status: "Danger", color: "rgba(255, 140, 0, 1)" },
-            { min: 54, max: Infinity, status: "Extreme Danger", color: "rgba(139, 0, 0, 1)" },
+            { min: 0, max: 33.99, label: "Good", color: "rgba(154, 205, 50)" },
+            { min: 34, max: 41.99, label: "Caution", color: "rgba(250, 196, 62)" },
+            { min: 42, max: 54.99, label: "Danger", color: "rgba(230, 126, 14)" },
+            { min: 55, max: Infinity, label: "Extreme", color: "rgba(232, 44, 48)" },
         ],
         oxygen: [
-            { min: 0, max: 19.49, status: "Poor", color: "rgba(255, 206, 86, 1)" },
-            { min: 19.5, max: Infinity, status: "Safe", color: "rgba(75, 192, 192, 1)" },
+            { min: 0, max: 19.49, label: "Poor", color: "rgba(232, 44, 48)" },
+            { min: 19.5, max: Infinity, label: "Safe", color: "rgba(154, 205, 50)" },
         ],
     };
 
@@ -159,7 +160,7 @@ const AirDashboard = () => {
             let hasComparisonData = false;
 
             for (const location of locations) {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseAir
                     .from('sensors')
                     .select('*')
                     .gte('date', start)
@@ -168,7 +169,7 @@ const AirDashboard = () => {
 
                 if (error) throw error;
 
-                const summaryComparisonData = await supabase
+                const summaryComparisonData = await supabaseAir
                     .from('sensors')
                     .select('*')
                     .gte('date', comparisonStart)
@@ -240,13 +241,80 @@ const AirDashboard = () => {
     }, [locations.length, isTransitioning, transitionDirection]);
 
     const calculateSummary = (locationData) => {
-        const summaries = locationData.map(({ location, data }) => {
-
+        const summaries = locationData.map(({ location, data, summaryComparisonData }) => {
             const calculateMetric = (metric) => {
-                const values = data.map((item) => item[metric]).filter((value) => value != null);
-                const avg = values.length > 0 ? values.reduce((acc, val) => acc + val, 0) / values.length : NaN;
+                // Helper function to calculate average based on range
+                const calculateRangeAverage = (data, range) => {
+                    if (!data || data.length === 0) return NaN;
+
+                    // Sort data by date
+                    const sortedData = [...data].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+                    switch (range) {
+                        case 'hour':
+                            // Group by hour and calculate hourly averages
+                            return calculateGroupedAverage(sortedData, d =>
+                                new Date(d.date).toISOString().split(':')[0]
+                            );
+                        case 'day':
+                            // Group by day and calculate daily averages
+                            return calculateGroupedAverage(sortedData, d =>
+                                new Date(d.date).toISOString().split('T')[0]
+                            );
+                        case 'week':
+                            // Group by week and calculate weekly averages
+                            return calculateGroupedAverage(sortedData, d => {
+                                const date = new Date(d.date);
+                                const startOfWeek = new Date(date);
+                                startOfWeek.setDate(date.getDate() - date.getDay());
+                                return startOfWeek.toISOString().split('T')[0];
+                            });
+                        case 'month':
+                            // Group by month and calculate monthly averages
+                            return calculateGroupedAverage(sortedData, d =>
+                                new Date(d.date).toISOString().slice(0, 7)
+                            );
+                        default:
+                            return NaN;
+                    }
+                };
+
+                // Helper function to calculate grouped averages
+                const calculateGroupedAverage = (data, groupKeyFn) => {
+                    const groups = {};
+                    data.forEach(item => {
+                        const key = groupKeyFn(item);
+                        if (!groups[key]) {
+                            groups[key] = { sum: 0, count: 0 };
+                        }
+                        const value = item[metric];
+                        if (value != null && !isNaN(value)) {
+                            groups[key].sum += value;
+                            groups[key].count++;
+                        }
+                    });
+
+                    // Calculate average of group averages
+                    const groupAverages = Object.values(groups)
+                        .map(g => g.sum / g.count)
+                        .filter(v => !isNaN(v));
+
+                    return groupAverages.length > 0
+                        ? groupAverages.reduce((a, b) => a + b) / groupAverages.length
+                        : NaN;
+                };
+
+                // Calculate averages for both periods
+                const avg = calculateRangeAverage(data, summaryFilters.range);
+                const comparisonAvg = calculateRangeAverage(summaryComparisonData, summaryFilters.range);
+
+                // Determine trend by comparing averages
+                const trend = !isNaN(avg) && !isNaN(comparisonAvg)
+                    ? (avg < comparisonAvg ? 'improving' : avg > comparisonAvg ? 'worsening' : 'stable')
+                    : '';
+
                 const status = getStatus(avg, metric);
-                const trend = getTrend(values);
+
                 return { avg, status, trend };
             };
 
@@ -265,22 +333,23 @@ const AirDashboard = () => {
 
     const getStatus = (value, metric) => {
         const metricThresholds = thresholds[metric];
-        if (!metricThresholds) return 'Unknown'; // Fallback for undefined metric thresholds
+        if (!metricThresholds || value === null || value === undefined || isNaN(value)) {
+            return 'Unknown';
+        }
 
-        const threshold = metricThresholds.find((range) => value <= range.max);
-        return threshold ? threshold.status : 'Unknown'; // Return the matched status
-    };
+        // Find the threshold where value is within range
+        const threshold = metricThresholds.find(
+            (range) => value >= range.min && value <= range.max
+        );
 
-    const getTrend = (values) => {
-        if (values.length < 2) return '';
-        const difference = values[values.length - 1] - values[values.length - 2];
-        return difference > 0 ? 'worsening' : difference < 0 ? 'improving' : 'stable';
+        // Return the label of the matched threshold or last threshold's label if value exceeds all ranges
+        return threshold ? threshold.label : metricThresholds[metricThresholds.length - 1].label;
     };
 
     const renderTrendIndicator = (trend) => {
         if (!trend) return null;
         return (
-            <span style={{ fontSize: '16px', color: trend === 'improving' ? 'green' : 'red' }}>
+            <span style={{ fontSize: '16px', color: trend === 'improving' ? 'green' : 'red', backgroundColor: '#fefefe', paddingLeft: '4px', paddingRight: '4px', borderRadius: '4px' }}>
                 {trend === 'improving' ? 'Improving ↑' : 'Worsening ↓'}
             </span>
         );
@@ -288,7 +357,7 @@ const AirDashboard = () => {
 
     const renderSummaryPanel = (metric, label, locationSummary) => {
         const metricData = locationSummary[metric];
-        if (isNaN(metricData.avg)) {
+        if (!metricData || isNaN(metricData.avg)) {
             return (
                 <div style={styles.summaryPanel}>
                     <h5>{label}</h5>
@@ -298,14 +367,36 @@ const AirDashboard = () => {
             );
         }
 
+        // Get status for the current value using the thresholds
+        const currentStatus = getStatus(metricData.avg, metric);
+
         return (
             <div style={styles.summaryPanel}>
                 <h5>{label}</h5>
                 <p>{metricData.avg.toFixed(2)}</p>
-                <p>Status: <span style={styles.status?.[metricData.status] || {}}>{metricData.status || 'Unknown'}</span></p>
+                <p>Status: <span style={{
+                    padding: '3px 8px',
+                    borderRadius: '4px',
+                    backgroundColor: getColor(metricData.avg, metric),
+                    color: 'white'
+                }}>{currentStatus}</span></p>
                 {renderTrendIndicator?.(metricData.trend)}
             </div>
         );
+    };
+
+    // You can also add this helper function if not already present
+    const getColor = (value, metric) => {
+        const metricThresholds = thresholds[metric];
+        if (!metricThresholds || value === null || value === undefined || isNaN(value)) {
+            return "rgba(128, 128, 128, 0.5)"; // Gray color for unknown status
+        }
+
+        const threshold = metricThresholds.find(
+            (range) => value >= range.min && value <= range.max
+        );
+
+        return threshold ? threshold.color : metricThresholds[metricThresholds.length - 1].color;
     };
 
     const fetchComparisonData = async () => {
@@ -364,7 +455,7 @@ const AirDashboard = () => {
             end = calculateEndDate(date, range);
         }
 
-        const { data, error } = await supabase
+        const { data, error } = await supabaseAir
             .from('sensors')
             .select('*')
             .eq('locationId', location) // Filter by location
@@ -429,37 +520,37 @@ const AirDashboard = () => {
 
     const thresholds1 = {
         pm25: [
-            { min: 0, max: 24.99, label: "Good", color: "rgba(75, 192, 192, 1)" },
-            { min: 25, max: 34.99, label: "Fair", color: "rgba(154, 205, 50, 1)" },
-            { min: 34.9, max: 44.99, label: "Unhealthy", color: "rgba(255, 206, 86, 1)" },
-            { min: 45, max: 54.99, label: "Very Unhealthy", color: "rgba(255, 140, 0, 1)" },
-            { min: 55, max: 89.99, label: "Severely Unhealthy", color: "rgba(255, 99, 132, 1)" },
-            { min: 90, max: Infinity, label: "Emergency", color: "rgba(139, 0, 0, 1)" },
+            { min: 0, max: 25.99, label: "Good", color: "rgba(154, 205, 50)" },
+            { min: 26, max: 35.99, label: "Fair", color: "rgba(250, 196, 62)" },
+            { min: 36, max: 45.99, label: "Unhealthy", color: "rgba(230, 126, 14)" },
+            { min: 46, max: 55.99, label: "Very Unhealthy", color: "rgba(232, 44, 48)" },
+            { min: 56, max: 90.99, label: "Acutely Unhealthy", color: "rgba(159, 109, 199)" },
+            { min: 91, max: Infinity, label: "Emergency", color: "rgba(140, 1, 4)" },
         ],
         pm10: [
-            { min: 0, max: 49.99, label: "Good", color: "rgba(75, 192, 192, 1)" },
-            { min: 50, max: 99.99, label: "Fair", color: "rgba(154, 205, 50, 1)" },
-            { min: 100, max: 149.99, label: "Unhealthy", color: "rgba(255, 206, 86, 1)" },
-            { min: 150, max: 199.99, label: "Very Unhealthy", color: "rgba(255, 140, 0, 1)" },
-            { min: 200, max: 299.99, label: "Severely Unhealthy", color: "rgba(255, 99, 132, 1)" },
-            { min: 300, max: Infinity, label: "Emergency", color: "rgba(139, 0, 0, 1)" },
+            { min: 0, max: 50.99, label: "Good", color: "rgba(154, 205, 50)" },
+            { min: 51, max: 100.99, label: "Fair", color: "rgba(250, 196, 62)" },
+            { min: 101, max: 150.99, label: "Unhealthy", color: "rgba(230, 126, 14)" },
+            { min: 151, max: 200.99, label: "Very Unhealthy", color: "rgba(232, 44, 48)" },
+            { min: 201, max: 300.99, label: "Acutely Unhealthy", color: "rgba(159, 109, 199)" },
+            { min: 301, max: Infinity, label: "Emergency", color: "rgba(140, 1, 4)" },
         ],
         humidity: [
-            { min: 0, max: 23.99, label: "Poor", color: "rgba(139, 0, 0, 1)" },
-            { min: 24, max: 29.99, label: "Fair", color: "rgba(255, 206, 86, 1)" },
-            { min: 30, max: 59.99, label: "Good", color: "rgba(75, 192, 192, 1)" },
-            { min: 60, max: 69.99, label: "Fair", color: "rgba(154, 205, 50, 1)" },
-            { min: 70, max: Infinity, label: "Poor", color: "rgba(255, 99, 132, 1)" },
+            { min: 0, max: 25.99, label: "Poor", color: "rgba(230, 126, 14)" },
+            { min: 26, max: 30.99, label: "Fair", color: "rgba(250, 196, 62)" },
+            { min: 31, max: 60.99, label: "Good", color: "rgba(154, 205, 50)" },
+            { min: 61, max: 70.99, label: "Fair", color: "rgba(250, 196, 62)" },
+            { min: 71, max: Infinity, label: "Poor", color: "rgba(232, 44, 48)" },
         ],
         temperature: [
-            { min: 0, max: 32.99, label: "Good", color: "rgba(75, 192, 192, 1)" },
-            { min: 33, max: 40.99, label: "Caution", color: "rgba(255, 206, 86, 1)" },
-            { min: 41, max: 53.99, label: "Danger", color: "rgba(255, 140, 0, 1)" },
-            { min: 54, max: Infinity, label: "Extreme Danger", color: "rgba(139, 0, 0, 1)" },
+            { min: 0, max: 33.99, label: "Good", color: "rgba(154, 205, 50)" },
+            { min: 34, max: 41.99, label: "Caution", color: "rgba(250, 196, 62)" },
+            { min: 42, max: 54.99, label: "Danger", color: "rgba(230, 126, 14)" },
+            { min: 55, max: Infinity, label: "Extreme", color: "rgba(232, 44, 48)" },
         ],
         oxygen: [
-            { min: 0, max: 19.49, label: "Poor", color: "rgba(255, 206, 86, 1)" },
-            { min: 19.5, max: Infinity, label: "Safe", color: "rgba(75, 192, 192, 1)" },
+            { min: 0, max: 19.49, label: "Poor", color: "rgba(232, 44, 48)" },
+            { min: 19.5, max: Infinity, label: "Safe", color: "rgba(154, 205, 50)" },
         ],
     };
 
@@ -529,15 +620,19 @@ const AirDashboard = () => {
     );
 
     const renderComparisonChart = (comparisonData) => {
-        if (!comparisonData) {
-            return null;
-        }
-
-        const { first, second } = comparisonData;
         const metrics = ["pm25", "pm10", "humidity", "temperature", "oxygen"];
 
+        // Default values when comparisonData is null or undefined
+        const defaultData = {
+            first: metrics.reduce((acc, metric) => ({ ...acc, [metric]: { avg: 0 } }), {}),
+            second: metrics.reduce((acc, metric) => ({ ...acc, [metric]: { avg: 0 } }), {}),
+        };
+
+        const dataToUse = comparisonData || defaultData;
+        const { first, second } = dataToUse;
+
         const getStatus = (value, metric) => {
-            const threshold = thresholds1[metric].find((t) => value <= t.max);
+            const threshold = thresholds1[metric]?.find((t) => value <= t.max);
             return threshold ? threshold.label : "Unknown";
         };
 
@@ -545,8 +640,8 @@ const AirDashboard = () => {
         const firstAverages = metrics.map((metric) => first[metric]?.avg || 0);
         const secondAverages = metrics.map((metric) => second[metric]?.avg || 0);
 
-        const firstDateLabel = formatDateLabel(filters.first);
-        const secondDateLabel = formatDateLabel(filters.second);
+        const firstDateLabel = comparisonData ? formatDateLabel(filters.first) : "No Range Selected";
+        const secondDateLabel = comparisonData ? formatDateLabel(filters.second) : "No Range Selected";
 
         const data = {
             labels,
@@ -555,18 +650,18 @@ const AirDashboard = () => {
                     label: `First Range: (${firstDateLabel})`,
                     data: firstAverages,
                     backgroundColor: firstAverages.map((value, index) =>
-                        thresholds1[metrics[index]].find((t) => value <= t.max)?.color
+                        thresholds1[metrics[index]]?.find((t) => value <= t.max)?.color || "rgba(128, 128, 128, 0.5)"
                     ),
-                    borderColor: "rgb(25, 25, 112)",
+                    borderColor: "rgb(252, 252, 247)",
                     borderWidth: 3,
                 },
                 {
                     label: `Second Range: (${secondDateLabel})`,
                     data: secondAverages,
                     backgroundColor: secondAverages.map((value, index) =>
-                        thresholds1[metrics[index]].find((t) => value <= t.max)?.color
+                        thresholds1[metrics[index]]?.find((t) => value <= t.max)?.color || "rgba(192, 192, 192, 0.5)"
                     ),
-                    borderColor: "rgb(220, 20, 60)",
+                    borderColor: "rgb(3, 3, 3)",
                     borderWidth: 3,
                 },
             ],
@@ -590,10 +685,10 @@ const AirDashboard = () => {
                     display: true,
                     position: "top",
                     labels: {
-                        color: "#fff", // Set legend text color
+                        color: "#fff",
                         font: {
-                            size: 14, // Adjust legend font size
-                            family: "Arial", // Optional: Change font family
+                            size: 14,
+                            family: "Arial",
                         },
                     },
                 },
@@ -601,42 +696,78 @@ const AirDashboard = () => {
             scales: {
                 x: {
                     grid: {
-                        display: false, // Hide grid lines on the x-axis
+                        display: false,
                     },
                     ticks: {
-                        color: "#fff", // Set x-axis tick label color
+                        color: "#fff",
                         font: {
-                            size: 20, // Adjust x-axis tick label size
-                            family: "Verdana", // Optional: Change font family
+                            size: 14,
+                            family: "Verdana",
                         },
                     },
                 },
                 y: {
                     grid: {
-                        display: false, // Hide grid lines on the y-axis
+                        display: false,
                     },
                     ticks: {
-                        color: "#fff", // Set y-axis tick label color
+                        color: "#fff",
                         font: {
-                            size: 20, // Adjust y-axis tick label size
-                            family: "Verdana", // Optional: Change font family
+                            size: 14,
+                            family: "Verdana",
                         },
-                        beginAtZero: true, // Ensure the y-axis starts at zero
+                        beginAtZero: true,
                     },
                 },
             },
             elements: {
                 bar: {
-                    borderRadius: 10, // Add border radius to the bars
-                    borderWidth: 2, // Optional: Add a border to the bars
+                    borderRadius: 15,
+                    borderWidth: 2,
+                    borderSkipped: false, // Ensure all edges of the bar have a border radius
+                },
+            },
+            datasets: {
+                bar: {
+                    barPercentage: 0.95, // Adjust the width of the bars
+                    categoryPercentage: 0.95, // Adjust the space between bars
                 },
             },
         };
 
+        const generateInsight = () => {
+            if (!comparisonData) {
+                return "No data available for comparison.";
+            }
+
+            return metrics.map((metric, index) => {
+                const firstValue = firstAverages[index];
+                const secondValue = secondAverages[index];
+                const firstStatus = getStatus(firstValue, metric);
+                const secondStatus = getStatus(secondValue, metric);
+
+                return `${metric.toUpperCase()} - First Range (${firstStatus}): ${firstValue.toFixed(
+                    2
+                )}, Second Range (${secondStatus}): ${secondValue.toFixed(
+                    2
+                )}. ${firstValue > secondValue ? "Decreased" : "Increased"} between ranges.`;
+            }).join("\n");
+        };
+
+        const narrativeInsight = generateInsight();
+
         return (
-            <div style={{ display: 'flex', flexDirection: 'column', height: '45vh' }}>
-                <div style={{ flex: 1, height: '100%' }}>
-                    <Bar data={data} options={options} height={null} />
+            <div style={{ display: "flex", flexDirection: "column", height: "70%" }}>
+                <div style={{ flex: 1 }}>
+                    <Bar data={data} options={options} height="100%" />
+                </div>
+                <div style={{ marginTop: "20px", color: "#fff", fontSize: "1rem", textAlign: "justify" }}>
+                    <strong>Narrative Insight:</strong>
+                    {comparisonData ? (
+                        <pre style={{ textAlign: "justify", whiteSpace: "pre-wrap" }}>{narrativeInsight}</pre>
+                    ) : (
+                        " No data available for comparison."
+                    )}
                 </div>
             </div>
         );
@@ -702,6 +833,8 @@ const AirDashboard = () => {
         setLogFilters({ ...logFilters, [name]: updatedValue });
     };
 
+    const logsContainerRef = useRef(null); // Add this near other state declarations
+
     const fetchLogs = async () => {
         const { range, date, locationId } = logFilters;
 
@@ -716,7 +849,7 @@ const AirDashboard = () => {
         const start = calculateStartDate(date, range);
         const end = calculateEndDate(date, range);
 
-        const { data, error } = await supabase
+        const { data, error } = await supabaseAir
             .from('sensors')
             .select('*')
             .eq('locationId', locationId)
@@ -734,8 +867,17 @@ const AirDashboard = () => {
             setLogsErrorMessage('No logs found for the selected date and location.');
             return;
         }
-        toast.success('Logs fetched successfully.');
+
         generateLogs(data);
+        toast.success('Logs fetched successfully.');
+
+        // Scroll to logs container after data is loaded
+        if (logsContainerRef.current) {
+            logsContainerRef.current.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
     };
 
     const generateLogs = (data) => {
@@ -846,7 +988,7 @@ const AirDashboard = () => {
                                         name="range"
                                         value={summaryFilters.range}
                                         onChange={handleSummaryFiltersChange}
-                                        style={styles.summaryRangeSelect}
+                                        style={styles.summaryRangeSelect2}
                                     >
                                         <option value="day">Days</option>
                                         <option value="week">Week</option>
@@ -857,7 +999,7 @@ const AirDashboard = () => {
                                 {(summaryFilters.range === 'day') && (
                                     <>
                                         <label style={styles.summaryRangeText}>
-                                            Date:
+                                            1st Date:
                                             <input
                                                 type="date"
                                                 name="date"
@@ -867,7 +1009,7 @@ const AirDashboard = () => {
                                             />
                                         </label>
                                         <label style={styles.summaryRangeText}>
-                                            Comparison Date:
+                                            2nd Date:
                                             <input
                                                 type="date"
                                                 name="comparisonDate"
@@ -882,7 +1024,7 @@ const AirDashboard = () => {
                                 {(summaryFilters.range === 'week') && (
                                     <>
                                         <label style={styles.summaryRangeText}>
-                                            Week:
+                                            1st Date:
                                             <input
                                                 type="date"
                                                 name="date"
@@ -892,7 +1034,7 @@ const AirDashboard = () => {
                                             />
                                         </label>
                                         <label style={styles.summaryRangeText}>
-                                            Comparison Week:
+                                            2nd Date:
                                             <input
                                                 type="date"
                                                 name="comparisonDate"
@@ -907,7 +1049,7 @@ const AirDashboard = () => {
                                 {summaryFilters.range === 'month' && (
                                     <>
                                         <label style={styles.summaryRangeText}>
-                                            Month:
+                                            1st Date:
                                             <select
                                                 name="month"
                                                 value={summaryFilters.month}
@@ -922,7 +1064,7 @@ const AirDashboard = () => {
                                             </select>
                                         </label>
                                         <label style={styles.summaryRangeText}>
-                                            Comparison Month:
+                                            2nd Date:
                                             <select
                                                 name="comparisonMonth"
                                                 value={summaryFilters.comparisonMonth}
@@ -978,9 +1120,9 @@ const AirDashboard = () => {
                                         name="range"
                                         value={logFilters.range}
                                         onChange={handleLogFiltersChange}
-                                        style={styles.alertRangeSelect}
+                                        style={styles.alertRangeSelect2}
                                     >
-                                        <option value="day">Day</option>
+                                        <option value="day">Days</option>
                                         <option value="week">Week</option>
                                         <option value="month">Month</option>
                                     </select>
@@ -1004,7 +1146,7 @@ const AirDashboard = () => {
                                         style={styles.alertRangeSelect}
                                     >
                                         <option value="" disabled>
-                                            Select a location
+                                            Select area
                                         </option>
                                         {locations.map((location) => (
                                             <option key={location.id} value={location.id}>
@@ -1265,7 +1407,10 @@ const AirDashboard = () => {
                 </div>
 
                 {/* Alert Log with Time Log Container */}
-                <div style={styles.alertLogsContainer}>
+                <div
+                    ref={logsContainerRef}
+                    style={styles.alertLogsContainer}
+                >
                     <div style={styles.alertLogHeader}>
                         <h2 style={styles.alertLogTitle}>Alert Logs:</h2>
                         <span style={styles.alertLogSubtitle}>Shows metric log with threshold</span>
@@ -1290,9 +1435,11 @@ const AirDashboard = () => {
                                 const metricLogs = logs[metric];
                                 return (
                                     <div
-                                        key={metric}
                                         style={styles.metricBlock}
+                                        key={metric}
+
                                     >
+                                        <div style={styles.metricTitle}></div>
                                         <h3>{metric.toUpperCase()}</h3>
                                         {metricLogs?.length > 0 ? (
                                             <div
@@ -1302,7 +1449,7 @@ const AirDashboard = () => {
                                                     overflowY: "auto",
                                                 }}
                                             >
-                                                <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
+                                                <ul style={{ margin: 0, padding: 0, listStyle: 'none', textAlign: 'left' }}>
                                                     {/* Render each log for the metric */}
                                                     {metricLogs.map((log, index) => (
                                                         <li
@@ -1342,6 +1489,7 @@ const AirDashboard = () => {
                                             <p>No critical levels detected for {metric.toUpperCase()}.</p>
                                         )}
                                     </div >
+                                    // </div>
                                 );
                             })}
                         </div >
@@ -1361,7 +1509,7 @@ const AirDashboard = () => {
 
 const styles = {
     body: {
-        backgroundColor: '#000000',
+        backgroundColor: '#0F0D1A',
         backgroundImage: `url(${backgroundImage})`,
         backgroundSize: 'cover',
         backgroundRepeat: 'no-repeat',
@@ -1382,6 +1530,8 @@ const styles = {
         marginTop: '20px',
         marginLeft: '70px',
         marginRight: 'auto',
+        alignItems: 'center',
+        justifyContent: 'center',
         width: '100%',
         maxWidth: '1440px', // Restrict to a maximum width for large screens
         backgroundColor: 'rgba(15, 13, 26, 0)',
@@ -1468,8 +1618,9 @@ const styles = {
     },
     filtersRow: {
         display: 'flex',
-        justifyContent: 'center',
+        justifyContent: 'left',
         alignItems: 'center',
+        justifyContent: 'center',
         gap: '5px',
         flexWrap: 'wrap', // Wrap content on smaller screens
     },
@@ -1477,15 +1628,36 @@ const styles = {
         color: '#fff',
         fontSize: '1rem',
         marginRight: '5px',
+        // margin: '0 5px',
+        // justifyContent: 'left',
     },
     summaryRangeSelect: {
-        marginLeft: '7px',
-        padding: '8px',
+        marginLeft: '5px',
+        padding: '10px 5px',
         borderRadius: '5px',
-        backgroundColor: 'rgba(27, 119, 211, 0.46)',
+        backgroundColor: 'rgba(0, 204, 221, 0.46)',
         color: '#fff',
         border: 'none',
         outline: 'none',
+        textAlign: 'left',
+        justifyContent: 'center',
+        width: '110px',
+        fontSize: '14px',
+        // marginRight: '1px',
+    },
+    summaryRangeSelect2: {
+        marginLeft: '5px',
+        marginBottom: '1px',
+        fontSize: '14px',
+        padding: '10px 0px',
+        borderRadius: '5px',
+        backgroundColor: 'rgb(0, 204, 221, 0.46)',
+        color: '#fff',
+        border: 'none',
+        outline: 'none',
+        textAlign: 'left',
+        justifyContent: 'center',
+        width: '65px',
     },
     summaryMessage: {
         marginTop: '20px',
@@ -1543,7 +1715,7 @@ const styles = {
     },
     summaryPanel: {
         flex: '1 1 calc(45% - 10px)', // Two panels per row
-        backgroundColor: 'rgb(27, 119, 211, 0.46)',
+        backgroundColor: 'rgb(21, 141, 153, 0.46)',
         padding: '20px',
         paddingLeft: '25px',
         borderRadius: '25px',
@@ -1589,16 +1761,30 @@ const styles = {
     },
     alertRangeSelect: {
         marginLeft: '7px',
-        padding: '8px',
+        padding: '10px 5px',
         borderRadius: '5px',
-        backgroundColor: 'rgba(27, 119, 211, 0.46)',
+        backgroundColor: 'rgb(0, 204, 221, 0.46)',
         color: '#fff',
         border: 'none',
         outline: 'none',
+        width: '110px',
+        fontSize: '14px',
+    },
+    alertRangeSelect2: {
+        marginLeft: '7px',
+        padding: '10px 5px',
+        borderRadius: '5px',
+        backgroundColor: 'rgb(0, 204, 221, 0.46)',
+        color: '#fff',
+        border: 'none',
+        outline: 'none',
+        width: '75px',
+        fontSize: '14px',
     },
     fetchButton: {
         padding: '10px 20px',
-        backgroundColor: '#1b77d3',
+        marginLeft: '13px',
+        backgroundColor: '#00CCDD',
         color: '#fff',
         border: 'none',
         borderRadius: '5px',
@@ -1651,7 +1837,7 @@ const styles = {
         borderRadius: '10px',
         marginBottom: '20px',
         marginLeft: '25px',
-        backgroundColor: 'rgb(27, 119, 211, 0.46)',
+        backgroundColor: 'rgb(0, 204, 221, 0.46)',
         color: "#fff",
         border: 'none',
     },
@@ -1760,17 +1946,27 @@ const styles = {
         display: 'grid', // Use grid to arrange metrics in rows
         gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', // Responsive grid with min width for each metric block
         gap: '20px', // Add space between the grid items
+        color: '#000',
+        // backgroundColor: 'rgba(, 0.1)',
+        textAlign: 'center',
     },
     metricBlock: {
         // border: "1px solid #ccc", 
         padding: "10px",
-        borderRadius: '10px',
-        backgroundColor: "rgba(79, 117, 255, 0.46)",
+        borderRadius: '20px',
+        backgroundColor: "rgb(29, 144, 154, 0.46)",
         color: "#fff",
         height: "500px", // Set fixed height for each metric block
         overflowY: "auto", // Enable vertical scrolling if content overflows
-
-
+        textAlign: "center",
+    },
+    metricTitle: {
+        backgroundColor: 'rgb(4, 71, 78)',
+        height: '40px',
+        width: '235px',
+        marginBottom: '-38px',
+        marginLeft: '38px',
+        borderRadius: '20px',
     },
 
 
@@ -1780,7 +1976,7 @@ const styles = {
         // marginLeft: '40px',
         display: 'inline-block',
         padding: '10px 20px',
-        backgroundColor: '#007bff',
+        backgroundColor: '#00CCDD',
         color: '#ffffff',
         borderRadius: '10px',
         border: 'none',
@@ -1814,7 +2010,44 @@ const styles = {
         comparisonContainer: {
             flexWrap: 'nowrap',
         }
-    }
+    },
+    // Styles for laptop screens (1920 x 1200 and smaller)
+    '@media (max-width: 1920px)': {
+        container: {
+            marginTop: '20px',
+            marginLeft: '40px',
+            marginRight: '40px',
+            padding: '15px', // Slightly reduced padding for laptops
+        },
+    },
+
+    // Styles for screens smaller than 1440px
+    '@media (max-width: 1440px)': {
+        container: {
+            marginLeft: '20px',
+            marginRight: '20px',
+            padding: '10px', // Further reduced padding for smaller screens
+        },
+    },
+
+    // Styles for screens smaller than 1024px (tablets and small laptops)
+    '@media (max-width: 1024px)': {
+        container: {
+            flexDirection: 'column', // Stack content vertically
+            alignItems: 'stretch',  // Stretch items to fit smaller width
+            padding: '10px 5px',    // Reduced padding
+        },
+    },
+
+    // Styles for mobile devices (768px and smaller)
+    '@media (max-width: 768px)': {
+        container: {
+            flexDirection: 'column',
+            marginLeft: '10px',
+            marginRight: '10px',
+            padding: '5px', // Minimal padding for mobile
+        },
+    },
 };
 
 

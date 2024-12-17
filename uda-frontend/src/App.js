@@ -4,12 +4,29 @@ import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { createGlobalStyle } from 'styled-components'; // <-- Import createGlobalStyle
 import RegisterForm from './components/RegisterForm';
 import LoginForm from './components/LoginForm';
+import AirSolo from './components/GeneralScreen/AirSolo';
 import AirDashboard from './components/iot/AirQuality/AirDashboard';
 import AirQualityInstance from './components/iot/AirQuality/AirQualityInstance';
 import AirQualityByDate from './components/iot/AirQuality/AirQualityByDate';
 import LandingPage from './components/LandingPage';
 import SidebarComponent from './components/global/Sidebar'; // Adjust the import path as needed
-import AirView from './components/iot/AirQuality/AirView';
+import SoilQualityByDate from './components/iot/SoilQuality/SoilQualityByDate';
+import SoilQualityInstance from './components/iot/SoilQuality/SoilQualityInstance';
+import SoilSolo from './components/GeneralScreen/SoilSolo';
+import SoilDashboard from './components/iot/SoilQuality/SoilDashboard';
+import WaterSolo from './components/GeneralScreen/WaterSolo';
+import WaterQualityByDate from './components/iot/WaterQuality/WaterQualityByDate';
+import WaterQualityInstance from './components/iot/WaterQuality/WaterQualityInstance';
+import WaterDashboard from './components/iot/WaterQuality/WaterDashboard';
+import GeneralScreen from './components/GeneralScreen/GeneralScreen';
+import Carousel from './components/GeneralScreen/Carousel';
+import ProfilePage from './components/Profile';
+import PrivateRoute from './components/auth/PrivateRoute'; // <-- Import PrivateRoute
+import { AuthProvider } from './components/auth/AuthContext'; // Add this import
+import { useAuth } from './components/auth/AuthContext'; // Add this import
+import GlobalToast from './components/common/GlobalToast'; // <-- Import GlobalToast
+import AirWater from './components/GeneralScreen/AirWater';
+
 
 // Define global styles for scrollbar
 const GlobalStyle = createGlobalStyle`
@@ -41,45 +58,69 @@ const GlobalStyle = createGlobalStyle`
 
 const AppContent = () => {
   const location = useLocation();
+  const { user } = useAuth();
 
-  // Define paths that require the Sidebar
-  const sidebarPaths = [
-    '/air-dashboard',
-    '/air-quality',
-    '/airview',
-    '/air-quality/date/:date/location/:locationId',
-    '/air-quality/id/:id'
-  ];
+  // Define public paths that don't need authentication or sidebar
+  const publicPaths = ['/', '/login', '/register'];
+  const isPublicPath = publicPaths.includes(location.pathname);
 
-  // Check if the current route is in the sidebarPaths array
-  const showSidebar = sidebarPaths.includes(location.pathname);
+  // Only show sidebar for authenticated routes
+  const showSidebar = !isPublicPath && user;
 
   return (
     <div className="app-layout" style={{ display: 'flex' }}>
-      {showSidebar && <SidebarComponent />} {/* Conditionally render Sidebar */}
+      {showSidebar && <SidebarComponent />}
       <div className="main-content" style={{ flex: 1 }}>
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<LandingPage />} />
-          <Route path="/register" element={<RegisterForm />} />
           <Route path="/login" element={<LoginForm />} />
+          <Route path="/register" element={<RegisterForm />} />
 
-          {/* Routes with Sidebar */}
-          <Route path="/air-dashboard" element={<AirDashboard />} />
-          <Route path="/air-quality" element={<AirQualityByDate />} />
-          <Route path="/air-quality/id/:id" element={<AirQualityInstance />} />
-          <Route path="/airview" element={<AirView />} />
+          {/* Protected Routes */}
+          <Route element={<PrivateRoute />}>
+            {/* Dashboard Routes */}
+            <Route path="/carousel" element={<Carousel />} />
+            <Route path="/general-screen" element={<GeneralScreen />} />
+            <Route path="/air-water" element={<AirWater />} />
+
+            {/* Air Quality Routes */}
+            <Route path="/air" element={<AirSolo />} />
+            <Route path="/air-dashboard" element={<AirDashboard />} />
+            <Route path="/air-quality" element={<AirQualityByDate />} />
+            <Route path="/air-quality/id/:id" element={<AirQualityInstance />} />
+
+            {/* Water Quality Routes */}
+            <Route path="/water" element={<WaterSolo />} />
+            <Route path="/water-dashboard" element={<WaterDashboard />} />
+            <Route path="/water-quality" element={<WaterQualityByDate />} />
+            <Route path="/water-quality/id/:id" element={<WaterQualityInstance />} />
+
+            {/* Soil Quality Routes */}
+            <Route path="/soil" element={<SoilSolo />} />
+            <Route path="/soil-dashboard" element={<SoilDashboard />} />
+            <Route path="/soil-quality" element={<SoilQualityByDate />} />
+            <Route path="/soil-quality/id/:id" element={<SoilQualityInstance />} />
+
+            {/* Profile Route */}
+            <Route path="/profile" element={<ProfilePage />} />
+          </Route>
         </Routes>
       </div>
     </div>
   );
 };
 
-export default function AppWrapper() {
+const AppWrapper = () => {
   return (
     <BrowserRouter>
-      <GlobalStyle /> {/* Inject global styles for the scrollbar */}
-      <AppContent />
+      <AuthProvider>
+        <GlobalToast />
+        <GlobalStyle />
+        <AppContent />
+      </AuthProvider>
     </BrowserRouter>
   );
-}
+};
+
+export default AppWrapper;
