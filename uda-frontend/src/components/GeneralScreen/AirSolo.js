@@ -65,44 +65,44 @@ const AirView = () => {
     // Update thresholds 
     const thresholds = {
         pm25: [
-            { min: 0, max: 25.99, label: "Good", color: "rgba(75, 192, 192)" },
-            { min: 26, max: 35.99, label: "Fair", color: "rgba(154, 205, 50)" },
-            { min: 36, max: 45.99, label: "Unhealthy", color: "rgba(250, 196, 62)" },
-            { min: 46, max: 55.99, label: "Very Unhealthy", color: "rgba(230, 126, 14)" },
+            { min: 0, max: 25.99, label: "Good", color: "rgba(154, 205, 50)" },
+            { min: 26, max: 35.99, label: "Fair", color: "rgba(250, 196, 62)" },
+            { min: 36, max: 45.99, label: "Unhealthy", color: "rgba(230, 126, 14)" },
+            { min: 46, max: 55.99, label: "Very Unhealthy", color: "rgba(232, 44, 48)" },
             { min: 56, max: 90.99, label: "Acutely Unhealthy", color: "rgba(159, 109, 199)" },
-            { min: 91, max: Infinity, label: "Emergency", color: "rgba(199, 46, 46)" },
+            { min: 91, max: Infinity, label: "Emergency", color: "rgba(140, 1, 4)" },
         ],
         pm10: [
-            { min: 0, max: 50.99, label: "Good", color: "rgba(75, 192, 192)" },
-            { min: 51, max: 100.99, label: "Fair", color: "rgba(154, 205, 50)" },
-            { min: 101, max: 150.99, label: "Unhealthy", color: "rgba(250, 196, 62)" },
-            { min: 151, max: 200.99, label: "Very Unhealthy", color: "rgba(230, 126, 14)" },
+            { min: 0, max: 50.99, label: "Good", color: "rgba(154, 205, 50)" },
+            { min: 51, max: 100.99, label: "Fair", color: "rgba(250, 196, 62)" },
+            { min: 101, max: 150.99, label: "Unhealthy", color: "rgba(230, 126, 14)" },
+            { min: 151, max: 200.99, label: "Very Unhealthy", color: "rgba(232, 44, 48)" },
             { min: 201, max: 300.99, label: "Acutely Unhealthy", color: "rgba(159, 109, 199)" },
-            { min: 301, max: Infinity, label: "Emergency", color: "rgba(199, 46, 46)" },
+            { min: 301, max: Infinity, label: "Emergency", color: "rgba(140, 1, 4)" },
         ],
         humidity: [
-            { min: 0, max: 25.99, label: "Poor", color: "rgba(250, 196, 62)" },
-            { min: 26, max: 30.99, label: "Fair", color: "rgba(154, 205, 50)" },
-            { min: 31, max: 60.99, label: "Good", color: "rgba(75, 192, 192)" },
-            { min: 61, max: 70.99, label: "Fair", color: "rgba(154, 205, 50)" },
-            { min: 71, max: Infinity, label: "Poor", color: "rgba(230, 126, 14)" },
+            { min: 0, max: 25.99, label: "Poor", color: "rgba(230, 126, 14)" },
+            { min: 26, max: 30.99, label: "Fair", color: "rgba(250, 196, 62)" },
+            { min: 31, max: 60.99, label: "Good", color: "rgba(154, 205, 50)" },
+            { min: 61, max: 70.99, label: "Fair", color: "rgba(250, 196, 62)" },
+            { min: 71, max: Infinity, label: "Poor", color: "rgba(232, 44, 48)" },
         ],
         temperature: [
-            { min: 0, max: 33.99, label: "Good", color: "rgba(75, 192, 192)" },
-            { min: 34, max: 41.99, label: "Caution", color: "rgba(154, 205, 50)" },
-            { min: 42, max: 54.99, label: "Danger", color: "rgba(250, 196, 62)" },
-            { min: 55, max: Infinity, label: "Extreme", color: "rgba(230, 126, 14)" },
+            { min: 0, max: 33.99, label: "Good", color: "rgba(154, 205, 50)" },
+            { min: 34, max: 41.99, label: "Caution", color: "rgba(250, 196, 62)" },
+            { min: 42, max: 54.99, label: "Danger", color: "rgba(230, 126, 14)" },
+            { min: 55, max: Infinity, label: "Extreme", color: "rgba(232, 44, 48)" },
         ],
         oxygen: [
-            { min: 0, max: 19.49, label: "Poor", color: "rgba(230, 126, 14)" },
-            { min: 19.5, max: Infinity, label: "Safe", color: "rgba(75, 192, 192)" },
+            { min: 0, max: 19.49, label: "Poor", color: "rgba(232, 44, 48)" },
+            { min: 19.5, max: Infinity, label: "Safe", color: "rgba(154, 205, 50)" },
         ],
     };
 
     const thresholdInfo = [
         {
             level: "Good",
-            color: "rgb(75, 192, 192)",
+            color: "rgb(154, 205, 50)",
             description: "The air is clean, and pollution levels are very low. It is safe for everyone to go outside, and no health risks are expected.",
             icon: "😊",
             recommendations: [
@@ -113,7 +113,7 @@ const AirView = () => {
         },
         {
             level: "Fair",
-            color: "rgb(154, 205, 50)",
+            color: "rgb(250, 196, 62)",
             description: "The air is okay, but sensitive people might have slight health problems. Most people can still go outside without issues.",
             icon: "🙂",
             recommendations: [
@@ -124,7 +124,7 @@ const AirView = () => {
         },
         {
             level: "Unhealthy",
-            color: "rgb(250, 196, 62)",
+            color: "rgb(230, 126, 14)",
             description: "People with breathing problems like asthma should spend less time outdoors. They may feel discomfort or breathing difficulty.",
             icon: "😷",
             recommendations: [
@@ -135,7 +135,7 @@ const AirView = () => {
         },
         {
             level: "Very Unhealthy",
-            color: "rgb(230, 126, 14)",
+            color: "rgb(232, 44, 48)",
             description: "People with breathing or heart issues should stay indoors. Avoid unnecessary trips, as the air can harm health if you stay outside too long.",
             icon: "⚠️",
             recommendations: [
@@ -157,7 +157,7 @@ const AirView = () => {
         },
         {
             level: "Emergency",
-            color: "rgb(199, 46, 46)",
+            color: "rgb(140, 1, 4)",
             description: "Everyone should stay inside with windows closed. The air is too dangerous for outdoor activities, except for emergencies.",
             icon: "☠️",
             recommendations: [

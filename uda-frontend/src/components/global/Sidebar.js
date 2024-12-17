@@ -16,6 +16,7 @@ import { supabase } from '../supabaseClient';
 import { useAuth } from '../auth/AuthContext';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import SpaceDashboardIcon from '@mui/icons-material/SpaceDashboard';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
@@ -97,6 +98,7 @@ const SidebarComponent = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
     const [calendarOpen, setCalendarOpen] = useState(false);
+    const [dashOpen, setDashOpen] = useState(false);
 
     const handleLogout = async () => {
         try {
@@ -134,7 +136,7 @@ const SidebarComponent = () => {
             case "Soil":
                 return "#141209";
             default:
-                return "black";
+                return "#061715";
         }
     };
 
@@ -143,6 +145,8 @@ const SidebarComponent = () => {
         // Don't collapse sidebar when clicking on calendar menu or its subitems
         if (
             !e.target.closest('.logo-container') &&
+            !e.target.closest('.dashboard-menu') &&
+            !e.target.closest('.dashboard-subitems')&&
             !e.target.closest('.calendar-menu') &&
             !e.target.closest('.calendar-subitems')
         ) {
@@ -224,7 +228,7 @@ const SidebarComponent = () => {
 
                         <Box paddingBottom="5px" />
 
-                        <Box paddingLeft={isCollapsed ? undefined : "2%"} display="flex" flexDirection="column" gap="8px">
+                        <Box paddingLeft={isCollapsed ? undefined : "0%"} display="flex" flexDirection="column" gap="8px">
                             <Item
                                 title="Dashboard"
                                 to="/carousel"
@@ -257,19 +261,74 @@ const SidebarComponent = () => {
                                 setSelected={setSelected}
                                 isCollapsed={isCollapsed}
                             />
-                            {/* <Item
-                                title="Calendar"
-                                to="/calendar"
-                                icon={<CalendarMonthIcon />}
-                                selected={selected}
-                                setSelected={setSelected}
-                                isCollapsed={isCollapsed}
-                            /> */}
+                            <Box paddingLeft={isCollapsed ? undefined : "0%"} display="flex" flexDirection="column" gap="0px">
+                                <MenuItem
+                                    className="dashboard-menu" // Add this className
+                                    style={{ color: colors.grey[100] }}
+                                    onClick={(e) => {
+                                        e.stopPropagation(); // Stop event from bubbling
+                                        if (!isCollapsed) {
+                                            setDashOpen(!dashOpen);
+                                        }
+                                    }}
+                                    icon={
+                                        <Box
+                                            sx={{
+                                                backgroundColor: selected === "Solo Dashboard" ? colors.white[900] : "transparent",
+                                                padding: "6px",
+                                                borderRadius: "6px",
+                                                display: "flex",
+                                                justifyContent: isCollapsed ? "center" : "flex-start",
+                                                alignItems: "center",
+                                                marginLeft: isCollapsed ? "5px" : "8px",
+                                                transition: "all 0.3s",
+                                                "&:hover": {
+                                                    backgroundColor: colors.yellow[300],
+                                                },
+                                            }}
+                                        >
+                                            <SpaceDashboardIcon />
+                                        </Box>
+                                    }
+                                >
+                                    {!isCollapsed && (
+                                        <Box display="flex" alignItems="center" width="100%">
+                                            <Typography variant="caption">Solo Dashboard</Typography>
+                                            {dashOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                                        </Box>
+                                    )}
+                                </MenuItem>
+
+                                {/* Calendar Subitems */}
+                                {!isCollapsed && dashOpen && (
+                                    <div className="dashboard-subitems"> {/* Add this wrapper */}
+                                        <SubMenuItem
+                                            title="Air Solo"
+                                            to="/air"
+                                            selected={selected}
+                                            setSelected={setSelected}
+                                            isCollapsed={isCollapsed}
+                                        />
+                                        <SubMenuItem
+                                            title="Water Solo"
+                                            to="/water"
+                                            selected={selected}
+                                            setSelected={setSelected}
+                                            isCollapsed={isCollapsed}
+                                        />
+                                        <SubMenuItem
+                                            title="Soil Solo"
+                                            to="/soil"
+                                            selected={selected}
+                                            setSelected={setSelected}
+                                            isCollapsed={isCollapsed}
+                                        />
+                                    </div>
+                                )}
+                            </Box>
                         </Box>
 
-                        <Box paddingBottom="140px" />
-
-                        <Box paddingLeft={isCollapsed ? undefined : "2%"} display="flex" flexDirection="column" gap="8px">
+                        <Box paddingLeft={isCollapsed ? undefined : "0%"} display="flex" flexDirection="column" gap="8px">
                             <MenuItem
                                 className="calendar-menu" // Add this className
                                 style={{ color: colors.grey[100] }}
@@ -291,7 +350,7 @@ const SidebarComponent = () => {
                                             marginLeft: isCollapsed ? "5px" : "8px",
                                             transition: "all 0.3s",
                                             "&:hover": {
-                                                backgroundColor: colors.teal[300],
+                                                backgroundColor: colors.yellow[300],
                                             },
                                         }}
                                     >
@@ -300,7 +359,7 @@ const SidebarComponent = () => {
                                 }
                             >
                                 {!isCollapsed && (
-                                    <Box display="flex" alignItems="center" justifyContent="space-between" width="100%">
+                                    <Box display="flex" alignItems="center" width="100%">
                                         <Typography variant="caption">Calendar</Typography>
                                         {calendarOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                                     </Box>
@@ -333,28 +392,57 @@ const SidebarComponent = () => {
                                     />
                                 </div>
                             )}
+
+
+                            {/* Profile & Logout Section */}
+                            <Box
+                                sx={{
+                                    position: "absolute",
+                                    bottom: "20px",
+                                    // left: isCollapsed ? "50%" : "0", // Center when collapsed, left when expanded
+                                    // transform: isCollapsed ? "translateX(-50%)" : "none", // Adjust alignment when collapsed
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    alignItems: "center",
+                                    transition: "all 0.3s",
+                                    gap: "10px", // Space between profile and logout button
+                                    // marginLeft: isCollapsed ? "0" : "0px", // Additional margin for expanded sidebar
+                                }}
+                            >
+                                <MenuItem
+                                    onClick={() => navigate('/profile')}
+                                    style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        color: colors.grey[100],
+                                        fontSize: "0.9em",
+                                        justifyContent: isCollapsed ? "center" : "flex-start",
+                                        width: "100%", // Ensures it fills the sidebar when expanded
+                                    }}
+                                    icon={<PersonIcon />}
+                                >
+                                    {!isCollapsed && <Typography variant="caption">Profile</Typography>}
+                                </MenuItem>
+                                
+                                <MenuItem
+                                    onClick={handleLogout}
+                                    style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        color: colors.grey[100],
+                                        fontSize: "0.9em",
+                                        justifyContent: isCollapsed ? "center" : "flex-start",
+                                        width: "100%", // Ensures it fills the sidebar when expanded
+                                    }}
+                                    icon={<ReplyIcon />}
+                                >
+                                    {!isCollapsed && <Typography variant="caption">Logout</Typography>}
+                                </MenuItem>
+                            </Box>
                         </Box>
 
-                        <Box paddingBottom="20px" />
 
-                        <Box paddingLeft={isCollapsed ? undefined : "2%"} display="flex" flexDirection="column" gap="8px">
-                            <Item
-                                title="Profile"
-                                to="/profile"
-                                icon={<PersonIcon />}
-                                selected={selected}
-                                setSelected={setSelected}
-                                isCollapsed={isCollapsed}
-                            />
-                            <Item
-                                title="Logout"
-                                icon={<ReplyIcon />}
-                                selected={selected}
-                                setSelected={setSelected}
-                                isCollapsed={isCollapsed}
-                                onClick={handleLogout} // Pass the logout handler directly
-                            />
-                        </Box>
+
                     </Menu>
                 </ProSidebar>
             </Box>

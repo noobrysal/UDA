@@ -26,7 +26,7 @@ const Header = styled.div`
   padding: 20px;
   width: 100%;
   z-index: 1;
-  margin-left: 300px;
+  margin-left: 130px;
   margin-top: 10px;
 `;
 
@@ -49,13 +49,13 @@ const Subtitle = styled.p`
 
 const ContentContainer = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   gap: 20px;
   width: 85%;
   max-width: 1500px;
   flex-wrap: wrap;
   margin-top: 50px;
-  margin-left: 130px;
+  margin-left: 70px;
 `;
 
 const LeftColumn = styled.div`

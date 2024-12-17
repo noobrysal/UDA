@@ -87,8 +87,8 @@ const Input = styled.input`
   background-color: #d9d9d926;
   border: none;
   border-radius: 8px;
-  padding: 18px;
-  font-size: 18px;
+  padding: 14px;
+  font-size: 14px;
   color: white;
   margin-bottom: 20px;
 
@@ -101,9 +101,9 @@ const SubmitButton = styled.button`
   background-color: #7ED956;
   border: none;
   border-radius: 8px;
-  padding: 18px;
+  padding: 14px;
   margin-top: 25px;
-  font-size: 18px;
+  font-size: 14px;
   font-weight: bold;
   color: white;
   cursor: pointer;
