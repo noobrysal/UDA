@@ -1330,6 +1330,7 @@ const styles = {
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed', // Prevent background from scrolling with content
         minHeight: '100vh', // Ensures full height
+        width: '100%',
         height: '100%', // Ensures it covers the viewport height
         boxSizing: 'border-box',
         overflow: 'hidden',
@@ -1353,7 +1354,8 @@ const styles = {
         display: 'grid',
         gridTemplateColumns: 'repeat(3, 1fr)', // Default for larger screens
         gap: '20px',
-        maxWidth: '1600px',
+        // maxWidth: '1600px',
+        width: '100%',  
         margin: '0 auto',
         overflow: 'hidden',
         // backgroundColor: 'rgba(255, 255, 255, 0.9)',

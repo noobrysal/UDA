@@ -1528,7 +1528,8 @@ const styles = {
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed',
         minHeight: '100vh',
-        // padding: '20px',
+        width: '100%',
+        padding: '20px',
         boxSizing: 'border-box',
         display: 'flex',
         justifyContent: 'center',
@@ -1539,13 +1540,15 @@ const styles = {
 
     // DASHBOARD CONTAINER TRANSPARENT
     container: {
-        marginTop: '20px',
-        marginLeft: '70px',
-        marginRight: 'auto',
+        // marginTop: '20px',
+        marginLeft: '50px',
+        // marginRight: 'auto',
         width: '100%',
-        maxWidth: '1440px', // Restrict to a maximum width for large screens
+        // maxWidth: '1440px', // Restrict to a maximum width for large screens
         backgroundColor: 'rgba(15, 13, 26, 0)',
         padding: '20px 0 0 20px',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 
     // WATER DASHBOARD TEXTS
@@ -1600,7 +1603,7 @@ const styles = {
     summaryFiltersContainer: {
         marginTop: '20px',
         padding: '20px',
-        width: '870px',
+        width: '100%',
         height: 'auto', // Adjust to auto height based on content
         backgroundColor: 'rgba(242, 242, 242, 0.1)',
         borderRadius: '15px',
@@ -1738,7 +1741,7 @@ const styles = {
     alertFiltersContainer: {
         marginTop: '20px',
         padding: '20px',
-        width: '870px',
+        width: '100%',
         height: 'auto', // Adjust to auto height based on content
         backgroundColor: 'rgba(242, 242, 242, 0.1)', // Semi-transparent background
         borderRadius: '15px',

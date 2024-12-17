@@ -161,7 +161,7 @@ const SidebarComponent = () => {
                     position: "fixed",
                     top: 28,
                     left: 15,
-                    height: "77vh", // Increased from 70vh to 85vh
+                    height: isCollapsed ? "auto" : "auto",
                     width: isCollapsed ? "60px" : "200px",
                     zIndex: 1300,
                     backgroundColor: getBackgroundColor(), // Dynamic color
