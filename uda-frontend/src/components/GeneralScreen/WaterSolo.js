@@ -19,6 +19,7 @@ import {
 import { Tooltip } from '@mui/material';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
+import { BsMagic } from 'react-icons/bs';
 
 ChartJS.register(
     CategoryScale,
@@ -527,35 +528,37 @@ const WaterView = () => {
 
         // Left Container
         leftContainer: {
-            flex: 0.4, // Slightly smaller than the right container
+            // flex: 0.4, // Slightly smaller than the right container
+            width: "40%",
+            height: "100%",
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
-            gap: "10px",
+            gap: "20px",
         },
 
         // UPPER LEFT BOX BAR CHART MERGED METRICS
         upperLeftBox: {
-            flex: 0.62, // Reduce flex value to make the upper box smaller
+            // flex: 0.62, // Reduce flex value to make the upper box smaller
             backgroundColor: 'rgba(242, 242, 242, 0.15)',
             borderRadius: "20px",
-            width: "100%",
-            height: "150px",  // Keep the height as needed
+            width: "36vw",
+            height: "65%",  // Keep the height as needed
             padding: "15px",
             display: "flex",
             flexDirection: "column"
         },
         chartContainer: {
-            flex: 1,
+            // flex: 1,
             width: '100%',
-            height: '50%', // Set height as a percentage of the parent container's height
+            height: '100%', // Set height as a percentage of the parent container's height
         },
 
         //LOWER LEFT THRESHOLD INFO SLIDER BOX
         lowerLeftBox: {
-            flex: 0.38, // Increase flex value to make the lower box taller
+            // flex: 0.38, // Increase flex value to make the lower box taller
             width: "100%",
-            minHeight: "250px",  // Set a minimum height to ensure it has enough space even if text grows
+            height: "35%",  // Set a minimum height to ensure it has enough space even if text grows
             borderRadius: "15px",
             padding: "15px",
             transition: "background-color 0.3s ease",
@@ -563,7 +566,8 @@ const WaterView = () => {
             backgroundColor: 'rgba(242, 242, 242, 0.15)',
             display: "flex",
             flexDirection: "column",
-            justifyContent: "space-between",
+            // justifyContent: "space-between",
+            // marginBottom: "20px",
         },
         thresholdWrapper: {
             display: "flex",
@@ -637,8 +641,8 @@ const WaterView = () => {
             textAlign: "left",
         },
         slideDescription: {
-            marginTop: "15px", // Reduce margin
-            fontSize: "25px", // Adjust font size for text
+            marginTop: "5px", // Reduce margin
+            fontSize: "20px", // Adjust font size for text
             lineHeight: "1.4", // Slightly tighter line spacing
         },
         rangeInfo: {
@@ -663,22 +667,25 @@ const WaterView = () => {
 
         // Right Container
         rightContainer: {
-            flex: 0.6, // Slightly larger than the left container
+            // flex: 0.6, // Slightly larger than the left container
+            width: "100vw",
+            height: "100%",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            gap: "20px",  // Increased gap between boxes
+            // gap: "30px",  // Increased gap between boxes
             backgroundColor: 'rgba(242, 242, 242, 0.1)',
             borderRadius: "20px",
-            padding: "20px 20px 5px 20px",  // Adjusted padding for better alignment
+            padding: "20px",  // Adjusted padding for better alignment
         },
 
         // UPPER RIGHT BOX
         upperRightBox: {
             backgroundColor: 'rgba(242, 242, 242, 0)',
             borderRadius: "10px",
-            height: "25%",
-            width: "95%",
+            height: "19%",
+            width: "100%",
+            // marginBottom: "10px",
         },
         // Add new styles for hour selector
         upperRightHeader: {
@@ -697,10 +704,12 @@ const WaterView = () => {
         },
         hoursContainer: {
             display: "flex",
-            justifyContent: "space-between",
-            flex: 1,
+            justifyContent: "center",
+            // flex: 1,
             gap: "10px",
             transition: "all 0.3s ease",
+            width: "100%",
+            height: "30%",
         },
         selectedHourCard: {
             backgroundColor: "rgba(0, 204, 221, 0.46)",
@@ -712,10 +721,11 @@ const WaterView = () => {
             alignItems: "center",
             borderRadius: "8px",
             width: "100%",
-            height: "130px", // Slightly bigger than the current 170px
+            height: "12vh", // Slightly bigger than the current 170px
             cursor: "pointer",
             transition: "0.3s ease",
             backgroundColor: "rgba(255, 255, 255, 0.1)",
+            padding: "10px",
         },
         hourText: {
             fontSize: "20px",
@@ -740,21 +750,23 @@ const WaterView = () => {
         middleRightBox: {
             backgroundColor: "rgba(255, 255, 255, 0)",
             borderRadius: "10px",
-            width: "95%",
-            height: "31%",
+            width: "100%",
+            // height: "30%",
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "center",
             gap: "20px", // Add gap between metric boxes
-            marginBottom: "8px",
+            // marginBottom: "50px",
+            marginTop: "50px",
         },
         metricBoxWrapper: {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            width: "30%",
-            marginBottom: "10px",
+            width: "100%",
+            // height: "100%",
+            // marginBottom: "20px",
         },
         metricBox: {
             backgroundColor: 'rgba(242, 242, 242, 0.1)',
@@ -766,7 +778,8 @@ const WaterView = () => {
             fontSize: "12px",
             overflow: "hidden",
             position: "relative",
-            height: "180px", // Set a fixed height for the metric box to allow room for both progress bar and trend indicator
+            height: "28vh", // Set a fixed height for the metric box to allow room for both progress bar and trend indicator
+            // marginTop: "35px",
         },
         metricTitle: {
             fontSize: "14px",
@@ -778,11 +791,13 @@ const WaterView = () => {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
+            marginTop: "10px", 
         },
         circularProgressContainer: {
-            width: "100px",
-            height: "100px",
+            width: "70%",
+            height: "100%",
             fontWeight: "bold",
+            marginTop: "10px",
         },
         noDataLabel: {
             fontSize: "15px",
@@ -811,6 +826,7 @@ const WaterView = () => {
             padding: "5px",
             marginTop: "8px",
             textAlign: "center",
+            marginBottom: "-41px",
         },
         statusLabel: {
             fontSize: "15px",
@@ -822,29 +838,34 @@ const WaterView = () => {
         lowerRightBox: {
             backgroundColor: 'rgba(242, 242, 242, 0.1)',
             borderRadius: "10px",
-            height: "35%", // Adjust height for smaller boxes
-            width: "95%",
+            height: "30%", // Adjust height for smaller boxes
+            width: "100%",
+            // marginBottom: "8px",
+            marginTop: "80px",
+
         },
         // NARRATIVE REPORT
         narrativeReportContainer: {
             height: "100%",
-            padding: "20px",
+            // width: "80%",
+            padding: "20px" ,
             color: "#fff",
             display: "flex",
-            flexDirection: "column",
+            // flexDirection: "column",
+            // marginTop: "200px",
             justifyContent: "center",
-            gap: "15px",
+            
         },
-        narrativeTitle: {
-            display: "flex",
-            alignItems: "center",
-            gap: "15px",
-            color: "#fff",
-            marginTop: 0,
-            marginBottom: "15px",
-        },
+        // narrativeTitle: {
+        //     display: "flex",
+        //     alignItems: "center",
+        //     gap: "15px",
+        //     color: "#fff",
+        //     marginTop: 0,
+        //     marginBottom: "15px",
+        // },
         narrativeHeader: {
-            fontSize: "25px",
+            fontSize: "24px",
             fontWeight: "bold",
         },
         narrativeContent: {
@@ -891,13 +912,16 @@ const WaterView = () => {
         },
         narrativeGrid: {
             display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "20px",
+            // flex: 1,
+            width: "100%",
+            gridTemplateColumns: "1fr 1.5fr",
+            // gap: "20px",
             padding: "15px",
             backgroundColor: 'rgb(6, 71, 68, 0.46)',
-            boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
+            // boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
             borderRadius: "10px",
-            margin: "10px 0",
+            // margin: "2px",
+            // marginTop: "-1px",
         },
         narrativeLeft: {
             borderRight: "1px solid rgba(255, 255, 255, 0.2)",
@@ -1179,7 +1203,7 @@ const WaterView = () => {
                 <header style={styles.header}>
                     <div>
                         <h1 style={styles.title}>Water Quality Dashboard</h1>
-                        <p style={styles.subtitle}>Monitor real-time water quality metrics</p>
+                        <p style={styles.subtitle}>Monitor real-time Water quality metrics</p>
                     </div>
                     <div style={styles.inputContainer}>
                         <input
@@ -1278,16 +1302,16 @@ const WaterView = () => {
                                                 <div
                                                     style={{
                                                         textAlign: 'center',
-                                                        fontSize: '15px',
+                                                        fontSize: '10px',
                                                         color: '#fff',
                                                         marginTop: '5px',
                                                         fontWeight: 'bold',
                                                         backgroundColor: waterQualityStatus
                                                             ? waterQualityStatus.color.replace('1)', '1)') // Apply the color only around the label
                                                             : 'transparent', // Ensure background is transparent when no status
-                                                        padding: '5px 10px', // Add padding around the label for better visibility
+                                                        padding: '5px', // Add padding around the label for better visibility
                                                         borderRadius: '20px', // Rounded corners for a bubble effect
-                                                        minWidth: '50px', // Ensure the label has a minimum width
+                                                        width: '100%', // Ensure the label has a minimum width
                                                         textTransform: 'capitalize', // Optional: Capitalize the status text
                                                     }}
                                                 >
@@ -1382,6 +1406,7 @@ const WaterView = () => {
                                                 ...styles.reportStatusWrapper,
                                                 backgroundColor: status.color,
                                                 marginTop: '10px',
+                                                
                                             }}>
                                                 <span style={styles.reportIcon}>{thresholdData.icon}</span>
                                                 <span style={styles.reportStatus}>{status.label}</span>

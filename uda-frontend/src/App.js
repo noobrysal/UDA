@@ -25,6 +25,7 @@ import PrivateRoute from './components/auth/PrivateRoute'; // <-- Import Private
 import { AuthProvider } from './components/auth/AuthContext'; // Add this import
 import { useAuth } from './components/auth/AuthContext'; // Add this import
 import GlobalToast from './components/common/GlobalToast'; // <-- Import GlobalToast
+import AirWater from './components/GeneralScreen/AirWater';
 
 
 // Define global styles for scrollbar
@@ -57,7 +58,7 @@ const GlobalStyle = createGlobalStyle`
 
 const AppContent = () => {
   const location = useLocation();
-  const { user } = useAuth(); // Add this line
+  const { user } = useAuth();
 
   // Define public paths that don't need authentication or sidebar
   const publicPaths = ['/', '/login', '/register'];
@@ -71,94 +72,39 @@ const AppContent = () => {
       {showSidebar && <SidebarComponent />}
       <div className="main-content" style={{ flex: 1 }}>
         <Routes>
-          {/* Public Routes - No authentication needed */}
+          {/* Public Routes */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginForm />} />
           <Route path="/register" element={<RegisterForm />} />
 
-          {/* Protected Routes - Need authentication */}
-          <Route path="/general-screen" element={
-            <PrivateRoute>
-              <GeneralScreen />
-            </PrivateRoute>
-          } />
-          <Route path="/carousel" element={
-            <PrivateRoute>
-              <Carousel />
-            </PrivateRoute>
-          } />
-          <Route path="/profile" element={
-            <PrivateRoute>
-              <ProfilePage />
-            </PrivateRoute>
-          } />
+          {/* Protected Routes */}
+          <Route element={<PrivateRoute />}>
+            {/* Dashboard Routes */}
+            <Route path="/carousel" element={<Carousel />} />
+            <Route path="/general-screen" element={<GeneralScreen />} />
+            <Route path="/air-water" element={<AirWater />} />
 
-          {/* Routes with Sidebar */}
-          <Route path="/air" element={
-            <PrivateRoute>
-              <AirSolo />
-            </PrivateRoute>
-          } />
-          <Route path="/air-dashboard" element={
-            <PrivateRoute>
-              <AirDashboard />
-            </PrivateRoute>
-          } />
-          <Route path="/air-quality" element={
-            <PrivateRoute>
-              <AirQualityByDate />
-            </PrivateRoute>
-          } />
-          <Route path="/air-quality/id/:id" element={
-            <PrivateRoute>
-              <AirQualityInstance />
-            </PrivateRoute>
-          } />
+            {/* Air Quality Routes */}
+            <Route path="/air" element={<AirSolo />} />
+            <Route path="/air-dashboard" element={<AirDashboard />} />
+            <Route path="/air-quality" element={<AirQualityByDate />} />
+            <Route path="/air-quality/id/:id" element={<AirQualityInstance />} />
 
-          <Route path="/water-quality" element={
-            <PrivateRoute>
-              <WaterQualityByDate />
-            </PrivateRoute>
-          } />
-          <Route path="/water-quality/id/:id" element={
-            <PrivateRoute>
-              <WaterQualityInstance />
-            </PrivateRoute>
-          } />
-          <Route path="/water-dashboard" element={
-            <PrivateRoute>
-              <WaterDashboard />
-            </PrivateRoute>
-          } />
-          <Route path="/water" element={
-            <PrivateRoute>
-              <WaterSolo />
-            </PrivateRoute>
-          } />
+            {/* Water Quality Routes */}
+            <Route path="/water" element={<WaterSolo />} />
+            <Route path="/water-dashboard" element={<WaterDashboard />} />
+            <Route path="/water-quality" element={<WaterQualityByDate />} />
+            <Route path="/water-quality/id/:id" element={<WaterQualityInstance />} />
 
-          <Route path="/soil-quality" element={
-            <PrivateRoute>
-              <SoilQualityByDate />
-            </PrivateRoute>
-          } />
-          <Route path="/soil-quality/id/:id" element={
-            <PrivateRoute>
-              <SoilQualityInstance />
-            </PrivateRoute>
-          } />
-          <Route path="/soil-dashboard" element={
-            <PrivateRoute>
-              <SoilDashboard />
-            </PrivateRoute>
-          } />
-          <Route path="/soil" element={
-            <PrivateRoute>
-              <SoilSolo />
-            </PrivateRoute>
-          } />
+            {/* Soil Quality Routes */}
+            <Route path="/soil" element={<SoilSolo />} />
+            <Route path="/soil-dashboard" element={<SoilDashboard />} />
+            <Route path="/soil-quality" element={<SoilQualityByDate />} />
+            <Route path="/soil-quality/id/:id" element={<SoilQualityInstance />} />
 
-
-          {/* <Route path="/airview" element={<AirView />} /> */}
+            {/* Profile Route */}
+            <Route path="/profile" element={<ProfilePage />} />
+          </Route>
         </Routes>
       </div>
     </div>

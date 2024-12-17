@@ -12,7 +12,7 @@ ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarEle
 const GeneralScreen = () => {
     const [latestAirData, setLatestAirData] = useState(null);
     const [latestWaterData, setLatestWaterData] = useState(null);
-    const [latestSoilData, setLatestSoilData] = useState(null);
+    
 
     const locations = [
         { id: 1, name: 'LAPASAN' },
@@ -79,29 +79,6 @@ const GeneralScreen = () => {
         ],
     };
 
-    const thresholdsSoil = {
-        soil_moisture: [
-            { min: 0, max: 19.99, label: "Dry", color: "rgba(159, 109, 199, 1)" }, // Poor
-            { min: 20, max: 39.99, label: "Low Moisture", color: "rgba(250, 196, 62, 1)" }, // Warning
-            { min: 40, max: 70.99, label: "Optimal", color: "rgba(75, 192, 192, 1)" }, // Good
-            { min: 71, max: 100, label: "Saturated", color: "rgba(154, 205, 50, 1)" }, // Caution
-            { min: 101, max: Infinity, label: "Waterlogged", color: "rgba(199, 46, 46, 1)" }, // Emergency
-        ],
-        temperature: [
-            { min: -Infinity, max: 4.99, label: "Cold", color: "rgba(199, 46, 46, 1)" }, // Poor
-            { min: 5, max: 14.99, label: "Cool", color: "rgba(250, 196, 62, 1)" }, // Warning
-            { min: 15, max: 29.99, label: "Optimal", color: "rgba(75, 192, 192, 1)" }, // Good
-            { min: 30, max: 34.99, label: "Warm", color: "rgba(250, 196, 62, 1)" }, // Caution
-            { min: 35, max: Infinity, label: "Hot", color: "rgba(159, 109, 199, 1)" }, // Danger
-        ],
-        humidity: [
-            { min: 0, max: 29.99, label: "Dry", color: "rgba(159, 109, 199, 1)" }, // Poor
-            { min: 30, max: 49.99, label: "Low Humidity", color: "rgba(250, 196, 62, 1)" }, // Warning
-            { min: 50, max: 70.99, label: "Optimal", color: "rgba(75, 192, 192, 1)" }, // Good
-            { min: 71, max: 85.99, label: "High Humidity", color: "rgba(154, 205, 50, 1)" }, // Caution
-            { min: 86, max: Infinity, label: "Waterlogged", color: "rgba(199, 46, 46, 1)" }, // Emergency
-        ],
-    };
 
     // Add recommendation data from Solo components
     const airRecommendations = {
@@ -155,23 +132,6 @@ const GeneralScreen = () => {
         ]
     };
 
-    const soilRecommendations = {
-        "Optimal": [
-            "Maintain current irrigation schedule",
-            "Continue monitoring soil conditions",
-            "Document successful conditions for reference"
-        ],
-        "Low Moisture": [
-            "Increase irrigation frequency",
-            "Apply mulch to retain moisture",
-            "Check irrigation system efficiency"
-        ],
-        "Waterlogged": [
-            "Improve drainage",
-            "Reduce irrigation",
-            "Consider raised beds or soil amendments"
-        ]
-    };
 
     // Add helper function to get recommendations
     const getRecommendations = (status, type) => {
@@ -179,7 +139,6 @@ const GeneralScreen = () => {
         const recommendationMap = {
             'air': airRecommendations,
             'water': waterRecommendations,
-            'soil': soilRecommendations
         };
         return recommendationMap[type][status.text] || [];
     };
@@ -235,25 +194,15 @@ const GeneralScreen = () => {
     };
 
     // Function to get latest soil quality data
-    const fetchLatestSoilData = async () => {
-        try {
-            const response = await axiosClient.get('');
-            const sortedData = response.data.sort((a, b) => b.id - a.id);
-            setLatestSoilData(sortedData[0]);
-        } catch (error) {
-            console.error('Error fetching soil data:', error);
-        }
-    };
 
     useEffect(() => {
         fetchLatestAirData();
         fetchLatestWaterData();
-        fetchLatestSoilData();
 
         const interval = setInterval(() => {
             fetchLatestAirData();
             fetchLatestWaterData();
-            fetchLatestSoilData();
+
         }, 30000); // Refresh every 30 seconds
 
         return () => clearInterval(interval);
@@ -363,19 +312,6 @@ const GeneralScreen = () => {
         }
     };
 
-    // Soil Quality Gauge Configuration
-    const soilGaugeData = {
-        labels: ['Soil Moisture'],
-        datasets: [{
-            data: [latestSoilData?.soil_moisture || 0, 100 - (latestSoilData?.soil_moisture || 0)],
-            backgroundColor: [
-                getColorForMetric(latestSoilData?.soil_moisture, 'soil_moisture', thresholdsSoil),
-                'rgba(200, 200, 200, 0.2)'
-            ],
-            circumference: 180,
-            rotation: -90,
-        }]
-    };
 
     // Helper function to get color based on metric value
     function getColorForMetric(value, metric, thresholds) {
@@ -418,11 +354,6 @@ const GeneralScreen = () => {
         return tssStatus.severity > tdsStatus.severity ? tssStatus : tdsStatus;
     };
 
-    const getSoilQualityStatus = () => {
-        if (!latestSoilData) return 'No data available';
-        return getStatusText(latestSoilData.soil_moisture, 'soil_moisture', thresholdsSoil);
-    };
-
     // Modified status text function to include severity and color
     function getStatusText(value, metric, thresholds) {
         // Handle null/undefined values
@@ -452,20 +383,6 @@ const GeneralScreen = () => {
     const getLocationName = (locationId) => {
         const location = locations.find(loc => loc.id === locationId);
         return location ? location.name : 'Unknown Location';
-    };
-
-    const renderSoilRecommendations = () => {
-        if (!latestSoilData) return null;
-        return (
-            <div style={styles.recommendationsList}>
-                <p style={styles.recommendationItem}>
-                    <strong>Irrigation Status:</strong> {latestSoilData.remarks || 'No status available'}
-                </p>
-                {getRecommendations(getSoilQualityStatus(), 'soil').map((rec, index) => (
-                    <p key={index} style={styles.recommendationItem}>• {rec}</p>
-                ))}
-            </div>
-        );
     };
 
     // Modified status display section in the return JSX
@@ -585,60 +502,6 @@ const GeneralScreen = () => {
                                     ))}
                                 </div>
                             )}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Soil Quality Column */}
-                <div style={styles.column}>
-                    <div style={styles.box7}>
-                        <div style={styles.iotHeaderBox}>
-                            <h2 style={styles.soilHeaderTitle}>Soil Quality</h2>
-                        </div>
-                        <div style={styles.chartContainer}>
-                            <Doughnut
-                                data={soilGaugeData} 
-                                options={{
-                                    maintainAspectRatio: false,
-                                    plugins: {
-                                        legend: {
-                                            labels: {
-                                                color: 'white', // Set the legend text color to white
-                                                font: {
-                                                    size: 14, // Optional: Adjust font size
-                                                },
-                                            },
-                                        },
-                                    },
-                                }}
-                            />
-                        </div>
-                    </div>
-                    <div style={styles.box8}>
-                        <div style={styles.iotHeaderBox}>
-                            <div style={styles.statusHeader}>
-                                <h2 style={styles.soilHeaderTitle}>Current Status:</h2>
-                                {latestSoilData && (
-                                    <div style={{
-                                        ...styles.statusBox,
-                                        backgroundColor: getSoilQualityStatus().color
-                                    }}>
-                                        <p style={styles.statusText}>{getSoilQualityStatus().text}</p>
-                                    </div>
-                                )}
-                            </div>
-                            {latestSoilData && (
-                                <p style={styles.metadataText}>
-                                    ID: {latestSoilData.id}<br />
-                                    Time: {new Date(latestSoilData.timestamp).toLocaleString()}
-                                </p>
-                            )}
-                        </div>
-                    </div>
-                    <div style={styles.box9}>
-                        <div style={styles.iotHeaderBox}>
-                            <h2 style={styles.soilHeaderTitle}>Recommendations</h2>
-                            {latestSoilData && renderSoilRecommendations()}
                         </div>
                     </div>
                 </div>
@@ -806,51 +669,6 @@ const styles = {
         padding: "20px",
     },
     waterHeaderTitle: {
-        fontSize: "1.2rem",
-        color: "#fff",
-    },
-
-    // Box styles SOIL QUALITY
-    box7: {
-        flex: 1,
-        backgroundColor: "rgba(255, 222, 89, 0.2)",
-        borderRadius: "30px",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "flex-start",  // Align header to the left
-        justifyContent: "flex-start",
-        fontSize: "1.5rem",
-        color: "#fff",
-        fontWeight: "bold",
-        padding: "20px",
-    },
-    box8: {
-        flex: 0.3,
-        backgroundColor: "rgba(255, 222, 89, 0.2)",
-        borderRadius: "30px",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "flex-start",  // Align header to the left
-        justifyContent: "flex-start",
-        fontSize: "1.5rem",
-        color: "#fff",
-        fontWeight: "bold",
-        padding: "20px",
-    },
-    box9: {
-        flex: 0.5,
-        backgroundColor: "rgba(255, 222, 89, 0.2)",
-        borderRadius: "30px",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "flex-start",  // Align header to the left
-        justifyContent: "flex-start",
-        fontSize: "1.5rem",
-        color: "#fff",
-        fontWeight: "bold",
-        padding: "20px",
-    },
-    soilHeaderTitle: {
         fontSize: "1.2rem",
         color: "#fff",
     },

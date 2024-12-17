@@ -4,6 +4,7 @@ import GeneralScreen from "./GeneralScreen";
 import AirSolo from "./AirSolo";
 import WaterSolo from "./WaterSolo";
 import SoilSolo from "./SoilSolo";
+import AirWater from "./AirWater";
 
 const Carousel = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -17,6 +18,7 @@ const Carousel = () => {
         { id: "air", Component: AirSolo },
         { id: "water", Component: WaterSolo },
         { id: "soil", Component: SoilSolo },
+        { id: "air-water", Component: AirWater },
     ];
 
     useEffect(() => {

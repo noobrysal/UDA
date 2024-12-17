@@ -476,35 +476,37 @@ const AirView = () => {
 
         // Left Container
         leftContainer: {
-            flex: 0.4, // Slightly smaller than the right container
+            // flex: 0.4, // Slightly smaller than the right container
+            width: "40%",
+            height: "100%",
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
-            gap: "10px",
+            gap: "20px",
         },
 
         // UPPER LEFT BOX BAR CHART MERGED METRICS
         upperLeftBox: {
-            flex: 0.62, // Reduce flex value to make the upper box smaller
+            // flex: 0.62, // Reduce flex value to make the upper box smaller
             backgroundColor: 'rgba(242, 242, 242, 0.1)',
             borderRadius: "20px",
-            width: "100%",
-            height: "150px",  // Keep the height as needed
+            width: "36vw",
+            height: "65%",  // Keep the height as needed
             padding: "15px",
             display: "flex",
             flexDirection: "column"
         },
         chartContainer: {
-            flex: 1,
+            // flex: 1,
             width: '100%',
-            height: '50%', // Set height as a percentage of the parent container's height
+            height: '100%', // Set height as a percentage of the parent container's height
         },
 
         //LOWER LEFT THRESHOLD INFO SLIDER BOX
         lowerLeftBox: {
-            flex: 0.38, // Increase flex value to make the lower box taller
+            // flex: 0.38, // Increase flex value to make the lower box taller
             width: "100%",
-            minHeight: "250px",  // Set a minimum height to ensure it has enough space even if text grows
+            height: "35%",  // Set a minimum height to ensure it has enough space even if text grows
             borderRadius: "15px",
             padding: "15px",
             transition: "background-color 0.3s ease",
@@ -512,7 +514,7 @@ const AirView = () => {
             backgroundColor: 'rgba(242, 242, 242, 0.1)',
             display: "flex",
             flexDirection: "column",
-            justifyContent: "space-between",
+            // justifyContent: "space-between",
         },
         thresholdWrapper: {
             display: "flex",
@@ -586,8 +588,8 @@ const AirView = () => {
             textAlign: "left",
         },
         slideDescription: {
-            marginTop: "15px", // Reduce margin
-            fontSize: "25px", // Adjust font size for text
+            marginTop: "5px", // Reduce margin
+            fontSize: "20px", // Adjust font size for text
             lineHeight: "1.4", // Slightly tighter line spacing
         },
         rangeInfo: {
@@ -612,22 +614,24 @@ const AirView = () => {
 
         // Right Container
         rightContainer: {
-            flex: 0.6, // Slightly larger than the left container
+            // flex: 0.6, // Slightly larger than the left container
+            width: "100vw", 
+            height: "100%",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            gap: "20px",  // Increased gap between boxes
+            // gap: "20px",  // Increased gap between boxes
             backgroundColor: 'rgba(242, 242, 242, 0.1)',
             borderRadius: "20px",
-            padding: "20px 10px 5px 10px",  // Adjusted padding for better alignment
+            padding: "20px",  // Adjusted padding for better alignment
         },
 
         // UPPER RIGHT BOX
         upperRightBox: {
             backgroundColor: 'rgba(242, 242, 242, 0)',
             borderRadius: "10px",
-            height: "25%",
-            width: "95%",
+            height: "19%",
+            width: "100%",
         },
         // Add new styles for hour selector
         upperRightHeader: {
@@ -647,8 +651,10 @@ const AirView = () => {
         hoursContainer: {
             display: "flex",
             justifyContent: "space-between",
-            flex: 1,
+            // flex: 1,
             gap: "10px",
+            width: "100%",
+            height: "30%",
             transition: "all 0.3s ease",
         },
         selectedHourCard: {
@@ -661,10 +667,11 @@ const AirView = () => {
             alignItems: "center",
             borderRadius: "8px",
             width: "100%",
-            height: "130px", // Slightly bigger than the current 170px
+            height: "12vh", // Slightly bigger than the current 170px
             cursor: "pointer",
             transition: "0.3s ease",
             backgroundColor: "rgba(255, 255, 255, 0.1)",
+            padding: "10px",
         },
         hourText: {
             fontSize: "20px",
@@ -689,21 +696,23 @@ const AirView = () => {
         middleRightBox: {
             backgroundColor: "rgba(255, 255, 255, 0)",
             borderRadius: "10px",
-            width: "95%",
-            height: "31%",
+            width: "100%",
+            // height: "30%",
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
-            justifyContent: "center", // Updated to center the metrics
-            gap: "10px", // Add gap between metric boxes
-            marginBottom: "8px",
+            justifyContent: "center",
+            gap: "20px", // Add gap between metric boxes
+            // marginBottom: "50px",
+            marginTop: "50px",
         },
         metricBoxWrapper: {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            width: "19%",
-            marginBottom: "10px",
+            width: "100%",
+            // height: "100%",
+            // marginBottom: "20px",
         },
         metricBox: {
             backgroundColor: 'rgba(242, 242, 242, 0.1)',
@@ -715,7 +724,8 @@ const AirView = () => {
             fontSize: "12px",
             overflow: "hidden",
             position: "relative",
-            height: "180px", // Set a fixed height for the metric box to allow room for both progress bar and trend indicator
+            height: "28vh", // Set a fixed height for the metric box to allow room for both progress bar and trend indicator
+            // marginTop: "35px",
         },
         metricTitle: {
             fontSize: "14px",
@@ -727,11 +737,13 @@ const AirView = () => {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
+            marginTop: "10px", 
         },
         circularProgressContainer: {
-            width: "100px",
-            height: "100px",
+            width: "80%",
+            height: "100%",
             fontWeight: "bold",
+            marginTop: "10px",
         },
         noDataLabel: {
             fontSize: "15px",
@@ -760,6 +772,7 @@ const AirView = () => {
             padding: "5px",
             marginTop: "8px",
             textAlign: "center",
+            marginBottom: "-41px",
         },
         statusLabel: {
             fontSize: "15px",
@@ -771,18 +784,21 @@ const AirView = () => {
         lowerRightBox: {
             backgroundColor: 'rgba(242, 242, 242, 0.1)',
             borderRadius: "10px",
-            height: "35%", // Adjust height for smaller boxes
-            width: "95%",
+            height: "30%", // Adjust height for smaller boxes
+            width: "100%",
+            // marginBottom: "8px",
+            marginTop: "80px",
         },
         // NARRATIVE REPORT
         narrativeReportContainer: {
             height: "100%",
-            padding: "20px",
+            // width: "80%",
+            padding: "20px" ,
             color: "#fff",
             display: "flex",
-            flexDirection: "column",
+            // flexDirection: "column",
+            // marginTop: "200px",
             justifyContent: "center",
-            gap: "15px",
         },
         narrativeTitle: {
             display: "flex",
@@ -793,7 +809,7 @@ const AirView = () => {
             marginBottom: "15px",
         },
         narrativeHeader: {
-            fontSize: "25px",
+            fontSize: "24px",
             fontWeight: "bold",
         },
         narrativeContent: {
@@ -840,13 +856,16 @@ const AirView = () => {
         },
         narrativeGrid: {
             display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "20px",
+            // flex: 1,
+            width: "100%",
+            gridTemplateColumns: "1fr 1.5fr",
+            // gap: "20px",
             padding: "15px",
             backgroundColor: "rgba(36, 77, 112, 0.46)",
-            boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
+            // boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
             borderRadius: "10px",
-            margin: "10px 0",
+            // margin: "2px",
+            // marginTop: "-1px",
         },
         narrativeLeft: {
             borderRight: "1px solid rgba(255, 255, 255, 0.2)",
@@ -1207,7 +1226,7 @@ const AirView = () => {
                 <div style={styles.rightContainer}>
                     <div style={styles.upperRightBox}>
                         {/* Header */}
-                        <h2 style={styles.upperRightHeader}>24-Hour View for Air Quality</h2>
+                        <h2 style={styles.upperRightHeader}>24-Hour Air Quality View</h2>
 
                         <div style={styles.hourSelector}>
                             <button
@@ -1237,7 +1256,7 @@ const AirView = () => {
                                                 <div
                                                     style={{
                                                         textAlign: 'center',
-                                                        fontSize: '15px',
+                                                        fontSize: '10px',
                                                         color: '#fff',
                                                         marginTop: '5px',
                                                         fontWeight: 'bold',

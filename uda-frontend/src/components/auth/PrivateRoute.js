@@ -1,23 +1,10 @@
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 
-const PrivateRoute = ({ children }) => {
-    const { user, loading } = useAuth();
-    const location = useLocation();
+const PrivateRoute = () => {
+    const { user } = useAuth();
 
-    if (loading) {
-        // You can replace this with a proper loading component
-        return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-            Loading...
-        </div>;
-    }
-
-    if (!user) {
-        // Redirect to login while saving the attempted URL
-        return <Navigate to="/login" state={{ from: location }} replace />;
-    }
-
-    return children;
+    return user ? <Outlet /> : <Navigate to="/login" />;
 };
 
 export default PrivateRoute;
