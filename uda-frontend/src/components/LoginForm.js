@@ -4,7 +4,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import styled from '@emotion/styled';
 import 'react-toastify/dist/ReactToastify.css';
 import logoImage from '../assets/logo.png';
-import backgroundImage from '../assets/udabackg.png';
+import backgroundImage from '../assets/udabackg4.png';
 import { supabase } from './supabaseClient'; // Add this import
 import { useAuth } from './auth/AuthContext';
 

@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { supabase } from './supabaseClient';
 import styled from '@emotion/styled';
 import logoImage from '../assets/logo.png';
-import backgroundImage from '../assets/udabackg.png';
+import backgroundImage from '../assets/udabackg4.png';
 
 const PageContainer = styled.div`
   display: flex;

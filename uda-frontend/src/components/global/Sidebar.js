@@ -392,57 +392,28 @@ const SidebarComponent = () => {
                                     />
                                 </div>
                             )}
-
-
-                            {/* Profile & Logout Section */}
-                            <Box
-                                sx={{
-                                    position: "absolute",
-                                    bottom: "20px",
-                                    // left: isCollapsed ? "50%" : "0", // Center when collapsed, left when expanded
-                                    // transform: isCollapsed ? "translateX(-50%)" : "none", // Adjust alignment when collapsed
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    alignItems: "center",
-                                    transition: "all 0.3s",
-                                    gap: "10px", // Space between profile and logout button
-                                    // marginLeft: isCollapsed ? "0" : "0px", // Additional margin for expanded sidebar
-                                }}
-                            >
-                                <MenuItem
-                                    onClick={() => navigate('/profile')}
-                                    style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        color: colors.grey[100],
-                                        fontSize: "0.9em",
-                                        justifyContent: isCollapsed ? "center" : "flex-start",
-                                        width: "100%", // Ensures it fills the sidebar when expanded
-                                    }}
-                                    icon={<PersonIcon />}
-                                >
-                                    {!isCollapsed && <Typography variant="caption">Profile</Typography>}
-                                </MenuItem>
-                                
-                                <MenuItem
-                                    onClick={handleLogout}
-                                    style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        color: colors.grey[100],
-                                        fontSize: "0.9em",
-                                        justifyContent: isCollapsed ? "center" : "flex-start",
-                                        width: "100%", // Ensures it fills the sidebar when expanded
-                                    }}
-                                    icon={<ReplyIcon />}
-                                >
-                                    {!isCollapsed && <Typography variant="caption">Logout</Typography>}
-                                </MenuItem>
-                            </Box>
                         </Box>
 
+                        <Box paddingBottom="140px" />
 
-
+                        <Box paddingLeft={isCollapsed ? undefined : "0%"} display="flex" flexDirection="column" gap="8px">
+                            <Item
+                                title="Profile"
+                                to="/profile"
+                                icon={<PersonIcon />}
+                                selected={selected}
+                                setSelected={setSelected}
+                                isCollapsed={isCollapsed}
+                            />
+                            <Item
+                                title="Logout"
+                                icon={<ReplyIcon />}
+                                selected={selected}
+                                setSelected={setSelected}
+                                isCollapsed={isCollapsed}
+                                onClick={handleLogout} // Pass the logout handler directly
+                            />
+                        </Box>
                     </Menu>
                 </ProSidebar>
             </Box>
