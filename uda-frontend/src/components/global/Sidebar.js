@@ -16,10 +16,12 @@ import { supabase } from '../supabaseClient';
 import { useAuth } from '../auth/AuthContext';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import SpaceDashboardIcon from '@mui/icons-material/SpaceDashboard';
+import CompareIcon from '@mui/icons-material/Compare';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import AnalyticsIcon from '@mui/icons-material/Analytics';
+
 
 // Modify the Item component to accept and handle onClick
 const Item = ({ title, to, icon, selected, setSelected, isCollapsed, onClick }) => {
@@ -99,6 +101,7 @@ const SidebarComponent = () => {
     const { user } = useAuth();
     const [calendarOpen, setCalendarOpen] = useState(false);
     const [dashOpen, setDashOpen] = useState(false);
+    const [iotOpen, setIotOpen] = useState(false);
 
     const handleLogout = async () => {
         try {
@@ -135,6 +138,21 @@ const SidebarComponent = () => {
                 return "#0A1B1F";
             case "Soil Dashboard":
                 return "#141209";
+
+            case "Air Quality":
+                return "#0F0D1A";
+            case "Water Quality":
+                return "#0A1B1F";
+            case "Soil Quality":
+                return "#141209";
+
+            case "Air Calendar":
+                return "#0F0D1A";
+            case "Water Calendar":
+                return "#0A1B1F";
+            case "Soil Calendar":
+                return "#141209";
+
             default:
                 return "#101010";
         }
@@ -147,6 +165,8 @@ const SidebarComponent = () => {
             !e.target.closest('.logo-container') &&
             !e.target.closest('.dashboard-menu') &&
             !e.target.closest('.dashboard-subitems')&&
+            !e.target.closest('.IOT-menu') &&
+            !e.target.closest('.IOT-subitems')&&
             !e.target.closest('.calendar-menu') &&
             !e.target.closest('.calendar-subitems')
         ) {
@@ -232,38 +252,16 @@ const SidebarComponent = () => {
 
                         <Box paddingLeft={isCollapsed ? undefined : "0%"} display="flex" flexDirection="column" gap="8px">
                             <Item
-                                title="General Screen"
-                                to="/carousel"
-                                icon={<DashboardIcon />}
-                                selected={selected}
-                                setSelected={setSelected}
-                                isCollapsed={isCollapsed}
-                            />
-                            <Item
-                                title="Air Dashboard"
-                                to="/air"
-                                icon={<AirOutlinedIcon />}
-                                selected={selected}
-                                setSelected={setSelected}
-                                isCollapsed={isCollapsed}
-                            />
-                            <Item
-                                title="Water Dashboard"
-                                to="/water"
-                                icon={<WaterOutlinedIcon />}
-                                selected={selected}
-                                setSelected={setSelected}
-                                isCollapsed={isCollapsed}
-                            />
-                            <Item
-                                title="Soil Dashboard"
-                                to="/soil"
-                                icon={<TerrainRoundedIcon />}
-                                selected={selected}
-                                setSelected={setSelected}
-                                isCollapsed={isCollapsed}
-                            />
-                            <Box paddingLeft={isCollapsed ? undefined : "0%"} display="flex" flexDirection="column" gap="0px" marginBottom={"7px"}>
+                                    title="General Screen"
+                                    to="/carousel"
+                                    icon={<DashboardIcon />}
+                                    selected={selected}
+                                    setSelected={setSelected}
+                                    isCollapsed={isCollapsed}
+                                />
+
+                        {/* Solo Dashboards */}
+                        <Box paddingLeft={isCollapsed ? undefined : "0%"} display="flex" flexDirection="column" gap="0px">
                                 <MenuItem
                                     className="dashboard-menu" // Add this className
                                     style={{ color: colors.grey[100] }}
@@ -289,21 +287,91 @@ const SidebarComponent = () => {
                                                 },
                                             }}
                                         >
-                                            <SpaceDashboardIcon />
+                                            <AnalyticsIcon />
+                                        </Box>
+                                    }
+                                >
+                                    {!isCollapsed && (
+                                        <Box display="flex" alignItems="center" width="100%">
+                                            <Typography variant="caption">Dashboards</Typography>
+                                            {dashOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                                        </Box>
+                                    )}
+                                </MenuItem>
+
+                                {/* Dashboards Subitems */}
+                                {!isCollapsed && dashOpen && (
+                                    <div className="dashboard-subitems"> {/* Add this wrapper */}
+                                        <SubMenuItem
+                                            title="Air Dashboard"
+                                            to="/air"
+                                            icon={<AirOutlinedIcon />}
+                                            selected={selected}
+                                            setSelected={setSelected}
+                                            isCollapsed={isCollapsed}
+                                        />
+                                        <SubMenuItem
+                                            title="Water Dashboard"
+                                            to="/water"
+                                            icon={<WaterOutlinedIcon />}
+                                            selected={selected}
+                                            setSelected={setSelected}
+                                            isCollapsed={isCollapsed}
+                                        />
+                                        <SubMenuItem
+                                            title="Soil Dashboard"
+                                            to="/soil"
+                                            icon={<TerrainRoundedIcon />}
+                                            selected={selected}
+                                            setSelected={setSelected}
+                                            isCollapsed={isCollapsed}
+                                        />
+                                    </div>
+                                )}
+                            </Box>
+
+                            {/* IOT Quality */}
+                            <Box paddingLeft={isCollapsed ? undefined : "0%"} display="flex" flexDirection="column" gap="0px" marginBottom={"7px"}>
+                                <MenuItem
+                                    className="IOT-menu" // Add this className
+                                    style={{ color: colors.grey[100] }}
+                                    onClick={(e) => {
+                                        e.stopPropagation(); // Stop event from bubbling
+                                        if (!isCollapsed) {
+                                            setIotOpen(!iotOpen);
+                                        }
+                                    }}
+                                    icon={
+                                        <Box
+                                            sx={{
+                                                backgroundColor: selected === "IOTs" ? colors.white[900] : "transparent",
+                                                padding: "6px",
+                                                borderRadius: "6px",
+                                                display: "flex",
+                                                justifyContent: isCollapsed ? "center" : "flex-start",
+                                                alignItems: "center",
+                                                marginLeft: isCollapsed ? "5px" : "8px",
+                                                transition: "all 0.3s",
+                                                "&:hover": {
+                                                    backgroundColor: colors.yellow[300],
+                                                },
+                                            }}
+                                        >
+                                            <CompareIcon />
                                         </Box>
                                     }
                                 >
                                     {!isCollapsed && (
                                         <Box display="flex" alignItems="center" width="100%">
                                             <Typography variant="caption">View Comparison</Typography>
-                                            {dashOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                                            {iotOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                                         </Box>
                                     )}
                                 </MenuItem>
 
-                                {/* Calendar Subitems */}
-                                {!isCollapsed && dashOpen && (
-                                    <div className="dashboard-subitems"> {/* Add this wrapper */}
+                                {/* IOT Quality Subitems */}
+                                {!isCollapsed && iotOpen && (
+                                    <div className="IOT-subitems"> {/* Add this wrapper */}
                                         <SubMenuItem
                                             title="Air Quality"
                                             to="/air-dashboard"
@@ -330,6 +398,7 @@ const SidebarComponent = () => {
                             </Box>
                         </Box>
 
+                        {/* Calendar Data Tracker */}
                         <Box paddingLeft={isCollapsed ? undefined : "0%"} display="flex" flexDirection="column" gap="8px">
                             <MenuItem
                                 className="calendar-menu" // Add this className
