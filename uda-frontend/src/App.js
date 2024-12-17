@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { createGlobalStyle } from 'styled-components'; // <-- Import createGlobalStyle
@@ -66,6 +66,53 @@ const AppContent = () => {
 
   // Only show sidebar for authenticated routes
   const showSidebar = !isPublicPath && user;
+
+  useEffect(() => {
+    const path = location.pathname;
+    let title = "UDA"; // Default title
+
+    if (path === "/") {
+      title = "Landing Page - UDA";
+    } else if (path === "/login") {
+      title = "Login - UDA";
+    } else if (path === "/register") {
+      title = "Register - UDA";
+
+    } else if (path === "/carousel") {
+      title = "General Dashboard - UDA";
+    } else if (path === "/air-dashboard") {
+      title = "Air Quality Dashboard - UDA";
+    } else if (path === "/water-dashboard") {
+      title = "Water Quality Dashboard - UDA";
+    } else if (path === "/soil-dashboard") {
+      title = "Soil Quality Dashboard - UDA";
+    
+    } else if (path === "/air") {
+      title = "Air Dashboard - UDA";
+    } else if (path === "/water") {
+      title = "Water Dashboard - UDA";
+    } else if (path === "/soil") {
+      title = "Soil Dashboard - UDA";
+
+
+    } else if (path === "/air-water") {
+      title = "Air & Water - UDA";
+    
+    } else if (path.includes("/air-quality")) {
+      title = "Air Quality - UDA";
+    } else if (path.includes("/water-quality")) {
+      title = "Water Quality - UDA";
+    } else if (path.includes("/soil-quality")) {
+      title = "Soil Quality - UDA";
+
+    } else if (path === "/profile") {
+      title = "Profile - UDA";
+    } else if (path === "/login") {
+      title = "Login - UDA";
+    }
+
+    document.title = title;
+  }, [location]);
 
   return (
     <div className="app-layout" style={{ display: 'flex' }}>

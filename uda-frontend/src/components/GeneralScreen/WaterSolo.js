@@ -3,7 +3,7 @@ import { supabaseWater } from '../iot/WaterQuality/supabaseClient';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Bar } from 'react-chartjs-2'; // Add Bar import
-import backgroundImage from '../../assets/waterdash.png';
+import backgroundImage from '../../assets/waterdash2.png';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import {

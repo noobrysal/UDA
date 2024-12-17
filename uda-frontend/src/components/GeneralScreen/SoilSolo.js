@@ -3,7 +3,7 @@ import axiosClient from '../iot/SoilQuality/axiosClient';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Bar } from 'react-chartjs-2';
-import backgroundImage from '../../assets/soildash.png';
+import backgroundImage from '../../assets/soildash2.png';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import {
