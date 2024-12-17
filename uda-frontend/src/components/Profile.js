@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
-import { FaPhoneAlt, FaEnvelope } from 'react-icons/fa';
-import { BsPlusCircle } from 'react-icons/bs';
+import { FaEnvelope } from 'react-icons/fa';
 import backgroundImage from '../assets/udabackg4.png';
+import { supabase } from './supabaseClient';
+import { useAuth } from './auth/AuthContext';
+import { toast } from 'react-toastify';
 
 const PageContainer = styled.div`
   display: flex;
@@ -79,15 +81,6 @@ const ProfileContainer = styled(SectionContainer)`
   align-items: center;
 `;
 
-const ProfileImage = styled.img`
-  width: 130px;
-  height: 130px;
-  border-radius: 50%;
-  object-fit: cover;
-  cursor: pointer;
-  background-color: #ddd; /* Placeholder background color */
-`;
-
 const InputField = styled.input`
   background: transparent;
   color: white;
@@ -98,9 +91,12 @@ const InputField = styled.input`
   width: 100%;
 `;
 
-const Name = styled(InputField)`
+const DisplayName = styled.div`
   font-size: 26px;
   font-weight: bold;
+  color: white;
+  text-align: center;
+  width: 100%;
 `;
 
 const Role = styled.p`
@@ -151,82 +147,100 @@ const StatusIndicator = styled.div`
   margin-left: 10px;
 `;
 
-const FindingsContainer = styled.div`
-  flex: 2;
-  min-width: 400px;
-`;
-
-const FindingsSection = styled(SectionContainer)`
-  flex-grow: 1;
-  height: 92%;
-`;
-
-const FindingsHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const FindingsTitle = styled.h3`
-  font-size: 26px;
-  font-weight: bold;
-`;
-
-const AddButton = styled(BsPlusCircle)`
-  color: #7ed956;
-  font-size: 30px;
+const Button = styled.button`
+  background-color: #7ed956;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 16px;
   cursor: pointer;
+  margin-top: 10px;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: #6bc248;
+  }
 `;
 
-const FindingsList = styled.div`
-  margin-top: 25px;
+const PasswordChangeForm = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 20px;
-`;
-
-const FindingItem = styled.textarea`
-  background-color: rgba(217, 217, 217, 0.5);
-  border-radius: 15px;
-  padding: 20px;
-  color: black;
-  font-size: 18px;
-  line-height: 1.6;
-  font-weight: lighter;
-  border: none;
-  resize: none;
+  gap: 10px;
   width: 100%;
-  outline: none;
+  margin-top: 15px;
 `;
 
 const ProfilePage = () => {
+  const { user } = useAuth();
   const [profile, setProfile] = useState({
-    name: "Naey Geur",
-    email: "Naegeur@gmail.com",
-    phone: "+639 123 4567",
-    image: null, // Initially null to indicate no image
-  });
+    name: "",
+    email: "",
+  }); // Removed image and phone from state
+  const [isEditing, setIsEditing] = useState(false);
+  const [passwords, setPasswords] = useState({
+    newPassword: '',
+    confirmPassword: '',
+  }); // Removed currentPassword as it's not needed
+  const [showPasswordChange, setShowPasswordChange] = useState(false);
 
-  const [findings, setFindings] = useState([
-    "Air Pollution and Health: Exposure to air pollutants like particulate matter (PM2.5 and PM10), sulfur dioxide, nitrogen oxides, and carbon monoxide is linked to respiratory and cardiovascular diseases, and it is a major environmental health risk worldwide.",
-    "Contaminants: Heavy metals, pesticides, plastics, and industrial waste pollute water bodies, affecting aquatic ecosystems and drinking water safety. Polluted water can lead to diseases such as cholera, dysentery, and hepatitis.",
-  ]);
+  useEffect(() => {
+    if (user) {
+      setProfile(prev => ({
+        ...prev,
+        email: user.email,
+        name: user.user_metadata?.name || "User",
+      }));
+    }
+  }, [user]);
 
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => setProfile((prev) => ({ ...prev, image: reader.result }));
-      reader.readAsDataURL(file);
+  const handleUpdateProfile = async () => {
+    try {
+      const { error } = await supabase.auth.updateUser({
+        data: { name: profile.name }
+      });
+
+      if (error) throw error;
+
+      toast.success('Profile updated successfully!');
+      setIsEditing(false);
+    } catch (error) {
+      toast.error('Error updating profile: ' + error.message);
     }
   };
 
-  const handleAddFinding = () => setFindings([...findings, ""]);
+  const handlePasswordChange = async () => {
+    if (passwords.newPassword !== passwords.confirmPassword) {
+      toast.error('New passwords do not match!');
+      return;
+    }
 
-  const handleFindingChange = (index, value) => {
-    const updatedFindings = [...findings];
-    updatedFindings[index] = value;
-    setFindings(updatedFindings);
+    // Add password validation
+    if (passwords.newPassword.length < 6) {
+      toast.error('Password must be at least 6 characters long');
+      return;
+    }
+
+    try {
+      // Use updateUser with just the password field
+      const { data, error } = await supabase.auth.updateUser({
+        password: passwords.newPassword
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      toast.success('Password updated successfully!');
+      setShowPasswordChange(false);
+      setPasswords({
+        newPassword: '',
+        confirmPassword: '',
+      });
+    } catch (error) {
+      console.error('Password update error:', error);
+      toast.error(error.message || 'Error updating password');
+    }
   };
 
   return (
@@ -241,40 +255,53 @@ const ProfilePage = () => {
       <ContentContainer>
         <LeftColumn>
           <ProfileContainer>
-            <label htmlFor="image-upload">
-              <ProfileImage
-                src={profile.image || "https://via.placeholder.com/130"} // Placeholder image if no profile image is set
-                alt="Profile"
+            {isEditing ? (
+              <InputField
+                type="text"
+                value={profile.name}
+                onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+                placeholder="Display Name"
               />
-            </label>
-            <input
-              type="file"
-              id="image-upload"
-              style={{ display: "none" }}
-              onChange={handleImageUpload}
-            />
-            <Name
-              value={profile.name}
-              onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-            />
-            <Role>Admin</Role>
+            ) : (
+              <DisplayName>{profile.name}</DisplayName>
+            )}
+
+            <Role>User</Role>
+
+            {isEditing ? (
+              <Button onClick={handleUpdateProfile}>Save Changes</Button>
+            ) : (
+              <Button onClick={() => setIsEditing(true)}>Edit Profile</Button>
+            )}
 
             <ContactInfo>
               <ContactItem>
-                <FaPhoneAlt />
-                <InputField
-                  value={profile.phone}
-                  onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                />
-              </ContactItem>
-              <ContactItem>
                 <FaEnvelope />
-                <InputField
-                  value={profile.email}
-                  onChange={(e) => setProfile({ ...profile, email: e.target.value })}
-                />
+                <span>{profile.email}</span>
               </ContactItem>
             </ContactInfo>
+
+            <Button onClick={() => setShowPasswordChange(!showPasswordChange)}>
+              {showPasswordChange ? 'Cancel Password Change' : 'Change Password'}
+            </Button>
+
+            {showPasswordChange && (
+              <PasswordChangeForm>
+                <InputField
+                  type="password"
+                  placeholder="New Password"
+                  value={passwords.newPassword}
+                  onChange={(e) => setPasswords({ ...passwords, newPassword: e.target.value })}
+                />
+                <InputField
+                  type="password"
+                  placeholder="Confirm New Password"
+                  value={passwords.confirmPassword}
+                  onChange={(e) => setPasswords({ ...passwords, confirmPassword: e.target.value })}
+                />
+                <Button onClick={handlePasswordChange}>Update Password</Button>
+              </PasswordChangeForm>
+            )}
           </ProfileContainer>
 
           <StatusContainer>
@@ -284,25 +311,6 @@ const ProfilePage = () => {
             </StatusText>
           </StatusContainer>
         </LeftColumn>
-
-        <FindingsContainer>
-          <FindingsSection>
-            <FindingsHeader>
-              <FindingsTitle>Findings</FindingsTitle>
-              <AddButton onClick={handleAddFinding} />
-            </FindingsHeader>
-
-            <FindingsList>
-              {findings.map((finding, index) => (
-                <FindingItem
-                  key={index}
-                  value={finding}
-                  onChange={(e) => handleFindingChange(index, e.target.value)}
-                />
-              ))}
-            </FindingsList>
-          </FindingsSection>
-        </FindingsContainer>
       </ContentContainer>
     </PageContainer>
   );

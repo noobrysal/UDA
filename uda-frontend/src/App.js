@@ -21,6 +21,10 @@ import WaterDashboard from './components/iot/WaterQuality/WaterDashboard';
 import GeneralScreen from './components/GeneralScreen/GeneralScreen';
 import Carousel from './components/GeneralScreen/Carousel';
 import ProfilePage from './components/Profile';
+import PrivateRoute from './components/auth/PrivateRoute'; // <-- Import PrivateRoute
+import { AuthProvider } from './components/auth/AuthContext'; // Add this import
+import { useAuth } from './components/auth/AuthContext'; // Add this import
+import GlobalToast from './components/common/GlobalToast'; // <-- Import GlobalToast
 
 
 // Define global styles for scrollbar
@@ -53,60 +57,105 @@ const GlobalStyle = createGlobalStyle`
 
 const AppContent = () => {
   const location = useLocation();
+  const { user } = useAuth(); // Add this line
 
-  // Define paths that require the Sidebar
-  const sidebarPaths = [
-    '/general-screen',
-    '/air-dashboard',
-    '/air-quality',
-    '/air-quality/id/:id',
-    '/air',
-    '/water',
-    '/soil',
-    '/water-dashboard',
-    '/water-quality',
-    '/water-quality/',
-    '/water-quality/id/:id',
-    '/soil-quality',
-    '/soil-dashboard',
-    '/general-screen',
-    '/carousel',
-    '/profile',
-  ];
+  // Define public paths that don't need authentication or sidebar
+  const publicPaths = ['/', '/login', '/register'];
+  const isPublicPath = publicPaths.includes(location.pathname);
 
-  // Check if the current route is in the sidebarPaths array
-  const showSidebar = sidebarPaths.includes(location.pathname);
+  // Only show sidebar for authenticated routes
+  const showSidebar = !isPublicPath && user;
 
   return (
     <div className="app-layout" style={{ display: 'flex' }}>
-      {showSidebar && <SidebarComponent />} {/* Conditionally render Sidebar */}
+      {showSidebar && <SidebarComponent />}
       <div className="main-content" style={{ flex: 1 }}>
         <Routes>
-          {/* Public Routes */}
+          {/* Public Routes - No authentication needed */}
           <Route path="/" element={<LandingPage />} />
-          <Route path="/register" element={<RegisterForm />} />
           <Route path="/login" element={<LoginForm />} />
+          <Route path="/register" element={<RegisterForm />} />
 
-          {/* General Screen with Solo IOTs */}
-          <Route path="/general-screen" element={<GeneralScreen />} />
-          <Route path="/carousel" element={<Carousel />} />
-          <Route path="/profile" element={<ProfilePage />} />
+          {/* Protected Routes - Need authentication */}
+          <Route path="/general-screen" element={
+            <PrivateRoute>
+              <GeneralScreen />
+            </PrivateRoute>
+          } />
+          <Route path="/carousel" element={
+            <PrivateRoute>
+              <Carousel />
+            </PrivateRoute>
+          } />
+          <Route path="/profile" element={
+            <PrivateRoute>
+              <ProfilePage />
+            </PrivateRoute>
+          } />
 
           {/* Routes with Sidebar */}
-          <Route path="/air" element={<AirSolo />} />
-          <Route path="/air-dashboard" element={<AirDashboard />} />
-          <Route path="/air-quality" element={<AirQualityByDate />} />
-          <Route path="/air-quality/id/:id" element={<AirQualityInstance />} />
+          <Route path="/air" element={
+            <PrivateRoute>
+              <AirSolo />
+            </PrivateRoute>
+          } />
+          <Route path="/air-dashboard" element={
+            <PrivateRoute>
+              <AirDashboard />
+            </PrivateRoute>
+          } />
+          <Route path="/air-quality" element={
+            <PrivateRoute>
+              <AirQualityByDate />
+            </PrivateRoute>
+          } />
+          <Route path="/air-quality/id/:id" element={
+            <PrivateRoute>
+              <AirQualityInstance />
+            </PrivateRoute>
+          } />
 
-          <Route path="/water-quality" element={<WaterQualityByDate />} />
-          <Route path="/water-quality/id/:id" element={<WaterQualityInstance />} />
-          <Route path="/water-dashboard" element={<WaterDashboard />} />
-          <Route path="/water" element={<WaterSolo />} />
+          <Route path="/water-quality" element={
+            <PrivateRoute>
+              <WaterQualityByDate />
+            </PrivateRoute>
+          } />
+          <Route path="/water-quality/id/:id" element={
+            <PrivateRoute>
+              <WaterQualityInstance />
+            </PrivateRoute>
+          } />
+          <Route path="/water-dashboard" element={
+            <PrivateRoute>
+              <WaterDashboard />
+            </PrivateRoute>
+          } />
+          <Route path="/water" element={
+            <PrivateRoute>
+              <WaterSolo />
+            </PrivateRoute>
+          } />
 
-          <Route path="/soil-quality" element={<SoilQualityByDate />} />
-          <Route path="/soil-quality/id/:id" element={<SoilQualityInstance />} />
-          <Route path="/soil-dashboard" element={<SoilDashboard />} />
-          <Route path="/soil" element={<SoilSolo />} />
+          <Route path="/soil-quality" element={
+            <PrivateRoute>
+              <SoilQualityByDate />
+            </PrivateRoute>
+          } />
+          <Route path="/soil-quality/id/:id" element={
+            <PrivateRoute>
+              <SoilQualityInstance />
+            </PrivateRoute>
+          } />
+          <Route path="/soil-dashboard" element={
+            <PrivateRoute>
+              <SoilDashboard />
+            </PrivateRoute>
+          } />
+          <Route path="/soil" element={
+            <PrivateRoute>
+              <SoilSolo />
+            </PrivateRoute>
+          } />
 
 
           {/* <Route path="/airview" element={<AirView />} /> */}
@@ -116,11 +165,16 @@ const AppContent = () => {
   );
 };
 
-export default function AppWrapper() {
+const AppWrapper = () => {
   return (
     <BrowserRouter>
-      <GlobalStyle /> {/* Inject global styles for the scrollbar */}
-      <AppContent />
+      <AuthProvider>
+        <GlobalToast />
+        <GlobalStyle />
+        <AppContent />
+      </AuthProvider>
     </BrowserRouter>
   );
-}
+};
+
+export default AppWrapper;

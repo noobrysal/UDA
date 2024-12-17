@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import styled from '@emotion/styled';
 import 'react-toastify/dist/ReactToastify.css';
 import logoImage from '../assets/logo.png';
 import backgroundImage from '../assets/udabackg.png';
+import { supabase } from './supabaseClient'; // Add this import
+import { useAuth } from './auth/AuthContext';
 
 const PageContainer = styled.div`
   display: flex;
@@ -181,6 +182,7 @@ const SocialContainer = styled.div`
 const LoginForm = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -188,22 +190,43 @@ const LoginForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      const response = await axios.post('http://127.0.0.1:8000/auth/token/login/', {
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: formData.email,
         password: formData.password,
       });
-      toast.success('Login successful! Redirecting...');
-      localStorage.setItem('accessToken', response.data.auth_token);
-      setTimeout(() => navigate('/home'), 3000);
+
+      if (error) throw error;
+
+      localStorage.setItem('userEmail', data.user.email);
+
+      toast.success('Login successful!', {
+        position: "top-center",
+        autoClose: 1500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        onClose: () => navigate('/carousel') // Changed from general-screen to carousel
+      });
+
     } catch (error) {
-      toast.error('Login failed. Please try again.');
+      toast.error(error.message);
     }
   };
 
+  // Update redirect for already logged-in users
+  useEffect(() => {
+    if (user && window.location.pathname === '/login') {
+      navigate('/carousel'); // Changed from general-screen to carousel
+    }
+  }, [user, navigate]);
+
   return (
     <PageContainer>
-      <ToastContainer />
       <ContentContainer>
         <FormBox>
           <LoginHeader>Log in</LoginHeader>
@@ -231,16 +254,6 @@ const LoginForm = () => {
             </CheckboxContainer>
             <SubmitButton>Continue</SubmitButton>
           </Form>
-          {/* <RegisterWithText>or register with</RegisterWithText> 
-          <SocialContainer>
-            <button>
-              <FaGoogle /> Google
-            </button>
-            <button>
-              <FaFacebook /> Facebook
-            </button>
-          </SocialContainer>
-          */}
         </FormBox>
         <LogoBox padding="80px" gap="30px">
           <Logo src={logoImage} alt="Logo" logoMarginBottom="20px" />

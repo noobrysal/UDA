@@ -12,6 +12,7 @@ import {
     LinearScale,
     PointElement,
     LineElement,
+    BarElement,  // Add this import
     Title,
     Tooltip as ChartTooltip,
     Legend,
@@ -25,6 +26,7 @@ ChartJS.register(
     LinearScale,
     PointElement,
     LineElement,
+    BarElement,  // Add this registration
     Title,
     ChartTooltip,
     Legend
@@ -948,10 +950,7 @@ const AirView = () => {
             const emergencyThreshold = metricThresholds[metricThresholds.length - 1].min;
             const goodThreshold = metricThresholds[0].max;
 
-            // If value is at emergency level or higher, return 0%
             if (value >= emergencyThreshold) return 0;
-
-            // Calculate percentage based on position between good and emergency levels
             return Math.max(0, Math.min(100, ((emergencyThreshold - value) / (emergencyThreshold - goodThreshold)) * 100));
         }
 
@@ -961,17 +960,55 @@ const AirView = () => {
             const criticalValue = metricThresholds[metricThresholds.length - 1].min;
 
             if (value >= criticalValue) return 0;
-
             return Math.max(0, Math.min(100, (criticalValue - value) / (criticalValue - maxGoodValue) * 100));
         }
 
-        // For other metrics (humidity, oxygen)
-        const optimalMax = metricThresholds.find(t => t.label === 'Good')?.max || 100;
-        const criticalValue = metricThresholds[metricThresholds.length - 1].min;
+        // For humidity
+        if (metricId === 'humidity') {
+            const optimalMin = 31; // Start of "Good" range
+            const optimalMax = 60; // End of "Good" range
+            const poorLow = 25; // Low poor threshold
+            const poorHigh = 71; // High poor threshold
+            const criticalLow = 0; // Double the difference from optimal to poor (low end)
+            const criticalHigh = 82; // Double the difference from optimal to poor (high end)
 
-        if (value >= criticalValue) return 0;
+            // If value is in optimal range, return 100%
+            if (value >= optimalMin && value <= optimalMax) {
+                return 100;
+            }
 
-        return Math.max(0, Math.min(100, (criticalValue - value) / (criticalValue - optimalMax) * 100));
+            // If value is below optimal
+            if (value < optimalMin) {
+                if (value <= criticalLow) return 0;
+                if (value <= poorLow) {
+                    return (value - criticalLow) / (poorLow - criticalLow) * 50;
+                }
+                return 50 + (value - poorLow) / (optimalMin - poorLow) * 50;
+            }
+
+            // If value is above optimal
+            if (value > optimalMax) {
+                if (value >= criticalHigh) return 0;
+                if (value >= poorHigh) {
+                    return (criticalHigh - value) / (criticalHigh - poorHigh) * 50;
+                }
+                return 50 + (poorHigh - value) / (poorHigh - optimalMax) * 50;
+            }
+        }
+
+        // For oxygen
+        if (metricId === 'oxygen') {
+            const safeThreshold = 19.5;
+            const criticalThreshold = 15; // Value at which safety becomes 0%
+
+            if (value <= criticalThreshold) return 0;
+            if (value >= safeThreshold) return 100;
+
+            // Linear scale between critical and safe thresholds
+            return ((value - criticalThreshold) / (safeThreshold - criticalThreshold)) * 100;
+        }
+
+        return 100; // Default return for any unhandled cases
     };
 
     // Update the getBarChartData function

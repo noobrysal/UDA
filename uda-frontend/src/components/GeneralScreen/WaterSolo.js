@@ -44,7 +44,6 @@ const WaterView = () => {
 
     // Now we can use getCurrentHourBlock in our initial state
     const [hourlyData, setHourlyData] = useState([]);
-    const [selectedLocation, setSelectedLocation] = useState(3); // Default to USTP-CDO
     const [loading, setLoading] = useState(true);
     const [selectedDate, setSelectedDate] = useState(getCurrentLocalDate());
     const [visibleHours, setVisibleHours] = useState([0]); // Show 9 hours
@@ -56,14 +55,6 @@ const WaterView = () => {
     const [visibleHourRange, setVisibleHourRange] = useState(() =>
         getCurrentHourBlock(new Date().getHours())
     );
-
-    const locations = [
-        { id: 1, name: 'LAPASAN' },
-        { id: 2, name: 'AGUSAN' },
-        { id: 3, name: 'USTP-CDO' },
-        { id: 4, name: 'EL SALVADOR' },
-        { id: 5, name: 'SPORTS COMPLEX' },
-    ];
 
     // Update thresholds 
     const thresholds = {
@@ -181,7 +172,7 @@ const WaterView = () => {
 
     useEffect(() => {
         fetchDayData();
-    }, [selectedLocation, selectedDate]);
+    }, [selectedDate]);
 
     useEffect(() => {
         // Auto-scroll timer
@@ -224,7 +215,7 @@ const WaterView = () => {
             if (error) throw error;
 
             if (!data || data.length === 0) {
-                toast.info('No data available for the selected date and location');
+                toast.info('No data available for the selected date');
                 setHourlyData([]);
                 setLoading(false);
                 return;
@@ -1197,17 +1188,6 @@ const WaterView = () => {
                             onChange={(e) => setSelectedDate(e.target.value)}
                             style={styles.datePicker}
                         />
-                        {/* <select
-                            value={selectedLocation}
-                            onChange={(e) => setSelectedLocation(Number(e.target.value))}
-                            style={styles.locationSelect}
-                        >
-                            {locations.map((location) => (
-                                <option key={location.id} value={location.id}>
-                                    {location.name}
-                                </option>
-                            ))}
-                        </select> */}
                     </div>
                 </header>
             </div>
