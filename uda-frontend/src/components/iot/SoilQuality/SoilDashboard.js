@@ -629,6 +629,27 @@ const SoilDashboard = () => {
         const firstDateLabel = comparisonData ? formatDateLabel(filters.first) : "No Range Selected";
         const secondDateLabel = comparisonData ? formatDateLabel(filters.second) : "No Range Selected";
 
+        const createStripedPattern = (baseColor, stripeColor = "rgba(0, 0, 0, 0.3)", angle = 45) => {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            canvas.width = 10; // Adjust for stripe density
+            canvas.height = 10;
+        
+            // Fill the background with the base color
+            ctx.fillStyle = baseColor;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+            // Add stripes
+            ctx.strokeStyle = stripeColor;
+            ctx.lineWidth = 3; // Adjust stripe thickness
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height);
+            ctx.lineTo(canvas.width, 0);
+            ctx.stroke();
+        
+            return ctx.createPattern(canvas, "repeat");
+        };
+        
         const data = {
             labels,
             datasets: [
@@ -644,9 +665,11 @@ const SoilDashboard = () => {
                 {
                     label: `Second Range: (${secondDateLabel})`,
                     data: secondAverages,
-                    backgroundColor: secondAverages.map((value, index) =>
-                        thresholds1[metrics[index]]?.find((t) => value <= t.max)?.color || "rgba(192, 192, 192, 0.5)"
-                    ),
+                    backgroundColor: secondAverages.map((value, index) => {
+                        const baseColor =
+                            thresholds1[metrics[index]]?.find((t) => value <= t.max)?.color || "rgba(192, 192, 192, 0.5)";
+                        return createStripedPattern(baseColor); // Keep the base color and add stripes
+                    }),
                     borderColor: "rgb(0, 0, 0)",
                     borderWidth: 3,
                 },
