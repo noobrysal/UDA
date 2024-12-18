@@ -757,7 +757,7 @@ const AirQualityByDate = () => {
                     }
 
                     .has-data {
-                        background-color: rgba(255, 255, 255, 0.6) !important;
+                        background-color: rgba(0, 123, 255, 0.6) !important;
                         color: black !important;
                         cursor: pointer !important;
                     }

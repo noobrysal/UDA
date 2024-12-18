@@ -185,7 +185,7 @@ const GeneralScreen = () => {
         try {
             // Get current date in UTC
             const today = new Date();
-            today.setDate(today.getDate() + 1);
+            today.setDate(today.getDate() );
             const tomorrow = new Date(today);
             tomorrow.setDate(today.getDate() + 1);
 
