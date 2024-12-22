@@ -55,6 +55,7 @@ const AirQualityByDate = () => {
     const [viewMode, setViewMode] = useState("average"); // 'hourly' or 'average'
     const [isCalendarLoading, setIsCalendarLoading] = useState(false); // Add new state
     const [expandedChart, setExpandedChart] = useState(null);
+    const [availableHours, setAvailableHours] = useState([]);
 
 
     useEffect(() => {
@@ -233,9 +234,26 @@ const AirQualityByDate = () => {
 
             if (error) throw error;
             setAirData(data);
+            updateAvailableHours(data); // Add this line
         } catch (error) {
             console.error("Error fetching air quality:", error);
             toast.error(`Error fetching air quality: ${error.message}`);
+        }
+    };
+
+    // Add this function after fetchData
+    const updateAvailableHours = (data) => {
+        const hours = new Set();
+        data.forEach(item => {
+            const hour = new Date(item.date).getHours();
+            hours.add(hour);
+        });
+        const sortedHours = Array.from(hours).sort((a, b) => a - b);
+        setAvailableHours(sortedHours);
+
+        // If current selected hour is not in available hours, select the first available hour
+        if (sortedHours.length > 0 && !sortedHours.includes(parseInt(selectedHour))) {
+            setSelectedHour(sortedHours[0].toString().padStart(2, "0"));
         }
     };
 
@@ -827,11 +845,14 @@ const AirQualityByDate = () => {
                                         onChange={(e) => setSelectedHour(e.target.value)}
                                         style={styles.calendarSelect}
                                     >
-                                        {Array.from({ length: 24 }, (_, i) => {
+                                        {availableHours.map((hour) => {
                                             const date = new Date();
-                                            date.setHours(i, 0, 0, 0);
+                                            date.setHours(hour, 0, 0, 0);
                                             return (
-                                                <option key={i} value={i.toString().padStart(2, "0")}>
+                                                <option
+                                                    key={hour}
+                                                    value={hour.toString().padStart(2, "0")}
+                                                >
                                                     {date.toLocaleString("en-US", {
                                                         hour: "2-digit",
                                                         minute: "2-digit",

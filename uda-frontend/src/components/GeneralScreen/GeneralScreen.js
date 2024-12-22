@@ -5,14 +5,19 @@ import backgroundImage from '../../assets/udabackg4.png';
 import { supabaseAir } from '../iot/AirQuality/supabaseClient';
 import { supabaseWater } from '../iot/WaterQuality/supabaseClient';
 import axiosClient from '../iot/SoilQuality/axiosClient';
+import { useNavigate } from 'react-router-dom';
 
 // Register ChartJS components
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
 const GeneralScreen = () => {
+    const navigate = useNavigate();
     const [latestAirData, setLatestAirData] = useState(null);
     const [latestWaterData, setLatestWaterData] = useState(null);
     const [latestSoilData, setLatestSoilData] = useState(null);
+    const [showLast24Hours, setShowLast24Hours] = useState(false);
+    const [airData24Hours, setAirData24Hours] = useState([]);
+    const [soilData24Hours, setSoilData24Hours] = useState([]);
 
     const locations = [
         { id: 1, name: 'LAPASAN' },
@@ -203,15 +208,32 @@ const GeneralScreen = () => {
     // Function to get latest air quality data
     const fetchLatestAirData = async () => {
         try {
-            const { data, error } = await supabaseAir
-                .from('sensors')
-                .select('*')
-                .order('id', { ascending: false })
-                .limit(1)
-                .single();
+            if (showLast24Hours) {
+                const today = new Date();
+                const yesterday = new Date(today);
+                yesterday.setDate(today.getDate() - 1);
 
-            if (error) throw error;
-            setLatestAirData(data);
+                const { data, error } = await supabaseAir
+                    .from('sensors')
+                    .select('*')
+                    .gte('date', yesterday.toISOString())
+                    .lte('date', today.toISOString())
+                    .order('id', { ascending: false });
+
+                if (error) throw error;
+                setAirData24Hours(data);
+                setLatestAirData(data[0]); // Set most recent data
+            } else {
+                const { data, error } = await supabaseAir
+                    .from('sensors')
+                    .select('*')
+                    .order('id', { ascending: false })
+                    .limit(1)
+                    .single();
+
+                if (error) throw error;
+                setLatestAirData(data);
+            }
         } catch (error) {
             console.error('Error fetching air data:', error);
         }
@@ -225,27 +247,40 @@ const GeneralScreen = () => {
     // Function to get latest water quality data
     const fetchLatestWaterData = async () => {
         try {
-            // Get current date in UTC
-            const today = new Date();
-            today.setDate(today.getDate() );
-            const tomorrow = new Date(today);
-            tomorrow.setDate(today.getDate() + 1);
+            if (showLast24Hours) {
+                // Get current date in UTC
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate());
+                const today = new Date(tomorrow);
+                today.setDate(tomorrow.getDate() - 1);
 
-            // Format dates as YYYY-MM-DDT00:00:00Z
-            const todayStr = `${formatDate(today)}T00:00:00Z`;
-            const tomorrowStr = `${formatDate(tomorrow)}T00:00:00Z`;
+                // Format dates as YYYY-MM-DDT00:00:00Z
+                const todayStr = `${formatDate(today)}T00:00:00Z`;
+                const tomorrowStr = `${formatDate(tomorrow)}T00:00:00Z`;
 
-            const { data, error } = await supabaseWater
-                .from('sensor_data')
-                .select('*')
-                .gte('timestamp', todayStr)
-                .lt('timestamp', tomorrowStr)
-                .order('id', { ascending: false })
-                .limit(1)
-                .single();
+                const { data, error } = await supabaseWater
+                    .from('sensor_data')
+                    .select('*')
+                    .gte('timestamp', todayStr)
+                    .lt('timestamp', tomorrowStr)
+                    .order('id', { ascending: false })
+                    .limit(1)
+                    .maybeSingle();
 
-            if (error) throw error;
-            setLatestWaterData(data);
+                if (error) throw error;
+                setLatestWaterData(data);
+            } else {
+                // Fetch only the latest record
+                const { data, error } = await supabaseWater
+                    .from('sensor_data')
+                    .select('*')
+                    .order('id', { ascending: false })
+                    .limit(1)
+                    .single();
+
+                if (error) throw error;
+                setLatestWaterData(data);
+            }
         } catch (error) {
             console.error('Error fetching water data:', error);
         }
@@ -254,9 +289,24 @@ const GeneralScreen = () => {
     // Function to get latest soil quality data
     const fetchLatestSoilData = async () => {
         try {
-            const response = await axiosClient.get('');
-            const sortedData = response.data.sort((a, b) => b.id - a.id);
-            setLatestSoilData(sortedData[0]);
+            if (showLast24Hours) {
+                const today = new Date();
+                const yesterday = new Date(today);
+                yesterday.setDate(today.getDate() - 1);
+
+                const response = await axiosClient.get('');
+                const last24HoursData = response.data.filter(data => {
+                    const dataDate = new Date(data.timestamp);
+                    return dataDate >= yesterday && dataDate <= today;
+                });
+
+                setSoilData24Hours(last24HoursData);
+                setLatestSoilData(last24HoursData[0]); // Set most recent data
+            } else {
+                const response = await axiosClient.get('');
+                const sortedData = response.data.sort((a, b) => b.id - a.id);
+                setLatestSoilData(sortedData[0]);
+            }
         } catch (error) {
             console.error('Error fetching soil data:', error);
         }
@@ -274,20 +324,99 @@ const GeneralScreen = () => {
         }, 30000); // Refresh every 30 seconds
 
         return () => clearInterval(interval);
-    }, []);
+    }, [showLast24Hours]);
 
-    // Air Quality Charts Configuration
+    // Add new calculation function for air quality safety percentage
+    const calculateAirSafetyPercentage = (value, metric) => {
+        if (value === null || value === undefined) {
+            return 0;
+        }
+
+        const thresholds = {
+            'pm25': { good: 25.99, emergency: 91 },
+            'pm10': { good: 50.99, emergency: 301 }
+        };
+
+        const { good, emergency } = thresholds[metric];
+
+        if (value <= good) {
+            // Scale from 100% to 50% within good range
+            return 100 - ((value / good) * 50);
+        } else {
+            // Scale from 50% to 0% after exceeding good range
+            const range = emergency - good;
+            const excess = value - good;
+            return Math.max(0, 50 - ((excess / range) * 50));
+        }
+    };
+
+    // Replace Air Quality Charts Configuration with new bar chart
     const airQualityData = {
-        labels: ['PM2.5', 'PM10'],
+        labels: ['PM2.5 Safety', 'PM10 Safety'],
         datasets: [{
-            data: [latestAirData?.pm25 || 0, latestAirData?.pm10 || 0],
-            backgroundColor: [
-                getColorForMetric(latestAirData?.pm25, 'pm25', thresholdsAir),
-                getColorForMetric(latestAirData?.pm10, 'pm10', thresholdsAir)
-            ],
-            circumference: 180,
-            rotation: -90,
+            data: latestAirData ? [
+                calculateAirSafetyPercentage(latestAirData?.pm25 ?? 0, 'pm25'),
+                calculateAirSafetyPercentage(latestAirData?.pm10 ?? 0, 'pm10')
+            ] : [0, 0],
+            backgroundColor: latestAirData ? [
+                getColorForMetric(latestAirData?.pm25 ?? 0, 'pm25', thresholdsAir),
+                getColorForMetric(latestAirData?.pm10 ?? 0, 'pm10', thresholdsAir)
+            ] : ['rgba(200, 200, 200, 0.2)', 'rgba(200, 200, 200, 0.2)'],
         }]
+    };
+
+    const airChartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 100,
+                ticks: {
+                    color: '#fff',
+                    callback: value => `${value}%`
+                },
+                grid: {
+                    color: 'rgba(255, 255, 255, 0.1)'
+                }
+            },
+            x: {
+                ticks: {
+                    color: '#fff'
+                },
+                grid: {
+                    display: false
+                }
+            }
+        },
+        elements: {
+            bar: {
+                borderRadius: 20,
+                borderSkipped: false,
+            },
+        },
+        plugins: {
+            legend: {
+                display: false
+            },
+            tooltip: {
+                callbacks: {
+                    label: function (context) {
+                        if (!latestAirData) {
+                            return 'No data available';
+                        }
+                        const metric = context.label.includes('PM2.5') ? 'pm25' : 'pm10';
+                        const actualValue = metric === 'pm25' ?
+                            latestAirData?.pm25 || 0 :
+                            latestAirData?.pm10 || 0;
+                        return [
+                            `Safety Level: ${context.raw.toFixed(1)}%`,
+                            `Actual ${metric.toUpperCase()}: ${actualValue}`
+                        ];
+                    }
+                }
+            }
+        }
     };
 
     // Update the calculateSafetyPercentage function
@@ -318,14 +447,14 @@ const GeneralScreen = () => {
     const waterQualityData = {
         labels: ['TSS Safety', 'TDS Safety'],
         datasets: [{
-            data: [
+            data: latestWaterData ? [
                 calculateSafetyPercentage(latestWaterData?.tss ?? 0, 'tss'),
                 calculateSafetyPercentage(latestWaterData?.tds_ppm ?? 0, 'tds_ppm')
-            ],
-            backgroundColor: [
+            ] : [0, 0],
+            backgroundColor: latestWaterData ? [
                 getColorForMetric(latestWaterData?.tss ?? 0, 'tss', thresholdsWater),
                 getColorForMetric(latestWaterData?.tds_ppm ?? 0, 'tds_ppm', thresholdsWater)
-            ],
+            ] : ['rgba(200, 200, 200, 0.2)', 'rgba(200, 200, 200, 0.2)'],
         }]
     };
 
@@ -366,6 +495,9 @@ const GeneralScreen = () => {
             tooltip: {
                 callbacks: {
                     label: function (context) {
+                        if (!latestWaterData) {
+                            return 'No data available';
+                        }
                         const metric = context.label.includes('TSS') ? 'tss' : 'tds_ppm';
                         const actualValue = metric === 'tss' ?
                             latestWaterData?.tss || 0 :
@@ -485,6 +617,37 @@ const GeneralScreen = () => {
         );
     };
 
+    // Add toggle handler
+    const handleToggleView = () => {
+        setShowLast24Hours(!showLast24Hours);
+    };
+
+    // Helper to render no data message
+    const renderNoDataMessage = () => (
+        <div style={styles.noDataMessage}>
+            No data available for last 24 hours
+        </div>
+    );
+
+    // Add click handlers for each chart
+    const handleAirChartClick = () => {
+        if (latestAirData?.id) {
+            window.open(`/air-quality/id/${latestAirData.id}`, '_blank');
+        }
+    };
+
+    const handleWaterChartClick = () => {
+        if (latestWaterData?.id) {
+            window.open(`/water-quality/id/${latestWaterData.id}`, '_blank');
+        }
+    };
+
+    const handleSoilChartClick = () => {
+        if (latestSoilData?.id) {
+            window.open(`/soil-quality/id/${latestSoilData.id}`, '_blank');
+        }
+    };
+
     // Modified status display section in the return JSX
     return (
         <div style={styles.fullcontainer}>
@@ -494,6 +657,12 @@ const GeneralScreen = () => {
                         <h1 style={styles.title}>Home Dashboard</h1>
                         <p style={styles.subtitle}>Unified Dashboard Analytics</p>
                     </div>
+                    <button
+                        onClick={handleToggleView}
+                        style={styles.toggleButton}
+                    >
+                        {showLast24Hours ? 'Show Latest Only' : 'Show Last 24 Hours'}
+                    </button>
                 </header>
             </div>
             <div style={styles.gridContainer}>
@@ -503,23 +672,17 @@ const GeneralScreen = () => {
                         <div style={styles.iotHeaderBox}>
                             <h2 style={styles.airHeaderTitle}>Air Quality</h2>
                         </div>
-                        <div style={styles.chartContainer}>
-                            <Doughnut
-                                data={airQualityData}
-                                options={{
-                                    maintainAspectRatio: false,
-                                    plugins: {
-                                        legend: {
-                                            labels: {
-                                                color: 'white', // Set the legend text color to white
-                                                font: {
-                                                    size: 14, // Optional: Adjust font size
-                                                },
-                                            },
-                                        },
-                                    },
-                                }}
-                            />
+                        <div style={styles.chartContainer} onClick={handleAirChartClick}>
+                            {showLast24Hours && airData24Hours.length === 0 ? (
+                                renderNoDataMessage()
+                            ) : (
+                                <div style={styles.clickableChart}>
+                                    <Bar
+                                        data={airQualityData}
+                                        options={airChartOptions}
+                                    />
+                                </div>
+                            )}
                         </div>
                     </div>
                     <div style={styles.box2}>
@@ -564,11 +727,17 @@ const GeneralScreen = () => {
                         <div style={styles.iotHeaderBox}>
                             <h2 style={styles.waterHeaderTitle}>Water Quality</h2>
                         </div>
-                        <div style={styles.chartContainer}>
-                            <Bar
-                                data={waterQualityData}
-                                options={waterChartOptions}
-                            />
+                        <div style={styles.chartContainer} onClick={handleWaterChartClick}>
+                            {showLast24Hours && !latestWaterData ? (
+                                renderNoDataMessage()
+                            ) : (
+                                <div style={styles.clickableChart}>
+                                    <Bar
+                                        data={waterQualityData}
+                                        options={waterChartOptions}
+                                    />
+                                </div>
+                            )}
                         </div>
                     </div>
                     <div style={styles.box5}>
@@ -612,23 +781,29 @@ const GeneralScreen = () => {
                         <div style={styles.iotHeaderBox}>
                             <h2 style={styles.soilHeaderTitle}>Soil Quality</h2>
                         </div>
-                        <div style={styles.chartContainer}>
-                            <Doughnut
-                                data={soilGaugeData}
-                                options={{
-                                    maintainAspectRatio: false,
-                                    plugins: {
-                                        legend: {
-                                            labels: {
-                                                color: 'white', // Set the legend text color to white
-                                                font: {
-                                                    size: 14, // Optional: Adjust font size
+                        <div style={styles.chartContainer} onClick={handleSoilChartClick}>
+                            {showLast24Hours && soilData24Hours.length === 0 ? (
+                                renderNoDataMessage()
+                            ) : (
+                                <div style={styles.clickableChart}>
+                                    <Doughnut
+                                        data={soilGaugeData}
+                                        options={{
+                                            maintainAspectRatio: false,
+                                            plugins: {
+                                                legend: {
+                                                    labels: {
+                                                        color: 'white', // Set the legend text color to white
+                                                        font: {
+                                                            size: 14, // Optional: Adjust font size
+                                                        },
+                                                    },
                                                 },
                                             },
-                                        },
-                                    },
-                                }}
-                            />
+                                        }}
+                                    />
+                                </div>
+                            )}
                         </div>
                     </div>
                     <div style={styles.box8}>
@@ -913,6 +1088,51 @@ const styles = {
     recommendationItem: {
         margin: '5px 0',
         lineHeight: '1.4',
+    },
+    toggleButton: {
+        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+        border: '1px solid rgba(255, 255, 255, 0.4)',
+        borderRadius: '20px',
+        color: '#fff',
+        padding: '8px 16px',
+        cursor: 'pointer',
+        fontSize: '0.9rem',
+        marginLeft: 'auto',
+        transition: 'background-color 0.3s',
+        '&:hover': {
+            backgroundColor: 'rgba(255, 255, 255, 0.3)',
+        }
+    },
+    gaugeContainer: {
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        margin: '20px 0',
+    },
+    gauge: {
+        width: '100%',
+        height: '45%',
+        position: 'relative',
+    },
+    noDataMessage: {
+        color: '#fff',
+        fontSize: '1rem',
+        textAlign: 'center',
+        width: '100%',
+        margin: 'auto',
+        opacity: 0.7,
+    },
+    clickableChart: {
+        width: '100%',
+        height: '100%',
+        cursor: 'pointer',
+        transition: 'transform 0.2s ease',
+        '&:hover': {
+            transform: 'scale(1.02)',
+        }
     }
 };
 

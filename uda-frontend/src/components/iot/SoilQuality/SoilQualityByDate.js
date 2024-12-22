@@ -52,6 +52,7 @@ const SoilQualityByDate = () => {
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const [isCalendarLoading, setIsCalendarLoading] = useState(false);
     const [expandedChart, setExpandedChart] = useState(null);
+    const [availableHours, setAvailableHours] = useState([]);
 
 
     useEffect(() => {
@@ -170,6 +171,7 @@ const SoilQualityByDate = () => {
 
             console.log('Data for date:', formattedDate, response.data);
             setSoilData(response.data);
+            updateAvailableHours(response.data); // Add this line
         } catch (error) {
             console.error("Error fetching soil quality:", error);
             toast.error(`Error fetching soil quality: ${error.message}`);
@@ -701,6 +703,21 @@ const SoilQualityByDate = () => {
         onClick: viewMode === "hourly" ? handlePointClick : undefined,
     });
 
+    const updateAvailableHours = (data) => {
+        const hours = new Set();
+        data.forEach(item => {
+            const hour = new Date(item.timestamp).getHours();
+            hours.add(hour);
+        });
+        const sortedHours = Array.from(hours).sort((a, b) => a - b);
+        setAvailableHours(sortedHours);
+
+        // If current selected hour is not in available hours, select the first available hour
+        if (sortedHours.length > 0 && !sortedHours.includes(parseInt(selectedHour))) {
+            setSelectedHour(sortedHours[0].toString().padStart(2, "0"));
+        }
+    };
+
     return (
         <div style={styles.fullContainer}>
             <header style={styles.header}>
@@ -861,11 +878,14 @@ const SoilQualityByDate = () => {
                                         onChange={(e) => setSelectedHour(e.target.value)}
                                         style={styles.calendarSelect}
                                     >
-                                        {Array.from({ length: 24 }, (_, i) => {
+                                        {availableHours.map((hour) => {
                                             const date = new Date();
-                                            date.setHours(i, 0, 0, 0);
+                                            date.setHours(hour, 0, 0, 0);
                                             return (
-                                                <option key={i} value={i.toString().padStart(2, "0")}>
+                                                <option
+                                                    key={hour}
+                                                    value={hour.toString().padStart(2, "0")}
+                                                >
                                                     {date.toLocaleString("en-US", {
                                                         hour: "2-digit",
                                                         minute: "2-digit",
