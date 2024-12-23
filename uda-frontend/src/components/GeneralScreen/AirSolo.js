@@ -516,10 +516,9 @@ const AirView = () => {
             flexDirection: "column"
         },
         chartContainer: {
-            flex: 1,
+            // flex: 1,
             width: '100%',
-            height: '100%',
-            cursor: 'pointer', // Add this line
+            height: '100%', // Set height as a percentage of the parent container's height
         },
 
         //LOWER LEFT THRESHOLD INFO SLIDER BOX
@@ -751,7 +750,7 @@ const AirView = () => {
             fontSize: "14px",
             fontWeight: "bold",
             color: "#fff",
-            marginBottom: "8px",
+            marginBottom: "0px",
         },
         progressWrapper: {
             display: "flex",

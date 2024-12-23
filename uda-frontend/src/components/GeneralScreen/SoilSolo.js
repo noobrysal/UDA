@@ -828,7 +828,7 @@ const SoilView = () => {
             fontSize: "14px",
             fontWeight: "bold",
             color: "#fff",
-            marginBottom: "8px",
+            marginBottom: "0px",
         },
         progressWrapper: {
             display: "flex",
