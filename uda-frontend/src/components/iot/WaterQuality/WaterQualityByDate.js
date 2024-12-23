@@ -43,10 +43,34 @@ ChartJS.register(
 );
 
 const WaterQualityByDate = () => {
-    const [selectedDate, setSelectedDate] = useState(new Date());
-    const { date } = useParams(); // Retrieve locationId from the URL  !!!!!{ date, locationId }!!!!!!
+    const { date, hour } = useParams();
+
+    const [selectedDate, setSelectedDate] = useState(() => {
+        if (date) {
+            return date; // Keep the date string format for the input element
+        }
+        // Default to tomorrow if no date provided
+        const today = new Date();
+        today.setDate(today.getDate() + 1);
+        return today.toISOString().split('T')[0];
+    });
+
+    const getSelectedDateAsObject = () => {
+        return new Date(selectedDate);
+    };
+
+    const [selectedHour, setSelectedHour] = useState(
+        hour ? hour : "00"
+    );
+
+    // Add useEffect to switch to hourly view when hour parameter is present
+    useEffect(() => {
+        if (hour) {
+            setViewMode("hourly");
+        }
+    }, [hour]);
+
     const [WaterData, setWaterData] = useState([]);
-    const [selectedHour, setSelectedHour] = useState("00");
     //    const [selectedLocation, setSelectedLocation] = useState(3);  Default to locationId from URL or 1
     const [highlightedDates, setHighlightedDates] = useState([]);
     // const navigate = useNavigate(); 
@@ -82,14 +106,23 @@ const WaterQualityByDate = () => {
     };
 
     const formatDate = (date) => {
+        if (typeof date === 'string') {
+            // If date is already a string in YYYY-MM-DD format, return it as is
+            if (date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                return date;
+            }
+            // Otherwise convert string to Date and format
+            date = new Date(date);
+        }
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, "0");
         const day = String(date.getDate()).padStart(2, "0");
         return `${year}-${month}-${day}`;
     };
 
-    // Add this helper function to format the date for display
-    const formatDisplayDate = (date) => {
+    // Update formatDisplayDate to handle string dates
+    const formatDisplayDate = (dateString) => {
+        const date = new Date(dateString);
         return date.toLocaleDateString('en-US', {
             weekday: 'long',
             year: 'numeric',
@@ -240,13 +273,13 @@ const WaterQualityByDate = () => {
 
     useEffect(() => {
         const startOfMonth = new Date(
-            selectedDate.getFullYear(),
-            selectedDate.getMonth(),
+            getSelectedDateAsObject().getFullYear(),
+            getSelectedDateAsObject().getMonth(),
             1
         );
         const endOfMonth = new Date(
-            selectedDate.getFullYear(),
-            selectedDate.getMonth() + 1,
+            getSelectedDateAsObject().getFullYear(),
+            getSelectedDateAsObject().getMonth() + 1,
             0
         );
         fetchMonthData(startOfMonth, endOfMonth);
@@ -256,41 +289,39 @@ const WaterQualityByDate = () => {
     const getFilteredData = (data) => {
         const selectedHourUTC = parseInt(selectedHour);
 
-        return data.filter((item) => {
-            const itemDate = new Date(item.timestamp);
-            // Use UTC hours to match database timezone
-            return itemDate.getUTCHours() === selectedHourUTC;
-        });
+        const filteredAndSorted = data
+            .filter((item) => {
+                const itemDate = new Date(item.timestamp);
+                return itemDate.getUTCHours() === selectedHourUTC;
+            })
+            .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp)); // Sort by timestamp
+
+        return filteredAndSorted;
     };
 
-    const filteredData = getFilteredData(WaterData);
-
-    // Function to filter data by each hour for hourly averages
-    // Preprocess WaterData for hourly averages
+    // Update getFilteredDataForAverage to sort by hour
     const getFilteredDataForAverage = (data, metric) => {
         const hourlyData = data.reduce((acc, item) => {
-            // Use UTC hours to match database timezone
             const hour = new Date(item.timestamp).getUTCHours();
             if (!acc[hour]) acc[hour] = { sum: 0, count: 0 };
-            // Convert null to 0 for tss and tds_ppm
             const value = (metric === 'tss' || metric === 'tds_ppm') && item[metric] === null ? 0 : item[metric];
-            if (value !== null) {  // Check for null values
+            if (value !== null) {
                 acc[hour].sum += value;
                 acc[hour].count++;
             }
             return acc;
         }, {});
 
-        return Object.keys(hourlyData).map((hour) => {
-            const { sum, count } = hourlyData[hour];
-            return {
+        // Convert to array and sort by hour
+        return Object.entries(hourlyData)
+            .map(([hour, { sum, count }]) => ({
                 hour: parseInt(hour),
-                average: count > 0 ? sum / count : 0  // Handle division by zero
-            };
-        });
+                average: count > 0 ? sum / count : 0
+            }))
+            .sort((a, b) => a.hour - b.hour); // Sort by hour chronologically
     };
-    // Calculate averages from full filtered data
-    // Calculate hourly averages based on the entire day
+
+    const filteredData = getFilteredData(WaterData);
 
     const getColor = (value, metric) => {
         // Access the metric-specific thresholds
@@ -736,7 +767,7 @@ const WaterQualityByDate = () => {
         <div style={styles.fullContainer}>
             <header style={styles.header}>
                 <h1 style={styles.title}>
-                    Water Quality Data for {formatDisplayDate(selectedDate)}
+                    Water Quality Data for {formatDisplayDate(date || selectedDate)}
                 </h1>
             </header>
 

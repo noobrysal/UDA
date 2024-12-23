@@ -16,10 +16,11 @@ import {
     Tooltip as ChartTooltip,
     Legend,
 } from 'chart.js';
-import { Tooltip } from '@mui/material';
+import { Tooltip as MuiTooltip, IconButton } from '@mui/material';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { BsMagic } from 'react-icons/bs';
+import InfoIcon from '@mui/icons-material/Info';
 
 ChartJS.register(
     CategoryScale,
@@ -121,7 +122,7 @@ const WaterView = () => {
         {
             id: 'pH',
             name: 'pH Level',
-            tooltip: 'Measure of water acidity or alkalinity. Optimal range is 6.5-8.5.',
+            tooltip: 'Indicates the acidity or alkalinity of water on a scale of 0-14. Neutral pH (7.0) is ideal for most aquatic life.',
             getIcon: (status) => {
                 switch (status) {
                     case 'Acceptable': return '✅';
@@ -134,7 +135,7 @@ const WaterView = () => {
         {
             id: 'temperature',
             name: 'Temperature',
-            tooltip: 'Water temperature in Celsius. Optimal range is 26-30°C.',
+            tooltip: 'A critical factor in water quality that affects the solubility of gases like oxygen and the metabolic rates of aquatic organisms.',
             getIcon: (status) => {
                 switch (status) {
                     case 'Acceptable': return '✅';
@@ -549,9 +550,10 @@ const WaterView = () => {
             flexDirection: "column"
         },
         chartContainer: {
-            // flex: 1,
+            flex: 1,
             width: '100%',
             height: '100%', // Set height as a percentage of the parent container's height
+            cursor: 'pointer', // Add this line
         },
 
         //LOWER LEFT THRESHOLD INFO SLIDER BOX
@@ -767,6 +769,7 @@ const WaterView = () => {
             width: "100%",
             // height: "100%",
             // marginBottom: "20px",
+            cursor: 'pointer'
         },
         metricBox: {
             backgroundColor: 'rgba(242, 242, 242, 0.1)',
@@ -778,7 +781,7 @@ const WaterView = () => {
             fontSize: "12px",
             overflow: "hidden",
             position: "relative",
-            height: "28vh", // Set a fixed height for the metric box to allow room for both progress bar and trend indicator
+            height: "29vh", // Set a fixed height for the metric box to allow room for both progress bar and trend indicator
             // marginTop: "35px",
         },
         metricTitle: {
@@ -815,7 +818,6 @@ const WaterView = () => {
             fontWeight: "bold",
             color: "#fff",
             position: "absolute",
-            bottom: "10px",
             width: "100%",
             textAlign: "center",
         },
@@ -1073,6 +1075,19 @@ const WaterView = () => {
         }
     };
 
+    const handleChartClick = () => {
+        // Format the date and hour for the URL
+        const formattedHour = selectedHourForNarrative.toString().padStart(2, '0');
+        // Use selectedDate directly as it's already in YYYY-MM-DD format
+        window.open(`/water-quality/${selectedDate}/${formattedHour}`, '_blank');
+    };
+
+    // Update the existing click handlers for metric boxes
+    const handleMetricClick = (metric) => {
+        const formattedHour = selectedHourForNarrative.toString().padStart(2, '0');
+        window.open(`/water-quality/${selectedDate}/${formattedHour}`, '_blank');
+    };
+
     // Update the getBarChartData function
     const getBarChartData = () => {
         const hourData = hourlyData[selectedHourForNarrative];
@@ -1167,6 +1182,7 @@ const WaterView = () => {
                 },
             },
         },
+        onClick: handleChartClick,
     };
 
     // Add this helper function near your other utility functions
@@ -1344,39 +1360,66 @@ const WaterView = () => {
                                 const maxValue = getMaxValue(metric.id);
 
                                 return (
-                                    <div key={metric.id} style={styles.metricBoxWrapper}>
+                                    <div
+                                        key={metric.id}
+                                        onClick={() => handleMetricClick(metric)}
+                                        // Make it look clickable
+                                        style={{
+                                            ...styles.metricBoxWrapper,
+                                            cursor: 'pointer'
+                                        }}
+                                    >
                                         <div style={styles.metricBox}>
-                                            <Tooltip title={metric.tooltip || ''} placement="top" arrow>
-                                                <h3 style={styles.metricTitle}>{metric.name}</h3>
-                                            </Tooltip>
-                                            <div style={styles.progressWrapper}>
-                                                <div style={styles.circularProgressContainer}>
-                                                    {value !== null && value !== undefined ? (
-                                                        <CircularProgressbar
-                                                            value={calculatePercentageValue(value, metric.id)}
-                                                            text={`${value.toFixed(1)}`}
-                                                            strokeWidth={20}
-                                                            styles={buildStyles({
-                                                                rotation: 0,
-                                                                strokeLinecap: 'round',
-                                                                textSize: '20px',
-                                                                pathTransitionDuration: 0.5,
-                                                                pathColor: status?.color || '#75c7b6',
-                                                                textColor: status?.color || '#75c7b6',
-                                                                trailColor: '#fff',
-                                                            })}
-                                                        />
-                                                    ) : (
-                                                        <div style={styles.noDataLabel}>No Data</div>
-                                                    )}
+                                            <div
+                                                style={{
+                                                    cursor: 'pointer',
+                                                    width: '100%',
+                                                    height: '100%'
+                                                }}
+                                                onClick={handleChartClick}
+                                            >
+                                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
+                                                    <span style={{ fontSize: '16px' }}>{metric.icon}</span>
+                                                    <h3 style={styles.metricTitle}>{metric.name}</h3>
+                                                    <MuiTooltip
+                                                        title={metric.tooltip}
+                                                        arrow
+                                                        placement="top"
+                                                    >
+                                                        <IconButton size="small" style={{ color: 'white' }}>
+                                                            <InfoIcon fontSize="small" />
+                                                        </IconButton>
+                                                    </MuiTooltip>
                                                 </div>
-                                            </div>
-                                            <div style={styles.trendIndicator}>
-                                                {value && hourlyData[(selectedHourForNarrative - 1 + 24) % 24]?.[metric.id] ?
-                                                    value > hourlyData[(selectedHourForNarrative - 1 + 24) % 24][metric.id] ?
-                                                        'Worsening' : value < hourlyData[(selectedHourForNarrative - 1 + 24) % 24][metric.id] ?
-                                                            'Improving' : 'Stable'
-                                                    : ''}
+                                                <div style={styles.progressWrapper}>
+                                                    <div style={styles.circularProgressContainer}>
+                                                        {value !== null && value !== undefined ? (
+                                                            <CircularProgressbar
+                                                                value={calculatePercentageValue(value, metric.id)}
+                                                                text={`${value.toFixed(1)}`}
+                                                                strokeWidth={20}
+                                                                styles={buildStyles({
+                                                                    rotation: 0,
+                                                                    strokeLinecap: 'round',
+                                                                    textSize: '20px',
+                                                                    pathTransitionDuration: 0.5,
+                                                                    pathColor: status?.color || '#75c7b6',
+                                                                    textColor: status?.color || '#75c7b6',
+                                                                    trailColor: '#fff',
+                                                                })}
+                                                            />
+                                                        ) : (
+                                                            <div style={styles.noDataLabel}>No Data</div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div style={styles.trendIndicator}>
+                                                    {value && hourlyData[(selectedHourForNarrative - 1 + 24) % 24]?.[metric.id] ?
+                                                        value > hourlyData[(selectedHourForNarrative - 1 + 24) % 24][metric.id] ?
+                                                            'Worsening' : value < hourlyData[(selectedHourForNarrative - 1 + 24) % 24][metric.id] ?
+                                                                'Improving' : 'Stable'
+                                                        : ''}
+                                                </div>
                                             </div>
                                         </div>
 

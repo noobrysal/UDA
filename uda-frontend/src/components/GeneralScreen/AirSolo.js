@@ -6,6 +6,8 @@ import { Bar } from 'react-chartjs-2'; // Add Bar import
 import backgroundImage from '../../assets/airdash2.png';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import { IconButton } from '@mui/material';
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -17,7 +19,7 @@ import {
     Tooltip as ChartTooltip,
     Legend,
 } from 'chart.js';
-import { Tooltip } from '@mui/material';
+import { Tooltip, Tooltip as MuiTooltip } from '@mui/material';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 
@@ -211,6 +213,13 @@ const AirView = () => {
         { id: 'oxygen', name: 'OXYGEN' }
     ];
 
+    const metricDescriptions = {
+        pm25: "Fine particulate matter smaller than 2.5 micrometers. Can penetrate deep into the lungs and affect health. Monitored for pollution levels.",
+        pm10: "Coarser particulate matter up to 10 micrometers. Can irritate the respiratory system and is used to assess air quality.",
+        humidity: "The amount of moisture in the air. High levels can worsen air pollution impacts, while very low levels can cause dryness.",
+        temperature: "Air temperature affects pollutant dispersion and chemical reactions in the atmosphere, influencing air quality.",
+        oxygen: "Essential for respiration. Low oxygen levels in the air can indicate poor ventilation or enclosed environments."
+    };
 
     useEffect(() => {
         fetchDayData();
@@ -398,6 +407,12 @@ const AirView = () => {
         });
     };
 
+    const handleChartClick = () => {
+        const formattedDate = selectedDate;
+        const formattedHour = selectedHourForNarrative.toString().padStart(2, '0');
+        window.open(`/air-quality/${formattedDate}/${selectedLocation}/${formattedHour}`, '_blank');
+    };
+
     const styles = {
         fullcontainer: {
             height: "100vh",
@@ -501,9 +516,10 @@ const AirView = () => {
             flexDirection: "column"
         },
         chartContainer: {
-            // flex: 1,
+            flex: 1,
             width: '100%',
-            height: '100%', // Set height as a percentage of the parent container's height
+            height: '100%',
+            cursor: 'pointer', // Add this line
         },
 
         //LOWER LEFT THRESHOLD INFO SLIDER BOX
@@ -1121,6 +1137,7 @@ const AirView = () => {
                 },
             },
         },
+        onClick: handleChartClick,
     };
 
     // Add this helper function near your other utility functions
@@ -1141,7 +1158,10 @@ const AirView = () => {
         return pm25Index >= pm10Index ? pm25Status : pm10Status;
     };
 
-
+    // Add this helper to get tooltip content based on metric and value
+    const getTooltipContent = (metric) => {
+        return metricDescriptions[metric] || "No description available";
+    };
 
     return (
         <div style={styles.fullcontainer}>
@@ -1304,37 +1324,55 @@ const AirView = () => {
                                 return (
                                     <div key={metric.id} style={styles.metricBoxWrapper}>
                                         <div style={styles.metricBox}>
-                                            <Tooltip title={metric.tooltip || ''} placement="top" arrow>
-                                                <h3 style={styles.metricTitle}>{metric.name}</h3>
-                                            </Tooltip>
-                                            <div style={styles.progressWrapper}>
-                                                <div style={styles.circularProgressContainer}>
-                                                    {value !== null && value !== undefined ? (
-                                                        <CircularProgressbar
-                                                            value={(value / maxValue) * 100}
-                                                            text={`${value.toFixed(1)}`}
-                                                            strokeWidth={20}
-                                                            styles={buildStyles({
-                                                                rotation: 0,
-                                                                strokeLinecap: 'round',
-                                                                textSize: '20px',
-                                                                pathTransitionDuration: 0.5,
-                                                                pathColor: status?.color || '#75c7b6',
-                                                                textColor: status?.color || '#75c7b6',
-                                                                trailColor: '#fff',
-                                                            })}
-                                                        />
-                                                    ) : (
-                                                        <div style={styles.noDataLabel}>No Data</div>
-                                                    )}
+                                            <div
+                                                style={{
+                                                    cursor: 'pointer',
+                                                    width: '100%',
+                                                    height: '100%'
+                                                }}
+                                                onClick={handleChartClick}
+                                            >
+                                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
+                                                    <h3 style={styles.metricTitle}>{metric.name}</h3>
+                                                    <MuiTooltip
+                                                        title={metricDescriptions[metric.id] || ""}
+                                                        arrow
+                                                        placement="top"
+                                                    >
+                                                        <IconButton size="small" style={{ color: 'white' }}>
+                                                            <HelpOutlineIcon fontSize="small" />
+                                                        </IconButton>
+                                                    </MuiTooltip>
                                                 </div>
-                                            </div>
-                                            <div style={styles.trendIndicator}>
-                                                {value && hourlyData[(selectedHourForNarrative - 1 + 24) % 24]?.[metric.id] ?
-                                                    value > hourlyData[(selectedHourForNarrative - 1 + 24) % 24][metric.id] ?
-                                                        'Worsening' : value < hourlyData[(selectedHourForNarrative - 1 + 24) % 24][metric.id] ?
-                                                            'Improving' : 'Stable'
-                                                    : ''}
+                                                <div style={styles.progressWrapper}>
+                                                    <div style={styles.circularProgressContainer}>
+                                                        {value !== null && value !== undefined ? (
+                                                            <CircularProgressbar
+                                                                value={(value / maxValue) * 100}
+                                                                text={`${value.toFixed(1)}`}
+                                                                strokeWidth={20}
+                                                                styles={buildStyles({
+                                                                    rotation: 0,
+                                                                    strokeLinecap: 'round',
+                                                                    textSize: '20px',
+                                                                    pathTransitionDuration: 0.5,
+                                                                    pathColor: status?.color || '#75c7b6',
+                                                                    textColor: status?.color || '#75c7b6',
+                                                                    trailColor: '#fff',
+                                                                })}
+                                                            />
+                                                        ) : (
+                                                            <div style={styles.noDataLabel}>No Data</div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div style={styles.trendIndicator}>
+                                                    {value && hourlyData[(selectedHourForNarrative - 1 + 24) % 24]?.[metric.id] ?
+                                                        value > hourlyData[(selectedHourForNarrative - 1 + 24) % 24][metric.id] ?
+                                                            'Worsening' : value < hourlyData[(selectedHourForNarrative - 1 + 24) % 24][metric.id] ?
+                                                                'Improving' : 'Stable'
+                                                        : ''}
+                                                </div>
                                             </div>
                                         </div>
 

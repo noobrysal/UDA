@@ -120,18 +120,21 @@ const AppContent = () => {
             <Route path="/air" element={<AirSolo />} />
             <Route path="/air-dashboard" element={<AirDashboard />} />
             <Route path="/air-quality" element={<AirQualityByDate />} />
+            <Route path="/air-quality/:date/:locationId/:hour" element={<AirQualityByDate />} />
             <Route path="/air-quality/id/:id" element={<AirQualityInstance />} />
 
             {/* Water Quality Routes */}
             <Route path="/water" element={<WaterSolo />} />
             <Route path="/water-dashboard" element={<WaterDashboard />} />
             <Route path="/water-quality" element={<WaterQualityByDate />} />
+            <Route path="/water-quality/:date/:hour" element={<WaterQualityByDate />} />
             <Route path="/water-quality/id/:id" element={<WaterQualityInstance />} />
 
             {/* Soil Quality Routes */}
             <Route path="/soil" element={<SoilSolo />} />
             <Route path="/soil-dashboard" element={<SoilDashboard />} />
             <Route path="/soil-quality" element={<SoilQualityByDate />} />
+            <Route path="/soil-quality/:date/:hour" element={<SoilQualityByDate />} />
             <Route path="/soil-quality/id/:id" element={<SoilQualityInstance />} />
 
             {/* Profile Route */}

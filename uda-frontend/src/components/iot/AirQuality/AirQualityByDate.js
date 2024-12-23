@@ -45,11 +45,44 @@ ChartJS.register(
 );
 
 const AirQualityByDate = () => {
-    const [selectedDate, setSelectedDate] = useState(new Date());
-    const { date } = useParams(); // Retrieve locationId from the URL  !!!!!{ date, locationId }!!!!!!
+    const { date, locationId, hour } = useParams();
+
+    // Update state initializers to properly handle date string
+    const [selectedDate, setSelectedDate] = useState(() => {
+        if (date) {
+            // Convert the date string to a Date object
+            const parsedDate = new Date(date);
+            // Check if it's a valid date
+            if (isNaN(parsedDate.getTime())) {
+                // If invalid, use tomorrow's date as default
+                const today = new Date();
+                today.setDate(today.getDate() + 1);
+                return today.toISOString().split('T')[0];
+            }
+            return date; // Keep the date string format for the input element
+        }
+        // Default to tomorrow if no date provided
+        const today = new Date();
+        today.setDate(today.getDate() + 1);
+        return today.toISOString().split('T')[0];
+    });
+
+    const [selectedLocation, setSelectedLocation] = useState(
+        locationId ? parseInt(locationId) : 3
+    );
+
+    const [selectedHour, setSelectedHour] = useState(
+        hour ? hour : "00"
+    );
+
+    // Add useEffect to switch to hourly view when hour parameter is present
+    useEffect(() => {
+        if (hour) {
+            setViewMode("hourly");
+        }
+    }, [hour]);
+
     const [airData, setAirData] = useState([]);
-    const [selectedHour, setSelectedHour] = useState("00");
-    const [selectedLocation, setSelectedLocation] = useState(3); // Default to locationId from URL or 1
     const [highlightedDates, setHighlightedDates] = useState([]);
     // const navigate = useNavigate(); 
     const [viewMode, setViewMode] = useState("average"); // 'hourly' or 'average'
@@ -111,6 +144,16 @@ const AirQualityByDate = () => {
     };
 
     const formatDate = (date) => {
+        // Handle both Date objects and date strings
+        if (typeof date === 'string') {
+            // If it's a string (from URL or input), convert to Date
+            const parsedDate = new Date(date);
+            const year = parsedDate.getFullYear();
+            const month = String(parsedDate.getMonth() + 1).padStart(2, "0");
+            const day = String(parsedDate.getDate()).padStart(2, "0");
+            return `${year}-${month}-${day}`;
+        }
+        // If it's already a Date object
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, "0");
         const day = String(date.getDate()).padStart(2, "0");
@@ -120,68 +163,52 @@ const AirQualityByDate = () => {
     // Fetch data for the entire month
     const fetchMonthData = async (startDate, endDate) => {
         try {
-            setIsCalendarLoading(true); // Start loading
-            // Get first day of month at 08:00 +08:00
-            const firstDay = new Date(
-                startDate.getFullYear(),
-                startDate.getMonth(),
-                1
-            );
+            setIsCalendarLoading(true);
+            setHighlightedDates([]); // Clear existing highlighted dates
+
+            const start = typeof startDate === 'string' ? new Date(startDate) : startDate;
+            const end = typeof endDate === 'string' ? new Date(endDate) : endDate;
+
+            // Adjust the date range for the query
+            const firstDay = new Date(start.getFullYear(), start.getMonth(), 1);
+            const lastDay = new Date(end.getFullYear(), end.getMonth() + 1, 0);
+
             const startDateTime = `${firstDay.toISOString().split('T')[0]}T00:00:00+08:00`;
+            const endDateTime = `${lastDay.toISOString().split('T')[0]}T23:59:59.999+08:00`;
 
-            // Get last day of month at 07:59:59.999 +08:00
-            const lastDay = new Date(
-                endDate.getFullYear(),
-                endDate.getMonth() + 1,
-                endDate.getDate() + 7,
-                0
-            );
-            const endDateTime = `${lastDay.toISOString().split('T')[0]}T11:59:59.999+08:00`;
+            const { data, error } = await supabaseAir
+                .from("sensors")
+                .select("date")
+                .gte("date", startDateTime)
+                .lte("date", endDateTime)
+                .eq("locationId", selectedLocation)
+                .order('date', { ascending: true });
 
-            const PAGE_SIZE = 100;
-            let currentOffset = 0;
-            let hasMore = true;
-            const allDates = new Set();
+            if (error) throw error;
 
-            while (hasMore) {
-                const { data, error } = await supabaseAir
-                    .from("sensors")
-                    .select("date")
-                    .gte("date", startDateTime)
-                    .lte("date", endDateTime)
-                    .range(currentOffset, currentOffset + PAGE_SIZE - 1)
-                    .order('date', { ascending: true })
-                    .eq("locationId", selectedLocation); // Filter by selectedLocation
+            if (data) {
+                // Process dates using a Map to ensure unique dates
+                const uniqueDates = new Map();
 
-
-
-                if (error) throw error;
-
-                if (!data || data.length === 0) {
-                    hasMore = false;
-                    break;
-                }
-
-                // Process dates considering +08:00 timezone
                 data.forEach(item => {
+                    // Convert to local date string in Asia/Manila timezone
                     const date = new Date(item.date);
-                    allDates.add(date.toISOString().split('T')[0]);
+                    const localDate = date.toLocaleDateString('en-CA', { // en-CA gives YYYY-MM-DD format
+                        timeZone: 'Asia/Manila'
+                    });
+                    uniqueDates.set(localDate, true);
                 });
 
-                hasMore = data.length === PAGE_SIZE;
-                currentOffset += PAGE_SIZE;
-                await new Promise(resolve => setTimeout(resolve, 100));
+                const sortedDates = Array.from(uniqueDates.keys()).sort();
+                console.log('Available dates for location:', sortedDates);
+                setHighlightedDates(sortedDates);
             }
-
-            const sortedDates = Array.from(allDates).sort();
-            console.log('Air Quality dates for month:', sortedDates);
-            setHighlightedDates(sortedDates);
 
         } catch (error) {
             console.error("Error fetching month data:", error);
             toast.error(`Error fetching data: ${error.message}`);
         } finally {
-            setIsCalendarLoading(false); // End loading
+            setIsCalendarLoading(false);
         }
     };
 
@@ -213,10 +240,14 @@ const AirQualityByDate = () => {
 
     const tileClassName = ({ date, view }) => {
         if (view === "month") {
-            const nextDay = new Date(date);
-            nextDay.setDate(nextDay.getDate() + 1);
-            const formattedDate = nextDay.toISOString().split('T')[0];
-            return highlightedDates.includes(formattedDate) ? 'has-data' : 'no-data';
+            // Format the date to match our highlighted dates format (YYYY-MM-DD)
+            const formattedDate = date.toLocaleDateString('en-CA', {
+                timeZone: 'Asia/Manila'
+            });
+
+            // Check if this date should be highlighted
+            const hasDataForLocation = highlightedDates.includes(formattedDate);
+            return hasDataForLocation ? 'has-data' : 'no-data';
         }
         return null;
     };
@@ -268,14 +299,18 @@ const AirQualityByDate = () => {
 
 
     useEffect(() => {
+        const dateObj = typeof selectedDate === 'string'
+            ? new Date(selectedDate)
+            : selectedDate;
+
         const startOfMonth = new Date(
-            selectedDate.getFullYear(),
-            selectedDate.getMonth(),
+            dateObj.getFullYear(),
+            dateObj.getMonth(),
             1
         );
         const endOfMonth = new Date(
-            selectedDate.getFullYear(),
-            selectedDate.getMonth() + 1,
+            dateObj.getFullYear(),
+            dateObj.getMonth() + 1,
             0
         );
         fetchMonthData(startOfMonth, endOfMonth);
@@ -666,6 +701,15 @@ const AirQualityByDate = () => {
         );
     };
 
+    // Update calendar onChange to reset data when changing dates
+    const handleCalendarChange = (date) => {
+        setSelectedDate(date);
+        setViewMode("average");
+        // Reset data for new date
+        setAirData([]);
+        setAvailableHours([]);
+    };
+
     return (
         <div style={styles.fullContainer}>
             <header style={styles.header}>
@@ -686,10 +730,7 @@ const AirQualityByDate = () => {
                         <div style={{ position: 'relative', width: '100%' }}>
                             <Calendar
                                 value={selectedDate}
-                                onChange={(date) => {
-                                    setSelectedDate(date);
-                                    setViewMode("average");
-                                }}
+                                onChange={handleCalendarChange}
                                 onActiveStartDateChange={handleMonthChange}
                                 tileClassName={tileClassName} // Use tileClassName for custom styles
                             />

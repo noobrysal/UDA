@@ -6,6 +6,8 @@ import { Bar } from 'react-chartjs-2';
 import backgroundImage from '../../assets/soildash2.png';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import InfoIcon from '@mui/icons-material/Info';
+import { IconButton } from '@mui/material';
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -19,6 +21,7 @@ import {
 import { Tooltip } from '@mui/material';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
+import { useNavigate } from 'react-router-dom';
 
 ChartJS.register(
     CategoryScale,
@@ -31,6 +34,8 @@ ChartJS.register(
 );
 
 const SoilView = () => {
+    const navigate = useNavigate(); // Add this line near other hooks
+
     // Get the current local date in YYYY-MM-DD format
     const getCurrentLocalDate = () => {
         const now = new Date();
@@ -149,12 +154,19 @@ const SoilView = () => {
         }
     ];
 
+    // Add the chart descriptions from SoilQualityByDate
+    const metricDescriptions = {
+        soil_moisture: "Indicates the amount of water present in the soil. Critical for plant growth and nutrient absorption, and helps assess irrigation needs.",
+        humidity: "Reflects the moisture in the air around the soil, which can influence soil evaporation rates and overall water retention.",
+        temperature: "Affects soil microbial activity, nutrient availability, and plant root development. Critical for understanding soil health and crop growth conditions."
+    };
+
     // Update metrics for soil quality parameters
     const metrics = [
         {
             id: 'soil_moisture',
             name: 'Soil Moisture',
-            tooltip: 'Soil moisture content percentage. Optimal range is 40-70%.',
+            tooltip: metricDescriptions.soil_moisture,
             getIcon: (status) => {
                 switch (status) {
                     case 'Optimal': return '✅';
@@ -167,7 +179,7 @@ const SoilView = () => {
         {
             id: 'temperature',
             name: 'Temperature',
-            tooltip: 'Soil temperature in Celsius. Optimal range is 15-29°C.',
+            tooltip: metricDescriptions.temperature,
             getIcon: (status) => {
                 switch (status) {
                     case 'Optimal': return '✅';
@@ -180,7 +192,7 @@ const SoilView = () => {
         {
             id: 'humidity',
             name: 'Humidity',
-            tooltip: 'Environmental humidity percentage. Optimal range is 50-70%.',
+            tooltip: metricDescriptions.humidity,
             getIcon: (status) => {
                 switch (status) {
                     case 'Optimal': return '✅';
@@ -579,7 +591,8 @@ const SoilView = () => {
         chartContainer: {
             flex: 1,
             width: '100%',
-            height: '100%', // Set height as a percentage of the parent container's height
+            height: '100%',
+            cursor: 'pointer', // Add this line
         },
 
         //LOWER LEFT THRESHOLD INFO SLIDER BOX
@@ -1061,6 +1074,14 @@ const SoilView = () => {
         }
     };
 
+    // Update the handleMetricClick function
+    const handleMetricClick = () => {
+        // Ensure date is in YYYY-MM-DD format
+        const formattedDate = selectedDate;
+        const formattedHour = selectedHourForNarrative.toString().padStart(2, '0');
+        // Ensure formattedDate is in the correct format
+        window.open(`/soil-quality/${formattedDate}/${formattedHour}`, '_blank');
+    };
 
     // Update generateNarrative to focus on soil quality metrics
     const generateNarrative = (hour) => {
@@ -1177,6 +1198,9 @@ const SoilView = () => {
 
     // Update the barChartOptions
     const barChartOptions = {
+        // ...existing options...
+        onClick: handleMetricClick,
+        // ...existing options...
         responsive: true,
         maintainAspectRatio: false,
         scales: {
@@ -1428,10 +1452,26 @@ const SoilView = () => {
 
                                 return (
                                     <div key={metric.id} style={styles.metricBoxWrapper}>
-                                        <div style={styles.metricBox}>
-                                            <Tooltip title={metric.tooltip || ''} placement="top" arrow>
+                                        <div
+                                            style={{
+                                                ...styles.metricBox,
+                                                cursor: 'pointer'
+                                            }}
+                                            onClick={handleMetricClick}
+                                        >
+                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
+                                                <span style={{ fontSize: '16px' }}>{metric.icon}</span>
                                                 <h3 style={styles.metricTitle}>{metric.name}</h3>
-                                            </Tooltip>
+                                                <Tooltip
+                                                    title={metricDescriptions[metric.id]}
+                                                    arrow
+                                                    placement="top"
+                                                >
+                                                    <IconButton size="small" style={{ color: 'white' }}>
+                                                        <InfoIcon fontSize="small" />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </div>
                                             <div style={styles.progressWrapper}>
                                                 <div style={styles.circularProgressContainer}>
                                                     {value !== null && value !== undefined ? (

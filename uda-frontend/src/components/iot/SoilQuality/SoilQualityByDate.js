@@ -43,12 +43,33 @@ ChartJS.register(
 );
 
 const SoilQualityByDate = () => {
-    const [selectedDate, setSelectedDate] = useState(new Date());
-    const { } = useParams();
+    const { date, hour } = useParams();
+
+    // Update initial states to handle date properly
+    const [selectedDate, setSelectedDate] = useState(() => {
+        if (date) {
+            return date; // Keep as string for input value
+        }
+        return new Date().toISOString().split('T')[0];
+    });
+
+    const [selectedHour, setSelectedHour] = useState(() => {
+        return hour || "00";
+    });
+
+    // Add effect to handle URL parameters
+    useEffect(() => {
+        if (date) {
+            setSelectedDate(date);
+        }
+        if (hour) {
+            setSelectedHour(hour);
+        }
+    }, [date, hour]);
+
     const [soilData, setSoilData] = useState([]);
-    const [selectedHour, setSelectedHour] = useState("00");
     const [highlightedDates, setHighlightedDates] = useState([]);
-    const [viewMode, setViewMode] = useState("average");
+    const [viewMode, setViewMode] = useState(() => hour ? "hourly" : "average");
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const [isCalendarLoading, setIsCalendarLoading] = useState(false);
     const [expandedChart, setExpandedChart] = useState(null);
@@ -83,8 +104,9 @@ const SoilQualityByDate = () => {
     };
 
     const formatDate = (date) => {
-        // Adjust the date to local timezone
-        const localDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
+        // Handle both Date objects and date strings
+        const dateObj = typeof date === 'string' ? new Date(date) : date;
+        const localDate = new Date(dateObj.getTime() - (dateObj.getTimezoneOffset() * 60000));
         const year = localDate.getFullYear();
         const month = String(localDate.getMonth() + 1).padStart(2, "0");
         const day = String(localDate.getDate()).padStart(2, "0");
@@ -263,26 +285,40 @@ const SoilQualityByDate = () => {
             new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
         );
 
+        // Create arrays for labels, data points, and colors in the same order
+        const chartData = sortedData.map(item => {
+            const date = new Date(item.timestamp);
+            const hours = date.getHours();
+            const minutes = date.getMinutes();
+            const seconds = date.getSeconds();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            const displayHours = hours % 12 || 12;
+
+            return {
+                label: `${displayHours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')} ${ampm}`,
+                value: Number(item[metric]).toFixed(2),
+                color: getColor(item[metric], metric),
+                id: item.id // Keep track of the id
+            };
+        });
+
         return {
-            labels: sortedData.map((item) => {
-                const date = new Date(item.timestamp);
-                return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;
-            }),
-            datasets: [
-                {
-                    label: label + " Average Level",
-                    data: data.map((item) => Number(item.value).toFixed(2)), // Format to 2 decimal places
-                    borderColor: "white",
-                    borderWidth: 1,
-                    backgroundColor: averageColor,
-                    pointBackgroundColor: data.map((item) => getColor(item.value, metric)),
-                    pointBorderColor: "white",
-                    fill: false,
-                    pointRadius: 8,
-                    pointHoverRadius: 10,
-                    tension: 0.4,
-                },
-            ],
+            labels: chartData.map(item => item.label),
+            datasets: [{
+                label: label + " Average Level",
+                data: chartData.map(item => item.value),
+                borderColor: "white",
+                borderWidth: 1,
+                backgroundColor: averageColor,
+                pointBackgroundColor: chartData.map(item => item.color),
+                pointBorderColor: "white",
+                fill: false,
+                pointRadius: 8,
+                pointHoverRadius: 10,
+                tension: 0.4,
+                // Store the ids in the dataset for reference
+                ids: chartData.map(item => item.id)
+            }],
         };
     };
 
@@ -419,9 +455,9 @@ const SoilQualityByDate = () => {
     const handlePointClick = (event, chartElement) => {
         if (chartElement && chartElement.length > 0) {
             const index = chartElement[0].index;
-            const selectedInstance = filteredData[index];
-            if (selectedInstance) {
-                const url = `${window.location.origin}/soil-quality/id/${selectedInstance.id}`;
+            const selectedId = event.chart.data.datasets[0].ids[index];
+            if (selectedId) {
+                const url = `${window.location.origin}/soil-quality/id/${selectedId}`;
                 window.open(url, '_blank');
             }
         }
@@ -722,7 +758,7 @@ const SoilQualityByDate = () => {
         <div style={styles.fullContainer}>
             <header style={styles.header}>
                 <h1 style={styles.title}>
-                    Soil Quality Data for {selectedDate.toLocaleDateString()}
+                    Soil Quality Data for {new Date(selectedDate).toLocaleDateString()}
                 </h1>
             </header>
 
@@ -740,7 +776,6 @@ const SoilQualityByDate = () => {
                                 value={selectedDate}
                                 onChange={(date) => {
                                     setSelectedDate(date);
-                                    setViewMode("average");
                                 }}
                                 onActiveStartDateChange={handleMonthChange}
                                 tileClassName={tileClassName} // Use tileClassName for custom styles
