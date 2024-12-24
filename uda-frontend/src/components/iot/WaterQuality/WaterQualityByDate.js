@@ -51,7 +51,7 @@ const WaterQualityByDate = () => {
         }
         // Default to tomorrow if no date provided
         const today = new Date();
-        today.setDate(today.getDate() + 1);
+        today.setDate(today.getDate());
         return today.toISOString().split('T')[0];
     });
 
@@ -283,8 +283,9 @@ const WaterQualityByDate = () => {
             0
         );
         fetchMonthData(startOfMonth, endOfMonth);
+    }, []); // Only run once on component mount
 
-    }, [selectedDate]);
+    // Remove or comment out the useEffect that runs fetchMonthData when selectedDate changes
 
     const getFilteredData = (data) => {
         const selectedHourUTC = parseInt(selectedHour);
@@ -628,6 +629,26 @@ const WaterQualityByDate = () => {
             if (selectedInstance) {
                 const url = `${window.location.origin}/water-quality/id/${selectedInstance.id}`;
                 window.open(url, '_blank');
+            }
+        }
+    };
+
+    const handleAverageChartClick = (event, chartElements) => {
+        if (chartElements && chartElements.length > 0) {
+            const index = chartElements[0].index;
+            const clickedHourData = getFilteredDataForAverage(WaterData, "pH")[index];
+
+            if (clickedHourData) {
+                const clickedHour = clickedHourData.hour;
+
+                // Check if this hour exists in availableHours
+                if (availableHours.includes(clickedHour)) {
+                    setViewMode("hourly");
+                    setSelectedHour(clickedHour.toString().padStart(2, "0"));
+                } else {
+                    // Show toast notification if no data exists for this hour
+                    toast.info(`No detailed data available for ${clickedHour}:00`);
+                }
             }
         }
     };
@@ -1068,7 +1089,7 @@ const WaterQualityByDate = () => {
                                         getFilteredDataForAverage(WaterData, "pH"),
                                         "pH"
                                     ).options,
-                                    // Remove onClick handler for average view
+                                    onClick: handleAverageChartClick // Add this line
                                 }}
                             />
                         ) : null}
@@ -1185,7 +1206,7 @@ const WaterQualityByDate = () => {
                                         getFilteredDataForAverage(WaterData, "temperature"),
                                         "temperature"
                                     ).options,
-                                    // Remove onClick handler for average view
+                                    onClick: handleAverageChartClick // Add this line
                                 }}
                             />
                         ) : null}
@@ -1302,7 +1323,7 @@ const WaterQualityByDate = () => {
                                         getFilteredDataForAverage(WaterData, "tss"),
                                         "tss"
                                     ).options,
-                                    // Remove onClick handler for average view
+                                    onClick: handleAverageChartClick // Add this line
                                 }}
                             />
                         ) : null}
@@ -1407,7 +1428,7 @@ const WaterQualityByDate = () => {
                                         getFilteredDataForAverage(WaterData, "tds_ppm"),
                                         "tds_ppm"
                                     ).options,
-                                    // Remove onClick handler for average view
+                                    onClick: handleAverageChartClick // Add this line
                                 }}
                             />
                         ) : null}

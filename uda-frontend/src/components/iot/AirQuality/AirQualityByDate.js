@@ -63,7 +63,7 @@ const AirQualityByDate = () => {
         }
         // Default to tomorrow if no date provided
         const today = new Date();
-        today.setDate(today.getDate() + 1);
+        today.setDate(today.getDate());
         return today.toISOString().split('T')[0];
     });
 
@@ -141,6 +141,16 @@ const AirQualityByDate = () => {
             { min: 0, max: 19.49, label: "Poor", color: "rgba(232, 44, 48)" },
             { min: 19.5, max: Infinity, label: "Safe", color: "rgba(154, 205, 50)" },
         ],
+    };
+
+    const formatDisplayDate = (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
     };
 
     const formatDate = (date) => {
@@ -315,7 +325,7 @@ const AirQualityByDate = () => {
         );
         fetchMonthData(startOfMonth, endOfMonth);
 
-    }, [selectedDate, selectedLocation]);
+    }, []); // Empty dependency array means it only runs once on mount
 
     const getFilteredData = (data) => {
         const selectedHourUTC = new Date();
@@ -710,11 +720,32 @@ const AirQualityByDate = () => {
         setAvailableHours([]);
     };
 
+    // Add this function after other handlers
+    const handleAverageChartClick = (event, chartElements) => {
+        if (chartElements && chartElements.length > 0) {
+            const index = chartElements[0].index;
+            const clickedHourData = getFilteredDataForAverage(airData, "pm25")[index];
+
+            if (clickedHourData) {
+                const clickedHour = clickedHourData.hour;
+
+                // Check if this hour exists in availableHours
+                if (availableHours.includes(clickedHour)) {
+                    setViewMode("hourly");
+                    setSelectedHour(clickedHour.toString().padStart(2, "0"));
+                } else {
+                    // Show toast notification if no data exists for this hour
+                    toast.info(`No detailed data available for ${clickedHour}:00`);
+                }
+            }
+        }
+    };
+
     return (
         <div style={styles.fullContainer}>
             <header style={styles.header}>
                 <h1 style={styles.title}>
-                    Air Quality Data for {date} at {locationName}
+                    Air Quality Data for {formatDisplayDate(date || selectedDate)} at {locationName}
                 </h1>
             </header>
 
@@ -1080,6 +1111,7 @@ const AirQualityByDate = () => {
                                             color: 'white',
                                         },
                                     },
+                                    onClick: handleAverageChartClick,
                                 }}
                             />
                         ) : null}
@@ -1267,6 +1299,7 @@ const AirQualityByDate = () => {
                                             },
                                         },
                                     },
+                                    onClick: handleAverageChartClick,
                                 }}
                             />
                         ) : null}
@@ -1454,6 +1487,7 @@ const AirQualityByDate = () => {
                                             },
                                         },
                                     },
+                                    onClick: handleAverageChartClick,
                                 }}
                             />
                         ) : null}
@@ -1641,6 +1675,7 @@ const AirQualityByDate = () => {
                                             },
                                         },
                                     },
+                                    onClick: handleAverageChartClick,
                                 }}
                             />
                         ) : null}
@@ -1828,6 +1863,7 @@ const AirQualityByDate = () => {
                                             },
                                         },
                                     },
+                                    onClick: handleAverageChartClick,
                                 }}
                             />
                         ) : null}

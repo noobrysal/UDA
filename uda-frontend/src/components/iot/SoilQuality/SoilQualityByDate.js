@@ -102,6 +102,15 @@ const SoilQualityByDate = () => {
             { min: 86, max: Infinity, label: "Waterlogged", color: "rgba(140, 1, 4, 1)" }, // Emergency
         ],
     };
+    const formatDisplayDate = (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    };
 
     const formatDate = (date) => {
         // Handle both Date objects and date strings
@@ -224,6 +233,25 @@ const SoilQualityByDate = () => {
         fetchMonthData(startOfMonth, endOfMonth);
 
     }, [currentMonth]);
+
+    // Add this new useEffect after the existing useEffects
+    useEffect(() => {
+        // Get the first day of the current month
+        const startOfMonth = new Date(
+            currentMonth.getFullYear(),
+            currentMonth.getMonth(),
+            1
+        );
+        // Get the last day of the current month
+        const endOfMonth = new Date(
+            currentMonth.getFullYear(),
+            currentMonth.getMonth() + 1,
+            0
+        );
+
+        // Fetch data for the current month when component mounts
+        fetchMonthData(startOfMonth, endOfMonth);
+    }, []); // Empty dependency array means this runs once on mount
 
     const getFilteredData = (data) => {
         const selectedHourUTC = parseInt(selectedHour);
@@ -463,6 +491,26 @@ const SoilQualityByDate = () => {
         }
     };
 
+    const handleAverageChartClick = (event, chartElements) => {
+        if (chartElements && chartElements.length > 0) {
+            const index = chartElements[0].index;
+            const clickedHourData = getFilteredDataForAverage(soilData, "soil_moisture")[index];
+
+            if (clickedHourData) {
+                const clickedHour = clickedHourData.hour;
+
+                // Check if this hour exists in availableHours
+                if (availableHours.includes(clickedHour)) {
+                    setViewMode("hourly");
+                    setSelectedHour(clickedHour.toString().padStart(2, "0"));
+                } else {
+                    // Show toast notification if no data exists for this hour
+                    toast.info(`No detailed data available for ${clickedHour}:00`);
+                }
+            }
+        }
+    };
+
     const calculateAverageColor = (data, metric) => {
         if (data.length === 0) return "rgba(0, 0, 0, 1)"; // Default for no data
 
@@ -682,7 +730,10 @@ const SoilQualityByDate = () => {
                                 metric
                             )}
                         height={250}
-                        options={getChartOptions(label, metric)}
+                        options={{
+                            ...getChartOptions(label, metric),
+                            onClick: viewMode === "hourly" ? handlePointClick : handleAverageChartClick
+                        }}
                     />
                 ) : (
                     <div style={{
@@ -758,7 +809,7 @@ const SoilQualityByDate = () => {
         <div style={styles.fullContainer}>
             <header style={styles.header}>
                 <h1 style={styles.title}>
-                    Soil Quality Data for {new Date(selectedDate).toLocaleDateString()}
+                    Soil Quality Data for {formatDisplayDate(date || selectedDate)}
                 </h1>
             </header>
 
