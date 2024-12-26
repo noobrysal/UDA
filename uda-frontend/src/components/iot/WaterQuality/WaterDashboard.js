@@ -16,6 +16,7 @@ import {
     Legend,
 } from 'chart.js';
 import { color, height, width } from '@mui/system';
+import InfoIcon from '@mui/icons-material/Info';
 
 // Register chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -37,6 +38,81 @@ const WaterDashboard = () => {
     const [logsErrorMessage, setLogsErrorMessage] = useState(null);
 
     const [comparisonData, setComparisonData] = useState(null); // State for comparison chart data
+    const [showComparisonTooltip, setShowComparisonTooltip] = useState(false);
+
+    const handleComparisonTooltipToggle = () => {
+        setShowComparisonTooltip(!showComparisonTooltip);
+    };
+
+    const renderComparisonTooltipContent = () => {
+        return (
+            <div>
+                <h4 style={{...styles.tooltipHeader, marginBottom: '20px'}}>Water Quality Thresholds</h4>
+                <table style={styles.tooltipTable}>
+                    <thead>
+                        <tr>
+                            <th style={styles.tooltipTableHeader}>Category</th>
+                            <th style={{ ...styles.tooltipTableHeader, width: '11%'}}>pH</th>
+                            <th style={{ ...styles.tooltipTableHeader, width: '12%'}}>Temperature (°C)</th>
+                            <th style={{ ...styles.tooltipTableHeader, width: '12%'}}>TSS (mg/L)</th>
+                            <th style={{ ...styles.tooltipTableHeader, width: '12%'}}>TDS (ppm)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(199, 46, 46, 1)", color: "#fff" }}>Too Acidic</td>
+                            <td style={styles.tooltipTableCell}>0 - 6.49</td>
+                            <td style={styles.tooltipTableCell}>N/A</td>
+                            <td style={styles.tooltipTableCell}>N/A</td>
+                            <td style={styles.tooltipTableCell}>N/A</td>
+                        </tr>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(154, 205, 50, 1)", color: "#fff" }}>Acceptable</td>
+                            <td style={styles.tooltipTableCell}>6.5 - 8.5</td>
+                            <td style={styles.tooltipTableCell}>26 - 30</td>
+                            <td style={styles.tooltipTableCell}>0 - 50</td>
+                            <td style={styles.tooltipTableCell}>0 - 500</td>
+                        </tr>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(230, 126, 14, 1)", color: "#fff" }}>Too Alkaline</td>
+                            <td style={styles.tooltipTableCell}>8.51 - ∞</td>
+                            <td style={styles.tooltipTableCell}>N/A</td>
+                            <td style={styles.tooltipTableCell}>N/A</td>
+                            <td style={styles.tooltipTableCell}>N/A</td>
+                        </tr>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(199, 46, 46, 1)", color: "#fff" }}>Too Cold</td>
+                            <td style={styles.tooltipTableCell}>N/A</td>
+                            <td style={styles.tooltipTableCell}>0 - 25.99</td>
+                            <td style={styles.tooltipTableCell}>N/A</td>
+                            <td style={styles.tooltipTableCell}>N/A</td>
+                        </tr>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(199, 46, 46, 1)", color: "#fff" }}>Too Hot</td>
+                            <td style={styles.tooltipTableCell}>N/A</td>
+                            <td style={styles.tooltipTableCell}>30.01 - ∞</td>
+                            <td style={styles.tooltipTableCell}>N/A</td>
+                            <td style={styles.tooltipTableCell}>N/A</td>
+                        </tr>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(199, 46, 46, 1)", color: "#fff" }}>Too Cloudy</td>
+                            <td style={styles.tooltipTableCell}>N/A</td>
+                            <td style={styles.tooltipTableCell}>N/A</td>
+                            <td style={styles.tooltipTableCell}>50.01 - ∞</td>
+                            <td style={styles.tooltipTableCell}>N/A</td>
+                        </tr>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(199, 46, 46, 1)", color: "#fff" }}>High Dissolved Substances</td>
+                            <td style={styles.tooltipTableCell}>N/A</td>
+                            <td style={styles.tooltipTableCell}>N/A</td>
+                            <td style={styles.tooltipTableCell}>N/A</td>
+                            <td style={styles.tooltipTableCell}>500.01 - ∞</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        );
+    };
 
     //BUTTON NAVIGATION TO WATER DETAILED DATA
     const navigate = useNavigate();
@@ -773,7 +849,7 @@ const WaterDashboard = () => {
 
         return (
             <div style={{ display: "flex", flexDirection: "column", height: "70%" }}>
-                <div style={{ flex: 1 }}>
+                <div style={{ flex: 1, position: 'relative' }}>
                     <Bar data={data} options={options} height="100%" />
                 </div>
                 <div style={{ marginTop: "20px", color: "#fff", fontSize: "1rem", textAlign: "justify" }}>
@@ -789,14 +865,7 @@ const WaterDashboard = () => {
     };
 
     const renderLegend = () => {
-        const metrics = ["pH", "temperature", "tss", "tds_ppm"];
-        return (
-            <div style={{ marginTop: "30px" }}>
-                {metrics.map((metric) => (
-                    <Legend key={metric} thresholds={thresholds1[metric]} metric={metric} />
-                ))}
-            </div>
-        );
+        return null; // Remove the legend rendering
     };
 
     const monthNames = [
@@ -1373,7 +1442,10 @@ const WaterDashboard = () => {
                     <div style={styles.renderComparisonBox}>
                         {/* Header Title and Subtitle */}
                         <div style={styles.comparisonChartHeader}>
-                            <h2 style={styles.comparisonChartTitle}>Comparison Chart</h2>
+                            <h2 style={styles.comparisonChartTitle}>
+                                Comparison Chart
+                                <InfoIcon style={styles.tooltipIcon} onClick={handleComparisonTooltipToggle} />
+                            </h2>
                             <p style={styles.comparisonChartSubtitle}>
                                 This chart displays a comparison between two selected datasets over time
                             </p>
@@ -1383,17 +1455,13 @@ const WaterDashboard = () => {
                         {renderComparisonChart(comparisonData)}
                     </div>
                 </div>
-                <div style={styles.thresholdLegendDiv}>
-                    <div style={styles.thresholdHeader}>
-                        <h3 style={styles.thresholdTitle}>Data Thresholds</h3>
-                        <p style={styles.thresholdSubtitle}>
-                            Scale of the various data levels for water monitoring
-                        </p>
+                {showComparisonTooltip && (
+                    <div style={styles.tooltipOverlay} onClick={handleComparisonTooltipToggle}>
+                        <div style={styles.tooltipContent} onClick={(e) => e.stopPropagation()}>
+                            {renderComparisonTooltipContent()}
+                        </div>
                     </div>
-                    {renderLegend()}
-                </div>
-
-                {/* Alert Filters */}
+                )}
                 <div style={styles.alertFiltersContainer}>
                     {/* Header Row */}
                     <div style={styles.alertHeaderRow}>
@@ -1569,25 +1637,22 @@ const styles = {
         width: '100%',
         // maxWidth: '1440px', // Restrict to a maximum width for large screens
         backgroundColor: 'rgba(15, 13, 26, 0)',
-        padding: '20px 0 0 20px',
+        padding: '0 0 0 20px',
         justifyContent: 'center',
         alignItems: 'center',
     },
 
     // WATER DASHBOARD TEXTS
     dashboardTitle: {
-        fontSize: '3rem',
-        fontWeight: 'bold',
-        marginLeft: '10px',
-        color: '#fff',
-        marginTop: '-20px',
+        fontSize: "28px",
+        fontWeight: "bold",
+        margin: 0,
+        color: "#fff",
     },
     dashboardTitle2: {
-        fontSize: '1.3rem',
-        fontWeight: '100',
-        marginBottom: '25px',
-        marginLeft: '10px',
-        color: '#fff',
+        fontSize: "15px",
+        margin: 0,
+        color: "#fff",
     },
 
     // HEADER ROW FOR TITLE AND BUTTON
@@ -2046,7 +2111,49 @@ const styles = {
         comparisonContainer: {
             flexWrap: 'nowrap',
         }
-    }
+    },
+    tooltipIcon: {
+        color: '#fff',
+        cursor: 'pointer',
+        fontSize: '1.5rem',
+        marginLeft: '10px',
+        // borderRadius: '50%',
+        // backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        // padding: '5px',
+    },
+    tooltipOverlay: {
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 1000,
+    },
+    tooltipContent: {
+        backgroundColor: 'rgba(20, 60, 11, 0.9)',
+        color: '#fff',
+        padding: '20px',
+        borderRadius: '20px',
+        maxWidth: '80%',
+        textAlign: 'center',
+    },
+    tooltipTable: {
+        width: '100%',
+        borderCollapse: 'collapse',
+        marginBottom: '10px',
+    },
+    tooltipTableHeader: {
+        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+        border: '1px solid rgba(255, 255, 255)',
+    },
+    tooltipTableCell: {
+        border: '1px solid rgba(255, 255, 255)',
+        padding: '10px',
+    },
 };
 
 

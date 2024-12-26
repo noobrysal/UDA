@@ -109,9 +109,9 @@ const SoilQualityInstance = () => {
         return () => mounted = false;
     }, [id]);
 
-    const handleButtonClick = () => {
-        navigate('/soil-quality'); // Make sure this matches your route path exactly
-    };
+    // const handleButtonClick = () => {
+    //     navigate('/soil-quality'); // Make sure this matches your route path exactly
+    // };
 
     const handleMouseMove = (e) => {
         setMousePosition({ x: e.clientX, y: e.clientY });
@@ -242,11 +242,11 @@ const SoilQualityInstance = () => {
                 </div>
                 {renderHoverMiniWindow()}
             </div>
-            <button style={styles.button}
+            {/* <button style={styles.button}
                 onClick={handleButtonClick}
             >
                 Detailed Data
-            </button>
+            </button> */}
             <ToastContainer />
         </div>
     );
@@ -328,22 +328,22 @@ const styles = {
         margin: '0 auto',
         marginTop: '20px',
     },
-    button: {
-        display: 'flex',
-        flexDirection: 'row',
-        padding: '10px 10px',
-        background: 'linear-gradient(50deg, #d3c740, #524d18)', // Gradient background
-        color: '#fff',
-        border: 'none',
-        borderRadius: '15px',
-        cursor: 'pointer',
-        fontSize: '1rem',
-        width: '300px',
-        justifyContent: 'center', // Center the content horizontally
-        alignItems: 'center',     // Center the content vertically
-        textAlign: 'center',      // Make sure the text is centered
-        margin: '0px 500px 0px 500px'
-    },
+    // button: {
+    //     display: 'flex',
+    //     flexDirection: 'row',
+    //     padding: '10px 10px',
+    //     background: 'linear-gradient(50deg, #d3c740, #524d18)', // Gradient background
+    //     color: '#fff',
+    //     border: 'none',
+    //     borderRadius: '15px',
+    //     cursor: 'pointer',
+    //     fontSize: '1rem',
+    //     width: '300px',
+    //     justifyContent: 'center', // Center the content horizontally
+    //     alignItems: 'center',     // Center the content vertically
+    //     textAlign: 'center',      // Make sure the text is centered
+    //     margin: '0px 500px 0px 500px'
+    // },
     progressContainerHover: {
         transform: 'scale(1.05)',
     },

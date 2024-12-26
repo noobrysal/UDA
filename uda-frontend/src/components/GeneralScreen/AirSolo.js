@@ -6,7 +6,7 @@ import { Bar } from 'react-chartjs-2'; // Add Bar import
 import backgroundImage from '../../assets/airdash2.png';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { IconButton } from '@mui/material';
 import {
     Chart as ChartJS,
@@ -22,6 +22,7 @@ import {
 import { Tooltip, Tooltip as MuiTooltip } from '@mui/material';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
+import InfoIcon from '@mui/icons-material/Info';
 
 ChartJS.register(
     CategoryScale,
@@ -59,6 +60,11 @@ const AirView = () => {
     const [visibleHourRange, setVisibleHourRange] = useState(() =>
         getCurrentHourBlock(new Date().getHours())
     );
+    const [showTooltip, setShowTooltip] = useState(false);
+
+    const handleTooltipToggle = () => {
+        setShowTooltip(!showTooltip);
+    };
 
     const locations = [
         { id: 1, name: 'LAPASAN' },
@@ -502,6 +508,7 @@ const AirView = () => {
             flexDirection: "column",
             justifyContent: "space-between",
             gap: "20px",
+            
         },
 
         // UPPER LEFT BOX BAR CHART MERGED METRICS
@@ -533,6 +540,7 @@ const AirView = () => {
             backgroundColor: 'rgba(242, 242, 242, 0.1)',
             display: "flex",
             flexDirection: "column",
+            // marginBottom: "20px",
             // justifyContent: "space-between",
         },
         thresholdWrapper: {
@@ -643,6 +651,7 @@ const AirView = () => {
             backgroundColor: 'rgba(242, 242, 242, 0.1)',
             borderRadius: "20px",
             padding: "20px",  // Adjusted padding for better alignment
+            // marginBottom: "20px",
         },
 
         // UPPER RIGHT BOX
@@ -664,7 +673,7 @@ const AirView = () => {
             display: "flex",
             justifyContent: "space-between",
             // alignItems: "center",
-            height: "100%",
+            height: "10%",
             gap: "10px",
         },
         hoursContainer: {
@@ -751,6 +760,7 @@ const AirView = () => {
             fontWeight: "bold",
             color: "#fff",
             marginBottom: "0px",
+            textAlign: "center",    
         },
         progressWrapper: {
             display: "flex",
@@ -762,7 +772,7 @@ const AirView = () => {
             width: "80%",
             height: "100%",
             fontWeight: "bold",
-            marginTop: "10px",
+            marginTop: "-5px",
         },
         noDataLabel: {
             fontSize: "15px",
@@ -803,10 +813,11 @@ const AirView = () => {
         lowerRightBox: {
             backgroundColor: 'rgba(242, 242, 242, 0.1)',
             borderRadius: "10px",
-            height: "30%", // Adjust height for smaller boxes
+            height: "100%", // Adjust height for smaller boxes
             width: "100%",
             // marginBottom: "8px",
-            marginTop: "80px",
+            marginTop: "60px",
+            // marginBottom: "20px",
         },
         // NARRATIVE REPORT
         narrativeReportContainer: {
@@ -818,6 +829,7 @@ const AirView = () => {
             // flexDirection: "column",
             // marginTop: "200px",
             justifyContent: "center",
+            // marginBottom: "20px",
         },
         narrativeTitle: {
             display: "flex",
@@ -834,7 +846,7 @@ const AirView = () => {
         narrativeContent: {
             whiteSpace: "pre-line",
             margin: 0,
-            fontSize: "14px", // Optional: Adjust content font size
+            fontSize: "12px", // Optional: Adjust content font size
             color: "#fff", // Optional: Adjust text color
         },
         tooltipContent: {
@@ -911,6 +923,39 @@ const AirView = () => {
             fontSize: "16px",
             color: "#fff",
         },
+        tooltipOverlay: {
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1000,
+        },
+        tooltipContent: {
+            backgroundColor: 'rgba(12, 38, 64, 0.9)',
+            color: '#fff',
+            padding: '20px',
+            borderRadius: '20px',
+            maxWidth: '80%',
+            textAlign: 'center',
+        },
+        tooltipTable: {
+            width: '100%',
+            borderCollapse: 'collapse',
+            marginBottom: '10px',
+        },
+        tooltipTableHeader: {
+            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+            border: '1px solid rgba(255, 255, 255)',
+        },
+        tooltipTableCell: {
+            border: '1px solid rgba(255, 255, 255)',
+            padding: '10px',
+        },
     };
 
     const renderTooltip = () => {
@@ -921,7 +966,7 @@ const AirView = () => {
         return (
             <div style={{
                 ...styles.tooltipContainer,
-                display: hoveredData ? 'block' : 'none',
+                display: hoveredData ? 'inline' : 'none',
                 position: 'fixed',
                 top: position?.y - 10 || 0,
                 left: position?.x || 0,
@@ -1162,6 +1207,77 @@ const AirView = () => {
         return metricDescriptions[metric] || "No description available";
     };
 
+    const renderTooltipContent = () => {
+        return (
+            <div>
+                <h4 style={{...styles.tooltipHeader, marginBottom: '20px'}}>Air Quality Thresholds</h4>
+                <table style={styles.tooltipTable}>
+                    <thead>
+                        <tr>
+                            <th style={styles.tooltipTableHeader}>Category</th>
+                            <th style={{ ...styles.tooltipTableHeader, width: '11%'}}>Particle Matter 10 (PM10)</th>
+                            <th style={{ ...styles.tooltipTableHeader, width: '12%'}}>Particle Matter 2.5 (PM2.5)</th>
+                            <th style={styles.tooltipTableHeader}>Cautionary Statement</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(154, 205, 50)", color: "#fff" }}>Good</td>
+                            <td style={styles.tooltipTableCell}>0–54µg/m³</td>
+                            <td style={styles.tooltipTableCell}>0–25µg/m³</td>
+                            <td style={styles.tooltipTableCell}>None.</td>
+                        </tr>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(250, 196, 62)", color: "#fff" }}>Fair</td>
+                            <td style={styles.tooltipTableCell}>55–154µg/m³</td>
+                            <td style={styles.tooltipTableCell}>25.1–35.0µg/m³</td>
+                            <td style={styles.tooltipTableCell}>None.</td>
+                        </tr>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(230, 126, 14)", color: "#fff" }}>Unhealthy</td>
+                            <td style={styles.tooltipTableCell}>155–254µg/m³</td>
+                            <td style={styles.tooltipTableCell}>35.1–45.0µg/m³</td>
+                            <td style={{ ...styles.tooltipTableCell, textAlign: "left" }}>People with respiratory disease, such as asthma, should limit outdoor exertion.</td>
+                        </tr>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(232, 44, 48)", color: "#fff" }}>Very Unhealthy</td>
+                            <td style={styles.tooltipTableCell}>255–354µg/m³</td>
+                            <td style={styles.tooltipTableCell}>45.1–55µg/m³</td>
+                            <td style={{ ...styles.tooltipTableCell, textAlign: "left" }}>
+                                Pedestrians should avoid heavy traffic areas.
+                                People with heart or respiratory disease such as asthma should stay indoors and rest as much as possible.
+                                Unnecessary trips should be postponed.
+                                People should voluntarily restrict the use of vehicles.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(159, 109, 199)", color: "#fff" }}>Acutely Unhealthy</td>
+                            <td style={styles.tooltipTableCell}>355–424µg/m³</td>
+                            <td style={styles.tooltipTableCell}>55.1–90µg/m³</td>
+                            <td style={{ ...styles.tooltipTableCell, textAlign: "left" }}>
+                                Pedestrians should avoid heavy traffic areas.
+                                People with heart or respiratory disease such as asthma should stay indoors and rest as much as possible.
+                                Unnecessary trips should be postponed.
+                                Motor vehicle use may be restricted.
+                                Industrial activities may be curtailed.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(140, 1, 4)", color: "#fff" }}>Emergency</td>
+                            <td style={styles.tooltipTableCell}>425–504µg/m³</td>
+                            <td style={styles.tooltipTableCell}>Above 91µg/m³</td>
+                            <td style={{ ...styles.tooltipTableCell, textAlign: "left" }}>
+                                Everyone should remain indoors (keeping windows and doors closed unless heat stress is possible).
+                                Motor vehicle use should be prohibited except for emergency situations.
+                                Industrial activities, except that which is vital for public safety and health, should be curtailed.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        );
+    };
+
     return (
         <div style={styles.fullcontainer}>
             {/* Header Section */}
@@ -1218,8 +1334,12 @@ const AirView = () => {
                             </div>
                             {/* Navigation buttons */}
                             <div style={styles.slideHeaderRight}>
+                            <IconButton size="small" style={{ color: 'white' }} onClick={handleTooltipToggle}>
+                                    <InfoOutlinedIcon fontSize="small" />
+                                </IconButton>
                                 <button onClick={prevSlide} style={styles.slideButton}>←</button>
                                 <button onClick={nextSlide} style={styles.slideButton}>→</button>
+                               
                             </div>
                         </div>
                         <div style={styles.slideshowBody}>
@@ -1229,15 +1349,6 @@ const AirView = () => {
                                         <p style={styles.slideDescription}>
                                             {thresholdInfo[currentSlide].description}
                                         </p>
-                                        {/* <div style={styles.rangeInfo}></div> */}
-                                        {/* <div style={styles.recommendations}>
-                                            <h5>Recommendations:</h5>
-                                            <ul>
-                                                {thresholdInfo[currentSlide].recommendations.map((rec, index) => (
-                                                    <li key={index}>{rec}</li>
-                                                ))}
-                                            </ul>
-                                        </div> */}
                                     </div>
                                 </div>
                             </div>
@@ -1331,18 +1442,19 @@ const AirView = () => {
                                                 }}
                                                 onClick={handleChartClick}
                                             >
-                                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0px', marginLeft: '15px' }}>
                                                     <h3 style={styles.metricTitle}>{metric.name}</h3>
+                                                
                                                     <MuiTooltip
                                                         title={metricDescriptions[metric.id] || ""}
                                                         arrow
                                                         placement="top"
                                                     >
                                                         <IconButton size="small" style={{ color: 'white' }}>
-                                                            <HelpOutlineIcon fontSize="small" />
+                                                            <InfoIcon fontSize="small" />
                                                         </IconButton>
                                                     </MuiTooltip>
-                                                </div>
+                                                    </div>
                                                 <div style={styles.progressWrapper}>
                                                     <div style={styles.circularProgressContainer}>
                                                         {value !== null && value !== undefined ? (
@@ -1468,7 +1580,14 @@ const AirView = () => {
                 </div>
             </div>
             {hoveredData && renderTooltip()}
-            <ToastContainer />
+            <ToastContainer style={{ marginTop: '70px' }} />
+            {showTooltip && (
+                <div style={styles.tooltipOverlay} onClick={handleTooltipToggle}>
+                    <div style={styles.tooltipContent} onClick={(e) => e.stopPropagation()}>
+                        {renderTooltipContent()}
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

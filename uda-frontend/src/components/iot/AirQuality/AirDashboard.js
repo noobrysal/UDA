@@ -16,6 +16,8 @@ import {
     Legend,
 } from 'chart.js';
 import { color, height, minHeight, width } from '@mui/system';
+import IconButton from '@mui/material/IconButton';
+import InfoIcon from '@mui/icons-material/Info';
 
 // Register chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -37,6 +39,82 @@ const AirDashboard = () => {
     const [logsErrorMessage, setLogsErrorMessage] = useState(null);
 
     const [comparisonData, setComparisonData] = useState(null); // State for comparison chart data
+    const [showComparisonTooltip, setShowComparisonTooltip] = useState(false);
+
+    const handleComparisonTooltipToggle = () => {
+        setShowComparisonTooltip(!showComparisonTooltip);
+    };
+
+    const renderComparisonTooltipContent = () => {
+        return (
+            <div>
+                <h4 style={{...styles.tooltipHeader, marginBottom: '20px'}}>Air Quality Thresholds</h4>
+                <table style={styles.tooltipTable}>
+                    <thead>
+                        <tr>
+                            <th style={styles.tooltipTableHeader}>Category</th>
+                            <th style={{ ...styles.tooltipTableHeader, width: '11%'}}>Particle Matter 10 (PM10)</th>
+                            <th style={{ ...styles.tooltipTableHeader, width: '12%'}}>Particle Matter 2.5 (PM2.5)</th>
+                            <th style={styles.tooltipTableHeader}>Cautionary Statement</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(154, 205, 50)", color: "#fff" }}>Good</td>
+                            <td style={styles.tooltipTableCell}>0–54µg/m³</td>
+                            <td style={styles.tooltipTableCell}>0–25µg/m³</td>
+                            <td style={styles.tooltipTableCell}>None.</td>
+                        </tr>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(250, 196, 62)", color: "#fff" }}>Fair</td>
+                            <td style={styles.tooltipTableCell}>55–154µg/m³</td>
+                            <td style={styles.tooltipTableCell}>25.1–35.0µg/m³</td>
+                            <td style={styles.tooltipTableCell}>None.</td>
+                        </tr>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(230, 126, 14)", color: "#fff" }}>Unhealthy</td>
+                            <td style={styles.tooltipTableCell}>155–254µg/m³</td>
+                            <td style={styles.tooltipTableCell}>35.1–45.0µg/m³</td>
+                            <td style={{ ...styles.tooltipTableCell, textAlign: "left" }}>People with respiratory disease, such as asthma, should limit outdoor exertion.</td>
+                        </tr>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(232, 44, 48)", color: "#fff" }}>Very Unhealthy</td>
+                            <td style={styles.tooltipTableCell}>255–354µg/m³</td>
+                            <td style={styles.tooltipTableCell}>45.1–55µg/m³</td>
+                            <td style={{ ...styles.tooltipTableCell, textAlign: "left" }}>
+                                Pedestrians should avoid heavy traffic areas.
+                                People with heart or respiratory disease such as asthma should stay indoors and rest as much as possible.
+                                Unnecessary trips should be postponed.
+                                People should voluntarily restrict the use of vehicles.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(159, 109, 199)", color: "#fff" }}>Acutely Unhealthy</td>
+                            <td style={styles.tooltipTableCell}>355–424µg/m³</td>
+                            <td style={styles.tooltipTableCell}>55.1–90µg/m³</td>
+                            <td style={{ ...styles.tooltipTableCell, textAlign: "left" }}>
+                                Pedestrians should avoid heavy traffic areas.
+                                People with heart or respiratory disease such as asthma should stay indoors and rest as much as possible.
+                                Unnecessary trips should be postponed.
+                                Motor vehicle use may be restricted.
+                                Industrial activities may be curtailed.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(140, 1, 4)", color: "#fff" }}>Emergency</td>
+                            <td style={styles.tooltipTableCell}>425–504µg/m³</td>
+                            <td style={styles.tooltipTableCell}>Above 91µg/m³</td>
+                            <td style={{ ...styles.tooltipTableCell, textAlign: "left" }}>
+                                Everyone should remain indoors (keeping windows and doors closed unless heat stress is possible).
+                                Motor vehicle use should be prohibited except for emergency situations.
+                                Industrial activities, except that which is vital for public safety and health, should be curtailed.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        );
+    };
 
     //BUTTON NAVIGATION TO AIR DETAILED DATA
     const navigate = useNavigate();
@@ -1352,17 +1430,28 @@ const AirDashboard = () => {
                     <div style={styles.renderComparisonBox}>
                         {/* Header Title and Subtitle */}
                         <div style={styles.comparisonChartHeader}>
-                            <h2 style={styles.comparisonChartTitle}>Comparison Chart</h2>
+                            <h2 style={styles.comparisonChartTitle}>Comparison Chart
+                                <InfoIcon style={styles.tooltipIcon} onClick={handleComparisonTooltipToggle} />
+                            </h2>
                             <p style={styles.comparisonChartSubtitle}>
                                 This chart displays a comparison between two selected datasets over time
                             </p>
+                            
                         </div>
 
                         {/* Render Comparison Chart */}
                         {renderComparisonChart(comparisonData)}
                     </div>
                 </div>
-                <div style={styles.thresholdLegendDiv}>
+                {showComparisonTooltip && (
+                    <div style={styles.tooltipOverlay} onClick={handleComparisonTooltipToggle}>
+                        <div style={styles.tooltipContent} onClick={(e) => e.stopPropagation()}>
+                            {renderComparisonTooltipContent()}
+                        </div>
+                    </div>
+                )}
+                {/* Remove the data threshold section */}
+                {/* <div style={styles.thresholdLegendDiv}>
                     <div style={styles.thresholdHeader}>
                         <h3 style={styles.thresholdTitle}>Data Thresholds</h3>
                         <p style={styles.thresholdSubtitle}>
@@ -1370,7 +1459,7 @@ const AirDashboard = () => {
                         </p>
                     </div>
                     {renderLegend()}
-                </div>
+                </div> */}
 
                 {/* Alert Filters */}
                 <div style={styles.alertFiltersContainer}>
@@ -1559,23 +1648,20 @@ const styles = {
         width: '100%',
         // maxWidth: '1440px', // Restrict to a maximum width for large screens
         backgroundColor: 'rgba(15, 13, 26, 0)',
-        padding: '20px 0 0 20px',
+        padding: '0 0 0 20px',
     },
 
     // AIR DASHBOARD TEXTS
     dashboardTitle: {
-        fontSize: '3rem',
-        fontWeight: 'bold',
-        marginLeft: '10px',
-        color: '#fff',
-        marginTop: '-20px',
+        fontSize: "28px",
+        fontWeight: "bold",
+        margin: 0,
+        color: "#fff",
     },
     dashboardTitle2: {
-        fontSize: '1.3rem',
-        fontWeight: '100',
-        marginBottom: '25px',
-        marginLeft: '10px',
-        color: '#fff',
+        fontSize: "15px",
+        margin: 0,
+        color: "#fff",
     },
 
     // HEADER ROW FOR TITLE AND BUTTON
@@ -1906,37 +1992,6 @@ const styles = {
     },
 
 
-    // DATA THRESHOLD CONTAINER STYLE
-    thresholdLegendDiv: {
-        backgroundColor: 'rgba(242, 242, 242, 0.1)',
-        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.3)',
-        padding: '15px 20px', // Adjust padding for better spacing
-        borderRadius: '20px',
-    },
-    thresholdHeader: {
-        display: 'flex',
-        justifyContent: 'space-between', // Align title and subtitle in a row
-        alignItems: 'center', // Center vertically
-        marginBottom: '10px', // Space between header and legend
-    },
-    thresholdTitle: {
-        color: '#fff',
-        fontSize: '1.8rem',
-        // fontWeight: 'bold',  
-        margin: 0,
-        marginTop: '15px',
-        marginLeft: '15px',
-    },
-    thresholdSubtitle: {
-        color: '#ddd',
-        fontSize: '1rem',
-        margin: 0,
-        marginTop: '15px',
-        marginRight: '15px',
-        paddingLeft: '10px', // Optional spacing between title and subtitle
-    },
-
-
     // RENDERED ALERT LOG WITH TIME LOG
     alertLogsContainer: {
         marginTop: '20px', // Add space above the container
@@ -2072,6 +2127,48 @@ const styles = {
             marginRight: '10px',
             padding: '5px', // Minimal padding for mobile
         },
+    },
+    tooltipIcon: {
+        color: '#fff',
+        cursor: 'pointer',
+        fontSize: '1.5rem',
+        marginLeft: '10px',
+        // borderRadius: '50%',
+        // backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        // padding: '5px',
+    },
+    tooltipOverlay: {
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 1000,
+    },
+    tooltipContent: {
+        backgroundColor: 'rgba(12, 38, 64, 0.9)',
+        color: '#fff',
+        padding: '20px',
+        borderRadius: '20px',
+        maxWidth: '80%',
+        textAlign: 'center',
+    },
+    tooltipTable: {
+        width: '100%',
+        borderCollapse: 'collapse',
+        marginBottom: '10px',
+    },
+    tooltipTableHeader: {
+        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+        border: '1px solid rgba(255, 255, 255)',
+    },
+    tooltipTableCell: {
+        border: '1px solid rgba(255, 255, 255)',
+        padding: '10px',
     },
 };
 

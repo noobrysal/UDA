@@ -6,6 +6,9 @@ import { supabaseAir } from '../iot/AirQuality/supabaseClient';
 import { supabaseWater } from '../iot/WaterQuality/supabaseClient';
 import axiosClient from '../iot/SoilQuality/axiosClient';
 import { useNavigate } from 'react-router-dom';
+import { border, display, margin, width } from '@mui/system';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import { IconButton, Tooltip as MuiTooltip } from '@mui/material';
 
 // Register ChartJS components
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
@@ -18,6 +21,64 @@ const GeneralScreen = () => {
     const [showLast24Hours, setShowLast24Hours] = useState(false);
     const [airData24Hours, setAirData24Hours] = useState([]);
     const [soilData24Hours, setSoilData24Hours] = useState([]);
+    const [expandedStatus, setExpandedStatus] = useState({
+        air: false,
+        water: false,
+        soil: false
+    });
+    const [showTooltip, setShowTooltip] = useState(false);
+    const [showAirTooltip, setShowAirTooltip] = useState(false);
+    const [showWaterTooltip, setShowWaterTooltip] = useState(false);
+    const [showSoilTooltip, setShowSoilTooltip] = useState(false);
+    const [showAirThreshold, setShowAirThreshold] = useState(false);
+    const [showWaterThreshold, setShowWaterThreshold] = useState(false);
+    const [showSoilThreshold, setShowSoilThreshold] = useState(false);
+
+    const toggleStatusExpansion = (type) => {
+        setExpandedStatus(prevState => ({
+            ...prevState,
+            [type]: !prevState[type]
+        }));
+    };
+
+/*************  ✨ Codeium Command ⭐  *************/
+/**
+ * Toggles the visibility of a general tooltip.
+ * When called, this function will switch the state of `showTooltip` between true and false.
+ */
+
+/******  22c83ee9-b4c6-4998-9224-233c11ba7abb  *******/
+    // const handleTooltipToggle = () => {
+    //     setShowTooltip(!showTooltip);
+    // };
+
+    const handleAirTooltipToggle = () => {
+        setShowAirTooltip(!showAirTooltip);
+        setShowWaterTooltip(false); // Ensure water tooltip is hidden
+    };
+
+    const handleWaterTooltipToggle = () => {
+        setShowWaterTooltip(!showWaterTooltip);
+        setShowAirTooltip(false); // Ensure air tooltip is hidden
+    };
+
+    const handleSoilTooltipToggle = () => {
+        setShowSoilTooltip(!showSoilTooltip);
+        setShowAirTooltip(false); // Ensure air tooltip is hidden
+        setShowWaterTooltip(false); // Ensure water tooltip is hidden
+    };
+
+    // const handleAirThresholdToggle = () => {
+    //     setShowAirThreshold(!showAirThreshold);
+    // };
+
+    // const handleWaterThresholdToggle = () => {
+    //     setShowWaterThreshold(!showWaterThreshold);
+    // };
+
+    // const handleSoilThresholdToggle = () => {
+    //     setShowSoilThreshold(!showSoilThreshold);
+    // };
 
     const locations = [
         { id: 1, name: 'LAPASAN' },
@@ -648,7 +709,362 @@ const GeneralScreen = () => {
         }
     };
 
+    const renderTooltipContent = () => {
+        return (
+            <div>
+                <h4 style={{...styles.tooltipHeader, marginBottom: '20px'}}>Air Quality Thresholds</h4>
+                <table style={styles.tooltipTable}>
+                    <thead>
+                        <tr>
+                            <th style={styles.tooltipTableHeader}>Category</th>
+                            <th style={{ ...styles.tooltipTableHeader, width: '11%'}}>Particle Matter 10 (PM10)</th>
+                            <th style={{ ...styles.tooltipTableHeader, width: '12%'}}>Particle Matter 2.5 (PM2.5)</th>
+                            <th style={styles.tooltipTableHeader}>Cautionary Statement</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(154, 205, 50)", color: "#fff" }}>Good</td>
+                            <td style={styles.tooltipTableCell}>0–54µg/m³</td>
+                            <td style={styles.tooltipTableCell}>0–25µg/m³</td>
+                            <td style={styles.tooltipTableCell}>None.</td>
+                        </tr>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(250, 196, 62)", color: "#fff" }}>Fair</td>
+                            <td style={styles.tooltipTableCell}>55–154µg/m³</td>
+                            <td style={styles.tooltipTableCell}>25.1–35.0µg/m³</td>
+                            <td style={styles.tooltipTableCell}>None.</td>
+                        </tr>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(230, 126, 14)", color: "#fff" }}>Unhealthy</td>
+                            <td style={styles.tooltipTableCell}>155–254µg/m³</td>
+                            <td style={styles.tooltipTableCell}>35.1–45.0µg/m³</td>
+                            <td style={{ ...styles.tooltipTableCell, textAlign: "left" }}>People with respiratory disease, such as asthma, should limit outdoor exertion.</td>
+                        </tr>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(232, 44, 48)", color: "#fff" }}>Very Unhealthy</td>
+                            <td style={styles.tooltipTableCell}>255–354µg/m³</td>
+                            <td style={styles.tooltipTableCell}>45.1–55µg/m³</td>
+                            <td style={{ ...styles.tooltipTableCell, textAlign: "left" }}>
+                                Pedestrians should avoid heavy traffic areas.
+                                People with heart or respiratory disease such as asthma should stay indoors and rest as much as possible.
+                                Unnecessary trips should be postponed.
+                                People should voluntarily restrict the use of vehicles.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(159, 109, 199)", color: "#fff" }}>Acutely Unhealthy</td>
+                            <td style={styles.tooltipTableCell}>355–424µg/m³</td>
+                            <td style={styles.tooltipTableCell}>55.1–90µg/m³</td>
+                            <td style={{ ...styles.tooltipTableCell, textAlign: "left" }}>
+                                Pedestrians should avoid heavy traffic areas.
+                                People with heart or respiratory disease such as asthma should stay indoors and rest as much as possible.
+                                Unnecessary trips should be postponed.
+                                Motor vehicle use may be restricted.
+                                Industrial activities may be curtailed.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(140, 1, 4)", color: "#fff" }}>Emergency</td>
+                            <td style={styles.tooltipTableCell}>425–504µg/m³</td>
+                            <td style={styles.tooltipTableCell}>Above 91µg/m³</td>
+                            <td style={{ ...styles.tooltipTableCell, textAlign: "left" }}>
+                                Everyone should remain indoors (keeping windows and doors closed unless heat stress is possible).
+                                Motor vehicle use should be prohibited except for emergency situations.
+                                Industrial activities, except that which is vital for public safety and health, should be curtailed.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        );
+    };
+
+    const thresholdInfo = [
+        {
+            level: "Acceptable",
+            color: "rgba(154, 205, 50)",
+            description: "The water quality is within safe limits. Both TSS and TDS levels are within acceptable ranges, indicating good water clarity and mineral content.",
+            icon: "✅",
+            recommendations: [
+                "Continue regular monitoring",
+                "Maintain current filtration system",
+                "Document conditions for reference"
+            ]
+        },
+        {
+            level: "Too Cloudy",
+            color: "rgba(199, 46, 46)",
+            description: "Total Suspended Solids (TSS) are too high, making the water cloudy. This affects water clarity and may indicate contamination.",
+            icon: "🌫️",
+            recommendations: [
+                "Check filtration systems",
+                "Increase settling time",
+                "Investigate source of turbidity"
+            ]
+        },
+        {
+            level: "High Dissolved Substances",
+            color: "rgba(199, 46, 46)",
+            description: "Total Dissolved Solids (TDS) exceed recommended levels. This may affect water taste and quality.",
+            icon: "💧",
+            recommendations: [
+                "Review treatment processes",
+                "Check for mineral buildup",
+                "Consider additional filtration"
+            ]
+        }
+    ];
+
+    const renderWaterTooltipContent = () => {
+        return (
+            <div>
+                <h4 style={{...styles.tooltipHeader, marginBottom: '20px'}}>Water Quality Thresholds</h4>
+                <table style={styles.tooltipTable}>
+                    <thead>
+                        <tr>
+                            <th style={styles.tooltipTableHeader}>Category</th>
+                            <th style={styles.tooltipTableHeader}>Total Suspended Solids (TSS)</th>
+                            <th style={styles.tooltipTableHeader}>Total Dissolved Solids (TDS)</th>
+                            <th style={styles.tooltipTableHeader}>Cautionary Statement</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: thresholdsWater.tss[0].color }}>Acceptable</td>
+                            <td style={styles.tooltipTableCell}>0–50 mg/L</td>
+                            <td style={styles.tooltipTableCell}>{"<500 mg/L"}</td>
+                            <td style={styles.tooltipTableCell}>Water quality is within safe limits.</td>
+                        </tr>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: thresholdsWater.tss[1].color }}>Too Cloudy/High Dissolved Substances</td>
+                            <td style={styles.tooltipTableCell}>50.01+ mg/L</td>
+                            <td style={styles.tooltipTableCell}>500.01+ mg/L</td>
+                            <td style={styles.tooltipTableCell}>High TSS and TDS levels may indicate contamination and affect water clarity and taste.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        );
+    };
+
+    const renderSoilTooltipContent = () => {
+        return (
+            <div>
+                <h4 style={{...styles.tooltipHeader, marginBottom: '20px'}}>Soil Quality Thresholds</h4>
+                <table style={styles.tooltipTable}>
+                    <thead>
+                        <tr>
+                            <th style={styles.tooltipTableHeader}>Category</th>
+                            <th style={styles.tooltipTableHeader}>Soil Moisture</th>
+                            <th style={styles.tooltipTableHeader}>Cautionary Statement</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: thresholdsSoil.soil_moisture[0].color }}>Dry</td>
+                            <td style={styles.tooltipTableCell}>0–19.99%</td>
+                            <td style={styles.tooltipTableCell}>Soil is too dry, which may affect plant growth.</td>
+                        </tr>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: thresholdsSoil.soil_moisture[1].color }}>Low Moisture</td>
+                            <td style={styles.tooltipTableCell}>20–39.99%</td>
+                            <td style={styles.tooltipTableCell}>Soil moisture is low, consider increasing irrigation.</td>
+                        </tr>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: thresholdsSoil.soil_moisture[2].color }}>Optimal</td>
+                            <td style={styles.tooltipTableCell}>40–70.99%</td>
+                            <td style={styles.tooltipTableCell}>Soil moisture is at optimal levels for plant growth.</td>
+                        </tr>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: thresholdsSoil.soil_moisture[3].color }}>Saturated</td>
+                            <td style={styles.tooltipTableCell}>71–100%</td>
+                            <td style={styles.tooltipTableCell}>Soil is saturated, which may lead to waterlogging.</td>
+                        </tr>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: thresholdsSoil.soil_moisture[4].color }}>Waterlogged</td>
+                            <td style={styles.tooltipTableCell}>101%+</td>
+                            <td style={styles.tooltipTableCell}>Soil is waterlogged, which can harm plant roots.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        );
+    };
+
     // Modified status display section in the return JSX
+    const thresholdInfoAir = [
+        {
+            level: "Good",
+            color: "rgb(154, 205, 50)",
+            description: "The air is clean, and pollution levels are very low. It is safe for everyone to go outside, and no health risks are expected.",
+            icon: "😊",
+            recommendations: [
+                "Ideal for outdoor activities",
+                "Safe for all groups",
+                "Perfect time for exercise"
+            ]
+        },
+        {
+            level: "Fair",
+            color: "rgb(250, 196, 62)",
+            description: "The air is okay, but sensitive people might have slight health problems. Most people can still go outside without issues.",
+            icon: "🙂",
+            recommendations: [
+                "Generally safe for outdoor activities",
+                "Sensitive individuals should monitor conditions",
+                "Good for moderate exercise"
+            ]
+        },
+        {
+            level: "Unhealthy",
+            color: "rgb(230, 126, 14)",
+            description: "People with breathing problems like asthma should spend less time outdoors. They may feel discomfort or breathing difficulty.",
+            icon: "😷",
+            recommendations: [
+                "Reduce prolonged outdoor activities",
+                "Sensitive groups should limit exposure",
+                "Consider indoor exercises"
+            ]
+        },
+        {
+            level: "Very Unhealthy",
+            color: "rgb(232, 44, 48)",
+            description: "People with breathing or heart issues should stay indoors. Avoid unnecessary trips, as the air can harm health if you stay outside too long.",
+            icon: "⚠️",
+            recommendations: [
+                "Avoid outdoor activities",
+                "Keep windows closed",
+                "Use air purifiers indoors"
+            ]
+        },
+        {
+            level: "Acutely Unhealthy",
+            color: "rgb(159, 109, 199)",
+            description: "People with health issues should stay indoors. Driving and factory work may be restricted because the air can cause serious harm.",
+            icon: "🚫",
+            recommendations: [
+                "Stay indoors",
+                "Seal windows and doors",
+                "Use air filtration systems"
+            ]
+        },
+        {
+            level: "Emergency",
+            color: "rgb(140, 1, 4)",
+            description: "Everyone should stay inside with windows closed. The air is too dangerous for outdoor activities, except for emergencies.",
+            icon: "☠️",
+            recommendations: [
+                "Avoid all outdoor activities",
+                "Seek medical attention if experiencing symptoms",
+                "Follow emergency guidelines"
+            ]
+        }
+    ];
+
+    const thresholdInfoWater = [
+        {
+            level: "Acceptable",
+            color: "rgba(154, 205, 50)",
+            description: "The water quality is within safe limits. Both TSS and TDS levels are within acceptable ranges, indicating good water clarity and mineral content.",
+            icon: "✅",
+            recommendations: [
+                "Continue regular monitoring",
+                "Maintain current filtration system",
+                "Document conditions for reference"
+            ]
+        },
+        {
+            level: "Too Cloudy",
+            color: "rgba(199, 46, 46)",
+            description: "Total Suspended Solids (TSS) are too high, making the water cloudy. This affects water clarity and may indicate contamination.",
+            icon: "🌫️",
+            recommendations: [
+                "Check filtration systems",
+                "Increase settling time",
+                "Investigate source of turbidity"
+            ]
+        },
+        {
+            level: "High Dissolved Substances",
+            color: "rgba(199, 46, 46)",
+            description: "Total Dissolved Solids (TDS) exceed recommended levels. This may affect water taste and quality.",
+            icon: "💧",
+            recommendations: [
+                "Review treatment processes",
+                "Check for mineral buildup",
+                "Consider additional filtration"
+            ]
+        }
+    ];
+
+    const thresholdInfoSoil = [
+        {
+            level: "Optimal",
+            color: "rgba(154, 205, 50, 1)",
+            description: "Soil moisture is between 40-70%. These conditions are ideal for plant growth, ensuring proper water availability while maintaining adequate oxygen in the soil.",
+            icon: "✅",
+            recommendations: [
+                "Maintain current irrigation schedule",
+                "Continue monitoring soil conditions",
+                "Document successful conditions for reference"
+            ]
+        },
+        {
+            level: "Low Moisture",
+            color: "rgba(250, 196, 62, 1)",
+            description: "Soil moisture is between 20-39%. Plants may start experiencing mild water stress, affecting their growth and development.",
+            icon: "💧",
+            recommendations: [
+                "Increase irrigation frequency",
+                "Apply mulch to retain moisture",
+                "Check irrigation system efficiency"
+            ]
+        },
+        {
+            level: "Dry",
+            color: "rgba(232, 44, 4, 1)",
+            description: "Soil moisture is below 20%. Plants are at risk of severe water stress and wilting. Immediate action is required.",
+            icon: "🏜️",
+            recommendations: [
+                "Implement emergency irrigation",
+                "Add organic matter to improve water retention",
+                "Consider drought-resistant crops"
+            ]
+        },
+        {
+            level: "Saturated",
+            color: "rgba(230, 126, 14, 1)",
+            description: "Soil moisture is between 71-100%. While plants have plenty of water, root health may be compromised due to limited oxygen.",
+            icon: "💦",
+            recommendations: [
+                "Reduce irrigation frequency",
+                "Improve soil drainage",
+                "Monitor for signs of root disease"
+            ]
+        },
+        {
+            level: "Waterlogged",
+            color: "rgba(140, 1, 4, 1)",
+            description: "Soil moisture exceeds 100%. Plants are at risk of root rot and other water-related diseases due to oxygen deficiency in the soil.",
+            icon: "🌊",
+            recommendations: [
+                "Stop irrigation immediately",
+                "Implement drainage solutions",
+                "Consider raised beds or soil amendments"
+            ]
+        }
+    ];
+
+    const getThresholdInfo = (level, type) => {
+        const thresholdMap = {
+            'air': thresholdInfoAir,
+            'water': thresholdInfoWater,
+            'soil': thresholdInfoSoil
+        };
+        return thresholdMap[type].find(info => info.level === level);
+    };
+
     return (
         <div style={styles.fullcontainer}>
             <div style={styles.headerContainer}>
@@ -670,7 +1086,12 @@ const GeneralScreen = () => {
                 <div style={styles.column}>
                     <div style={styles.box1}>
                         <div style={styles.iotHeaderBox}>
-                            <h2 style={styles.airHeaderTitle}>Air Quality</h2>
+                            <h2 style={styles.airHeaderTitle}>Air Quality
+                            <IconButton size="small" style={{ ...styles.tooltipButton}} onClick={handleAirTooltipToggle}>
+                                <InfoOutlinedIcon />
+                            </IconButton>
+                            </h2>
+                            
                         </div>
                         <div style={styles.chartContainer} onClick={handleAirChartClick}>
                             {showLast24Hours && airData24Hours.length === 0 ? (
@@ -690,15 +1111,24 @@ const GeneralScreen = () => {
                             <div style={styles.statusHeader}>
                                 <h2 style={styles.airHeaderTitle}>Current Status:</h2>
                                 {latestAirData && (
-                                    <div style={{
-                                        ...styles.statusBox,
-                                        backgroundColor: getAirQualityStatus().color
-                                    }}>
+                                    <div
+                                        style={{
+                                            ...styles.statusBox,
+                                            backgroundColor: getAirQualityStatus().color,
+                                            cursor: 'pointer'
+                                        }}
+                                        onClick={() => toggleStatusExpansion('air')}
+                                    >
                                         <p style={styles.statusText}>{getAirQualityStatus().text}</p>
                                     </div>
                                 )}
                             </div>
-                            {latestAirData && (
+                            {latestAirData && expandedStatus.air && (
+                                <div style={styles.metadataText}>
+                                    <p>{getThresholdInfo(getAirQualityStatus().text, 'air').description}</p>
+                                </div>
+                            )}
+                            {latestAirData && !expandedStatus.air && (
                                 <p style={styles.metadataText}>
                                     ID: {latestAirData.id}<br />
                                     Time: {new Date(latestAirData.date).toLocaleString()}<br />
@@ -725,7 +1155,11 @@ const GeneralScreen = () => {
                 <div style={styles.column}>
                     <div style={styles.box4}>
                         <div style={styles.iotHeaderBox}>
-                            <h2 style={styles.waterHeaderTitle}>Water Quality</h2>
+                            <h2 style={styles.waterHeaderTitle}>Water Quality
+                            <IconButton size="small" style={{ ...styles.tooltipButton2}} onClick={handleWaterTooltipToggle}>
+                                <InfoOutlinedIcon />
+                            </IconButton>
+                            </h2>
                         </div>
                         <div style={styles.chartContainer} onClick={handleWaterChartClick}>
                             {showLast24Hours && !latestWaterData ? (
@@ -745,15 +1179,24 @@ const GeneralScreen = () => {
                             <div style={styles.statusHeader}>
                                 <h2 style={styles.waterHeaderTitle}>Current Status:</h2>
                                 {latestWaterData && (
-                                    <div style={{
-                                        ...styles.statusBox,
-                                        backgroundColor: getWaterQualityStatus().color
-                                    }}>
+                                    <div
+                                        style={{
+                                            ...styles.statusBox,
+                                            backgroundColor: getWaterQualityStatus().color,
+                                            cursor: 'pointer'
+                                        }}
+                                        onClick={() => toggleStatusExpansion('water')}
+                                    >
                                         <p style={styles.statusText}>{getWaterQualityStatus().text}</p>
                                     </div>
                                 )}
                             </div>
-                            {latestWaterData && (
+                            {latestWaterData && expandedStatus.water && (
+                                <div style={styles.metadataText}>
+                                    <p>{getThresholdInfo(getWaterQualityStatus().text, 'water').description}</p>
+                                </div>
+                            )}
+                            {latestWaterData && !expandedStatus.water && (
                                 <p style={styles.metadataText}>
                                     ID: {latestWaterData.id}<br />
                                     Time: {formatTimestampWithoutOffset(latestWaterData.timestamp)}
@@ -779,7 +1222,11 @@ const GeneralScreen = () => {
                 <div style={styles.column}>
                     <div style={styles.box7}>
                         <div style={styles.iotHeaderBox}>
-                            <h2 style={styles.soilHeaderTitle}>Soil Quality</h2>
+                            <h2 style={styles.soilHeaderTitle}>Soil Quality
+                            <IconButton size="small" style={{ ...styles.tooltipButton3}} onClick={handleSoilTooltipToggle}>
+                                <InfoOutlinedIcon />
+                            </IconButton>
+                            </h2>
                         </div>
                         <div style={styles.chartContainer} onClick={handleSoilChartClick}>
                             {showLast24Hours && soilData24Hours.length === 0 ? (
@@ -811,15 +1258,24 @@ const GeneralScreen = () => {
                             <div style={styles.statusHeader}>
                                 <h2 style={styles.soilHeaderTitle}>Current Status:</h2>
                                 {latestSoilData && (
-                                    <div style={{
-                                        ...styles.statusBox,
-                                        backgroundColor: getSoilQualityStatus().color
-                                    }}>
+                                    <div
+                                        style={{
+                                            ...styles.statusBox,
+                                            backgroundColor: getSoilQualityStatus().color,
+                                            cursor: 'pointer'
+                                        }}
+                                        onClick={() => toggleStatusExpansion('soil')}
+                                    >
                                         <p style={styles.statusText}>{getSoilQualityStatus().text}</p>
                                     </div>
                                 )}
                             </div>
-                            {latestSoilData && (
+                            {latestSoilData && expandedStatus.soil && (
+                                <div style={styles.metadataText}>
+                                    <p>{getThresholdInfo(getSoilQualityStatus().text, 'soil').description}</p>
+                                </div>
+                            )}
+                            {latestSoilData && !expandedStatus.soil && (
                                 <p style={styles.metadataText}>
                                     ID: {latestSoilData.id}<br />
                                     Time: {new Date(latestSoilData.timestamp).toLocaleString()}
@@ -835,6 +1291,27 @@ const GeneralScreen = () => {
                     </div>
                 </div>
             </div>
+            {showAirTooltip && (
+                <div style={styles.tooltipOverlay} onClick={handleAirTooltipToggle}>
+                    <div style={styles.tooltipContent} onClick={(e) => e.stopPropagation()}>
+                        {renderTooltipContent()}
+                    </div>
+                </div>
+            )}
+            {showWaterTooltip && (
+                <div style={styles.tooltipOverlay} onClick={handleWaterTooltipToggle}>
+                    <div style={styles.tooltipContent2} onClick={(e) => e.stopPropagation()}>
+                        {renderWaterTooltipContent()}
+                    </div>
+                </div>
+            )}
+            {showSoilTooltip && (
+                <div style={styles.tooltipOverlay} onClick={handleSoilTooltipToggle}>
+                    <div style={styles.tooltipContent3} onClick={(e) => e.stopPropagation()}>
+                        {renderSoilTooltipContent()}
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
@@ -1000,6 +1477,7 @@ const styles = {
     waterHeaderTitle: {
         fontSize: "1.2rem",
         color: "#fff",
+
     },
 
     // Box styles SOIL QUALITY
@@ -1053,7 +1531,8 @@ const styles = {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        margin: '20px 0',
+        margin: '-20px 0',
+        paddingBottom: '20px',
     },
     statusHeader: {
         display: 'flex',
@@ -1064,8 +1543,7 @@ const styles = {
     statusBox: {
         padding: '5px 10px',
         borderRadius: '5px',
-        flex: 1,
-        opacity: 0.8,
+        width: 'auto',
     },
     statusText: {
         color: '#fff',
@@ -1100,7 +1578,7 @@ const styles = {
         marginLeft: 'auto',
         transition: 'background-color 0.3s',
         '&:hover': {
-            backgroundColor: 'rgba(255, 255, 255, 0.3)',
+            backgroundColor: 'rgba(0, 0, 0, 0.3)',
         }
     },
     gaugeContainer: {
@@ -1123,7 +1601,6 @@ const styles = {
         textAlign: 'center',
         width: '100%',
         margin: 'auto',
-        opacity: 0.7,
     },
     clickableChart: {
         width: '100%',
@@ -1133,6 +1610,86 @@ const styles = {
         '&:hover': {
             transform: 'scale(1.02)',
         }
+    },
+
+    // tooltipHeaderBox: {
+    //     display: "flex",
+    //     margin: 0,
+    //     fontWeight: "bold",
+    //     // textAlign: "left",
+    //     alignItems: "center",
+    //     justifyContent: "space-between",
+    // },
+    tooltipButton: {
+        color: '#fff',
+        padding: '5px 10px',
+        cursor: 'pointer',
+        fontSize: '1rem',
+    },
+    tooltipButton2: {
+        color: '#fff',
+        padding: '5px 10px',
+        cursor: 'pointer',
+        fontSize: '1rem',
+    },
+    tooltipButton3: {
+        color: '#fff',
+        padding: '5px 10px',
+        cursor: 'pointer',
+        fontSize: '1rem',
+    },
+    tooltipOverlay: {
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 1000,
+    },
+    tooltipContent: {
+        backgroundColor: 'rgba(12, 38, 64, 0.9)',
+        color: '#fff',
+        padding: '20px',
+        borderRadius: '20px',
+        maxWidth: '80%',
+        textAlign: 'center',
+    },
+    tooltipContent2: {
+        backgroundColor: 'rgba(20, 60, 11, 0.9)',
+        color: '#fff',
+        padding: '20px',
+        borderRadius: '20px',
+        maxWidth: '80%',
+        textAlign: 'center',
+    },
+    tooltipContent3: {
+        backgroundColor: 'rgba(81, 74, 29, 0.9)',
+        color: '#fff',
+        padding: '20px',
+        borderRadius: '20px',
+        maxWidth: '80%',
+        textAlign: 'center',
+    },
+    tooltipTable: {
+        width: '100%',
+        borderCollapse: 'collapse',
+        marginBottom: '10px',
+    },
+    tooltipTableHeader: {
+        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+        border: '1px solid rgba(255, 255, 255)',
+    },
+    tooltipTableCell: {
+        border: '1px solid rgba(255, 255, 255)',
+        padding: '10px',
+    },
+    tooltipTableCell2: {
+        border: '1px solid rgba(255, 255, 255)',
+        // padding: '10px',
     }
 };
 

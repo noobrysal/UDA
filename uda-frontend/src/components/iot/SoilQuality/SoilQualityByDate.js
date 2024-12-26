@@ -913,7 +913,7 @@ const SoilQualityByDate = () => {
                     }
 
                     .has-data {
-                        background-color: rgba(255, 255, 255, 0.6) !important;
+                        background-color: rgba(255, 222, 89, 0.6) !important;
                         color: black !important;
                         cursor: pointer !important;
                     }
@@ -1025,11 +1025,12 @@ const styles = {
     },
     header: {
         textAlign: 'left',
-        marginTop: '15px',
-        marginBottom: '50px',
+        marginTop: '2px',
+        marginBottom: '20px',
         marginLeft: '70px',
     },
     title: {
+        fontWeight: "bold",
         margin: '0',
         fontSize: '2rem',
         color: 'white',

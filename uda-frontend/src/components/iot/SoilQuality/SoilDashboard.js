@@ -16,6 +16,7 @@ import {
     Legend,
 } from 'chart.js';
 import { color, height, width } from '@mui/system';
+import InfoIcon from '@mui/icons-material/Info';
 
 // Register chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -37,6 +38,61 @@ const SoilDashboard = () => {
     const [logsErrorMessage, setLogsErrorMessage] = useState(null);
 
     const [comparisonData, setComparisonData] = useState(null); // State for comparison chart data
+    const [showComparisonTooltip, setShowComparisonTooltip] = useState(false);
+
+    const handleComparisonTooltipToggle = () => {
+        setShowComparisonTooltip(!showComparisonTooltip);
+    };
+
+    const renderComparisonTooltipContent = () => {
+        return (
+            <div>
+                <h4 style={{...styles.tooltipHeader, marginBottom: '20px'}}>Soil Quality Thresholds</h4>
+                <table style={styles.tooltipTable}>
+                    <thead>
+                        <tr>
+                            <th style={styles.tooltipTableHeader}>Category</th>
+                            <th style={{ ...styles.tooltipTableHeader, width: '11%'}}>Soil Moisture</th>
+                            <th style={{ ...styles.tooltipTableHeader, width: '12%'}}>Temperature</th>
+                            <th style={styles.tooltipTableHeader}>Humidity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(232, 44, 4, 1)", color: "#fff" }}>Dry</td>
+                            <td style={styles.tooltipTableCell}>0 - 19.99</td>
+                            <td style={styles.tooltipTableCell}>-∞ - 4.99</td>
+                            <td style={styles.tooltipTableCell}>0 - 29.99</td>
+                        </tr>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(250, 196, 62, 1)", color: "#fff" }}>Low Moisture</td>
+                            <td style={styles.tooltipTableCell}>20 - 39.99</td>
+                            <td style={styles.tooltipTableCell}>5 - 14.99</td>
+                            <td style={styles.tooltipTableCell}>30 - 49.99</td>
+                        </tr>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(154, 205, 50, 1)", color: "#fff" }}>Optimal</td>
+                            <td style={styles.tooltipTableCell}>40 - 70.99</td>
+                            <td style={styles.tooltipTableCell}>15 - 29.99</td>
+                            <td style={styles.tooltipTableCell}>50 - 70.99</td>
+                        </tr>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(230, 126, 14, 1)", color: "#fff" }}>Saturated</td>
+                            <td style={styles.tooltipTableCell}>71 - 100</td>
+                            <td style={styles.tooltipTableCell}>30 - 34.99</td>
+                            <td style={styles.tooltipTableCell}>71 - 85.99</td>
+                        </tr>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(140, 1, 4, 1)", color: "#fff" }}>Waterlogged</td>
+                            <td style={styles.tooltipTableCell}>101 - ∞</td>
+                            <td style={styles.tooltipTableCell}>35 - ∞</td>
+                            <td style={styles.tooltipTableCell}>86 - ∞</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        );
+    };
 
     //BUTTON NAVIGATION TO SOIL DETAILED DATA
     const navigate = useNavigate();
@@ -1334,27 +1390,25 @@ const SoilDashboard = () => {
                     <div style={styles.renderComparisonBox}>
                         {/* Header Title and Subtitle */}
                         <div style={styles.comparisonChartHeader}>
-                            <h2 style={styles.comparisonChartTitle}>Comparison Chart</h2>
+                            <h2 style={styles.comparisonChartTitle}>Comparison Chart
+                            <InfoIcon style={styles.tooltipIcon} onClick={handleComparisonTooltipToggle} /></h2>                   
                             <p style={styles.comparisonChartSubtitle}>
                                 This chart displays a comparison between two selected datasets over time
                             </p>
+                            
                         </div>
 
                         {/* Render Comparison Chart */}
                         {renderComparisonChart(comparisonData)}
                     </div>
                 </div>
-                <div style={styles.thresholdLegendDiv}>
-                    <div style={styles.thresholdHeader}>
-                        <h3 style={styles.thresholdTitle}>Data Thresholds</h3>
-                        <p style={styles.thresholdSubtitle}>
-                            Scale of the various data levels for soil monitoring
-                        </p>
+                {showComparisonTooltip && (
+                    <div style={styles.tooltipOverlay} onClick={handleComparisonTooltipToggle}>
+                        <div style={styles.tooltipContent} onClick={(e) => e.stopPropagation()}>
+                            {renderComparisonTooltipContent()}
+                        </div>
                     </div>
-                    {renderLegend()}
-                </div>
-
-                {/* Alert Filters */}
+                )}
                 <div style={styles.alertFiltersContainer}>
                     {/* Header Row */}
                     <div style={styles.alertHeaderRow}>
@@ -1464,23 +1518,20 @@ const styles = {
         width: '100%',
         // maxWidth: '1440px', // Restrict to a maximum width for large screens
         backgroundColor: 'rgba(15, 13, 26, 0)',
-        padding: '20px 0 0 20px',
+        padding: '0 0 0 20px',
     },
 
     // SOIL DASHBOARD TEXTS
     dashboardTitle: {
-        fontSize: '3rem',
-        fontWeight: 'bold',
-        marginLeft: '10px',
-        color: '#fff',
-        marginTop: '-20px',
+        fontSize: "28px",
+        fontWeight: "bold",
+        margin: 0,
+        color: "#fff",
     },
     dashboardTitle2: {
-        fontSize: '1.3rem',
-        fontWeight: '100',
-        marginBottom: '25px',
-        marginLeft: '10px',
-        color: '#fff',
+        fontSize: "15px",
+        margin: 0,
+        color: "#fff",
     },
 
     // HEADER ROW FOR TITLE AND BUTTON
@@ -1941,7 +1992,49 @@ const styles = {
         comparisonContainer: {
             flexWrap: 'nowrap',
         }
-    }
+    },
+    tooltipIcon: {
+        color: '#fff',
+        cursor: 'pointer',
+        fontSize: '1.5rem',
+        marginLeft: '10px',
+        // borderRadius: '50%',
+        // backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        // padding: '5px',
+    },
+    tooltipOverlay: {
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 1000,
+    },
+    tooltipContent: {
+        backgroundColor: 'rgba(81, 74, 29, 0.9)',
+        color: '#fff',
+        padding: '20px',
+        borderRadius: '20px',
+        maxWidth: '80%',
+        textAlign: 'center',
+    },
+    tooltipTable: {
+        width: '100%',
+        borderCollapse: 'collapse',
+        marginBottom: '10px',
+    },
+    tooltipTableHeader: {
+        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+        border: '1px solid rgba(255, 255, 255)',
+    },
+    tooltipTableCell: {
+        border: '1px solid rgba(255, 255, 255)',
+        padding: '10px',
+    },
 };
 
 

@@ -22,6 +22,7 @@ import { Tooltip } from '@mui/material';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { useNavigate } from 'react-router-dom';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 ChartJS.register(
     CategoryScale,
@@ -47,6 +48,13 @@ const SoilView = () => {
         const blockStart = Math.floor(hour / 6) * 6;
         return Array.from({ length: 6 }, (_, i) => (blockStart + i) % 24);
     };
+
+    const [showTooltip, setShowTooltip] = useState(false);
+
+    const handleTooltipToggle = () => {
+        setShowTooltip(!showTooltip);
+    };
+
 
     const [hourlyData, setHourlyData] = useState([]);
     const [selectedLocation, setSelectedLocation] = useState(3); // Default to USTP-CDO
@@ -580,7 +588,7 @@ const SoilView = () => {
         // UPPER LEFT BOX BAR CHART MERGED METRICS
         upperLeftBox: {
             // flex: 0.62, // Reduce flex value to make the upper box smaller
-            backgroundColor: 'rgba(242, 242, 242, 0.15)',
+            backgroundColor: 'rgba(242, 242, 242, 0.1)',
             borderRadius: "20px",
             width: "36vw",
             height: "65%",  // Keep the height as needed
@@ -740,7 +748,7 @@ const SoilView = () => {
             display: "flex",
             justifyContent: "space-between",
             // alignItems: "center",
-            height: "100%",
+            height: "10%",
             gap: "10px",
         },
         hoursContainer: {
@@ -834,7 +842,7 @@ const SoilView = () => {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            marginTop: "10px",
+            marginTop: "-5px",
         },
         circularProgressContainer: {
             width: "50%",
@@ -861,6 +869,7 @@ const SoilView = () => {
             bottom: "10px",
             width: "100%",
             textAlign: "center",
+            
         },
         statusWrapper: {
             backgroundColor: '#75c7b6',
@@ -884,7 +893,7 @@ const SoilView = () => {
             height: "30%", // Adjust height for smaller boxes
             width: "100%",
             // marginBottom: "8px",
-            marginTop: "80px",
+            marginTop: "60px",
 
         },
         // NARRATIVE REPORT
@@ -1020,6 +1029,44 @@ const SoilView = () => {
             gap: "8px",
             fontSize: "16px",
             color: "#fff",
+        },
+
+
+        tooltipOverlay: {
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1000,
+        },
+        tooltipContentOverlay: {
+            backgroundColor: 'rgba(81, 74, 29, 0.9)',
+            color: '#fff',
+            padding: '20px',
+            borderRadius: '20px',
+            maxWidth: '80%',
+            textAlign: 'center',
+        },
+        tooltipTable: {
+            width: '100%',
+            borderCollapse: 'collapse',
+            marginBottom: '10px',
+        },
+        tooltipTableHeader: {
+            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+            border: '1px solid rgba(255, 255, 255)',
+        },
+        tooltipTableCell: {
+            border: '1px solid rgba(255, 255, 255)',
+            padding: '10px',
+        },
+        tooltipTableCell2: {
+            border: '1px solid rgba(255, 255, 255)',
         },
     };
 
@@ -1306,6 +1353,49 @@ const SoilView = () => {
         return getSoilQualityStatus(parseFloat(hourData.soil_moisture), 'soil_moisture');
     };
 
+    const renderTooltipContent = () => {
+        return (
+            <div>
+                <h4 style={{...styles.tooltipHeader, marginBottom: '20px'}}>Soil Quality Thresholds</h4>
+                <table style={styles.tooltipTable}>
+                    <thead>
+                        <tr>
+                            <th style={styles.tooltipTableHeader}>Category</th>
+                            <th style={styles.tooltipTableHeader}>Soil Moisture</th>
+                            <th style={styles.tooltipTableHeader}>Cautionary Statement</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: thresholds.soil_moisture[0].color }}>Dry</td>
+                            <td style={styles.tooltipTableCell}>0–19.99%</td>
+                            <td style={styles.tooltipTableCell}>Soil is too dry, which may affect plant growth.</td>
+                        </tr>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: thresholds.soil_moisture[1].color }}>Low Moisture</td>
+                            <td style={styles.tooltipTableCell}>20–39.99%</td>
+                            <td style={styles.tooltipTableCell}>Soil moisture is low, consider increasing irrigation.</td>
+                        </tr>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: thresholds.soil_moisture[2].color }}>Optimal</td>
+                            <td style={styles.tooltipTableCell}>40–70.99%</td>
+                            <td style={styles.tooltipTableCell}>Soil moisture is at optimal levels for plant growth.</td>
+                        </tr>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: thresholds.soil_moisture[3].color }}>Saturated</td>
+                            <td style={styles.tooltipTableCell}>71–100%</td>
+                            <td style={styles.tooltipTableCell}>Soil is saturated, which may lead to waterlogging.</td>
+                        </tr>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: thresholds.soil_moisture[4].color }}>Waterlogged</td>
+                            <td style={styles.tooltipTableCell}>101%+</td>
+                            <td style={styles.tooltipTableCell}>Soil is waterlogged, which can harm plant roots.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        );
+    };
 
     return (
         <div style={styles.fullcontainer}>
@@ -1352,6 +1442,9 @@ const SoilView = () => {
                             </div>
                             {/* Navigation buttons */}
                             <div style={styles.slideHeaderRight}>
+                                <IconButton size="small" style={{ color: 'white' }} onClick={handleTooltipToggle}>
+                                    <InfoOutlinedIcon/>
+                                </IconButton>
                                 <button onClick={prevSlide} style={styles.slideButton}>←</button>
                                 <button onClick={nextSlide} style={styles.slideButton}>→</button>
                             </div>
@@ -1611,8 +1704,16 @@ const SoilView = () => {
                 </div>
             </div>
 
+            {showTooltip && (
+                <div style={styles.tooltipOverlay} onClick={handleTooltipToggle}>
+                    <div style={styles.tooltipContentOverlay} onClick={(e) => e.stopPropagation()}>
+                        {renderTooltipContent()}
+                    </div>
+                </div>
+            )}
+
             {hoveredData && renderTooltip()}
-            <ToastContainer />
+            <ToastContainer style={{ marginTop: '70px' }} />
         </div>
     );
 };

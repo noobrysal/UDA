@@ -19,8 +19,8 @@ import {
 import { Tooltip as MuiTooltip, IconButton } from '@mui/material';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-import { BsMagic } from 'react-icons/bs';
 import InfoIcon from '@mui/icons-material/Info';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 ChartJS.register(
     CategoryScale,
@@ -57,6 +57,11 @@ const WaterView = () => {
     const [visibleHourRange, setVisibleHourRange] = useState(() =>
         getCurrentHourBlock(new Date().getHours())
     );
+    const [showTooltip, setShowTooltip] = useState(false);
+    
+    const handleTooltipToggle = () => {
+        setShowTooltip(!showTooltip);
+    };
 
     // Update thresholds 
     const thresholds = {
@@ -80,7 +85,6 @@ const WaterView = () => {
         ],
     };
 
-    // Update thresholdInfo to only include relevant statuses
     const thresholdInfo = [
         {
             level: "Acceptable",
@@ -341,112 +345,6 @@ const WaterView = () => {
     };
 
 
-    // const responsiveStyles = {
-    //     // Mobile styles (default)
-    //     container: {
-    //         padding: '10px',
-    //         width: '100%',
-    //         maxWidth: '100vw',
-    //         overflowX: 'hidden',
-    //     },
-    //     header: {
-    //         flexDirection: 'column',
-    //         gap: '15px',
-    //     },
-    //     controls: {
-    //         flexDirection: 'column',
-    //         width: '100%',
-    //     },
-    //     datePicker: {
-    //         width: '100%',
-    //         maxWidth: '300px',
-    //     },
-    //     locationSelect: {
-    //         width: '100%',
-    //         maxWidth: '300px',
-    //     },
-    //     scrollContainer: {
-    //         width: 'calc(100vw - 100px)', // Account for buttons and padding
-    //         maxWidth: '1000px',
-    //     },
-    //     hourCard: {
-    //         maxHeight: '10px', // Smaller cards on mobile
-    //         padding: '10px',
-    //         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)',
-
-    //     },
-    //     levelIndicator: {
-    //         height: '80px', // Smaller height on mobile
-    //         fontSize: '14px',
-    //     },
-    //     slideshowContainer: {
-    //         flexDirection: 'column',
-    //         gap: '10px',
-    //     },
-    //     slide: {
-    //         width: '100%',
-    //         maxWidth: '400px',
-    //         height: 'auto',
-    //         minHeight: '330px',
-    //     },
-    // };
-
-    // // Tablet styles
-    // const tabletStyles = {
-    //     '@media (min-width: 768px)': {
-    //         container: {
-    //             padding: '15px',
-    //         },
-    //         header: {
-    //             flexDirection: 'row',
-    //         },
-    //         controls: {
-    //             flexDirection: 'row',
-    //             width: 'auto',
-    //         },
-    //         scrollContainer: {
-    //             width: 'calc(100vw - 150px)',
-    //         },
-    //         hourCard: {
-    //             minWidth: '100px',
-    //         },
-    //         levelIndicator: {
-    //             height: '90px',
-    //             fontSize: '15px',
-    //         },
-    //         slideshowContainer: {
-    //             flexDirection: 'row',
-    //         },
-    //         slide: {
-    //             width: '600px',
-    //             height: '350px',
-    //         },
-    //     },
-    // };
-
-    // // Desktop styles
-    // const desktopStyles = {
-    //     '@media (min-width: 0px)': {
-    //         container: {
-    //             padding: '20px',
-    //         },
-    //         scrollContainer: {
-    //             width: '1000px',
-    //         },
-    //         hourCard: {
-    //             minWidth: '120px',
-    //         },
-    //         levelIndicator: {
-    //             height: '100px',
-    //             fontSize: '16px',
-    //         },
-    //         slide: {
-    //             width: '800px',
-    //             height: '400px',
-    //         },
-    //     },
-    // };
-
     const styles = {
         fullcontainer: {
             height: "100vh",
@@ -541,7 +439,7 @@ const WaterView = () => {
         // UPPER LEFT BOX BAR CHART MERGED METRICS
         upperLeftBox: {
             // flex: 0.62, // Reduce flex value to make the upper box smaller
-            backgroundColor: 'rgba(242, 242, 242, 0.15)',
+            backgroundColor: 'rgba(242, 242, 242, 0.1)',
             borderRadius: "20px",
             width: "36vw",
             height: "65%",  // Keep the height as needed
@@ -565,7 +463,7 @@ const WaterView = () => {
             padding: "15px",
             transition: "background-color 0.3s ease",
             boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-            backgroundColor: 'rgba(242, 242, 242, 0.15)',
+            backgroundColor: 'rgba(242, 242, 242, 0.1)',
             display: "flex",
             flexDirection: "column",
             // justifyContent: "space-between",
@@ -701,7 +599,7 @@ const WaterView = () => {
             display: "flex",
             justifyContent: "space-between",
             // alignItems: "center",
-            height: "100%",
+            height: "10%",
             gap: "10px",
         },
         hoursContainer: {
@@ -781,7 +679,7 @@ const WaterView = () => {
             fontSize: "12px",
             overflow: "hidden",
             position: "relative",
-            height: "29vh", // Set a fixed height for the metric box to allow room for both progress bar and trend indicator
+            height: "28vh", // Set a fixed height for the metric box to allow room for both progress bar and trend indicator
             // marginTop: "35px",
         },
         metricTitle: {
@@ -800,7 +698,7 @@ const WaterView = () => {
             width: "70%",
             height: "100%",
             fontWeight: "bold",
-            marginTop: "10px",
+            marginTop: "-5px",
         },
         noDataLabel: {
             fontSize: "15px",
@@ -818,6 +716,7 @@ const WaterView = () => {
             fontWeight: "bold",
             color: "#fff",
             position: "absolute",
+            bottom: "4px",
             width: "100%",
             textAlign: "center",
         },
@@ -840,10 +739,10 @@ const WaterView = () => {
         lowerRightBox: {
             backgroundColor: 'rgba(242, 242, 242, 0.1)',
             borderRadius: "10px",
-            height: "30%", // Adjust height for smaller boxes
+            height: "100%", // Adjust height for smaller boxes
             width: "100%",
             // marginBottom: "8px",
-            marginTop: "80px",
+            marginTop: "60px",
 
         },
         // NARRATIVE REPORT
@@ -876,25 +775,25 @@ const WaterView = () => {
             fontSize: "14px", // Optional: Adjust content font size
             color: "#fff", // Optional: Adjust text color
         },
-        tooltipContent: {
-            backgroundColor: 'rgba(255, 255, 255, 1)',
-            color: 'black',
-            padding: '10px 15px',
-            borderRadius: '8px',
-            fontSize: '14px',
-            boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
-            minWidth: '200px',
-            textAlign: 'center',
-            '& h4': {
-                margin: '0 0 8px 0',
-                fontSize: '16px',
-                fontWeight: 'bold',
-            },
-            '& p': {
-                margin: '4px 0',
-                fontSize: '14px',
-            }
-        },
+        // tooltipContent: {
+        //     backgroundColor: 'rgba(255, 255, 255, 1)',
+        //     color: 'black',
+        //     padding: '10px 15px',
+        //     borderRadius: '8px',
+        //     fontSize: '14px',
+        //     boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
+        //     minWidth: '200px',
+        //     textAlign: 'center',
+        //     '& h4': {
+        //         margin: '0 0 8px 0',
+        //         fontSize: '16px',
+        //         fontWeight: 'bold',
+        //     },
+        //     '& p': {
+        //         margin: '4px 0',
+        //         fontSize: '14px',
+        //     }
+        // },
         reportStatusWrapper: {
             display: "flex",
             alignItems: "center",
@@ -947,6 +846,40 @@ const WaterView = () => {
             gap: "8px",
             fontSize: "16px",
             color: "#fff",
+        },
+
+        tooltipOverlay: {
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1000,
+        },
+        tooltipContent: {
+            backgroundColor: 'rgba(20, 60, 11, 0.9)',
+            color: '#fff',
+            padding: '20px',
+            borderRadius: '20px',
+            maxWidth: '80%',
+            textAlign: 'center',
+        },
+        tooltipTable: {
+            width: '100%',
+            borderCollapse: 'collapse',
+            marginBottom: '10px',
+        },
+        tooltipTableHeader: {
+            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+            border: '1px solid rgba(255, 255, 255)',
+        },
+        tooltipTableCell: {
+            border: '1px solid rgba(255, 255, 255)',
+            padding: '10px',
         },
     };
 
@@ -1211,6 +1144,37 @@ const WaterView = () => {
         return tdsStatus || tssStatus;
     };
 
+    const renderWaterTooltipContent = () => {
+        return (
+            <div>
+                <h4 style={{...styles.tooltipHeader, marginBottom: '20px'}}>Water Quality Thresholds</h4>
+                <table style={styles.tooltipTable}>
+                    <thead>
+                        <tr>
+                            <th style={styles.tooltipTableHeader}>Category</th>
+                            <th style={styles.tooltipTableHeader}>Total Suspended Solids (TSS)</th>
+                            <th style={styles.tooltipTableHeader}>Total Dissolved Solids (TDS)</th>
+                            <th style={styles.tooltipTableHeader}>Cautionary Statement</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: thresholds.tss[0].color }}>Acceptable</td>
+                            <td style={styles.tooltipTableCell}>0–50 mg/L</td>
+                            <td style={styles.tooltipTableCell}>{"<500 mg/L"}</td>
+                            <td style={styles.tooltipTableCell}>Water quality is within safe limits.</td>
+                        </tr>
+                        <tr>
+                            <td style={{ ...styles.tooltipTableCell, backgroundColor: thresholds.tss[1].color }}>Too Cloudy/High Dissolved Substances</td>
+                            <td style={styles.tooltipTableCell}>50.01+ mg/L</td>
+                            <td style={styles.tooltipTableCell}>500.01+ mg/L</td>
+                            <td style={styles.tooltipTableCell}>High TSS and TDS levels may indicate contamination and affect water clarity and taste.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        );
+    };
 
     return (
         <div style={styles.fullcontainer}>
@@ -1257,6 +1221,9 @@ const WaterView = () => {
                             </div>
                             {/* Navigation buttons */}
                             <div style={styles.slideHeaderRight}>
+                            <IconButton size="small" style={{ color: 'white' }} onClick={handleTooltipToggle}>
+                                    <InfoOutlinedIcon fontSize="small" />
+                                </IconButton>
                                 <button onClick={prevSlide} style={styles.slideButton}>←</button>
                                 <button onClick={nextSlide} style={styles.slideButton}>→</button>
                             </div>
@@ -1378,9 +1345,8 @@ const WaterView = () => {
                                                 }}
                                                 onClick={handleChartClick}
                                             >
-                                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
-                                                    <span style={{ fontSize: '16px' }}>{metric.icon}</span>
-                                                    <h3 style={styles.metricTitle}>{metric.name}</h3>
+                                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0px', marginLeft: '15px' }}>
+                                                <h3 style={styles.metricTitle}>{metric.name}</h3>
                                                     <MuiTooltip
                                                         title={metric.tooltip}
                                                         arrow
@@ -1516,7 +1482,14 @@ const WaterView = () => {
                 </div>
             </div>
             {hoveredData && renderTooltip()}
-            <ToastContainer />
+            <ToastContainer style={{ marginTop: '70px' }} />
+            {showTooltip && (
+                <div style={styles.tooltipOverlay} onClick={handleTooltipToggle}>
+                    <div style={styles.tooltipContent} onClick={(e) => e.stopPropagation()}>
+                        {renderWaterTooltipContent()}
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

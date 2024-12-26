@@ -849,7 +849,7 @@ const WaterQualityByDate = () => {
                     /* Hover effect for green tile */
                     .react-calendar__tile:hover {
                         background-color: white !important; /* Change to white on hover */
-                        color: #00732f !important; /* Keep the text color green when hovered */
+                        color: #007bff !important; /* Keep the text color green when hovered */
                     }
 
                     /* Active (clicked) tile - turn blue */
@@ -893,7 +893,7 @@ const WaterQualityByDate = () => {
                     }
 
                     .has-data {
-                        background-color: rgba(255, 255, 255, 0.6) !important;
+                        background-color: rgba(0, 115, 47, 0.6) !important;
                         color: black !important;
                         cursor: pointer !important;
                     }
@@ -1480,11 +1480,12 @@ const styles = {
     },
     header: {
         textAlign: 'left',
-        marginTop: '15px',
-        marginBottom: '50px',
+        marginTop: '2px',
+        marginBottom: '20px',
         marginLeft: '70px',
     },
     title: {
+        fontWeight: "bold",
         margin: '0',
         fontSize: '2rem',
         color: 'white',

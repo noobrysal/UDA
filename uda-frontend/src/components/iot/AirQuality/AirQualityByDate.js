@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-
 import { useParams } from 'react-router-dom';
 import { supabaseAir } from './supabaseClient';
 import { toast, ToastContainer } from 'react-toastify';
@@ -19,7 +18,7 @@ import {
     Legend,
 } from "chart.js";
 import { IconButton, Tooltip as MuiTooltip } from '@mui/material';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import InfoIcon from '@mui/icons-material/Info';
 // import { colors } from "@mui/material";
 
 const plugin = {
@@ -656,7 +655,7 @@ const AirQualityByDate = () => {
             <div style={{ position: 'absolute', top: '10px', width: '100%', display: 'flex', justifyContent: 'space-between', zIndex: 10, padding: '0 10px' }}>
                 <MuiTooltip title={metricDescriptions[metricType] || ""} arrow placement="top">
                     <IconButton size="small" style={{ color: 'white' }}>
-                        <HelpOutlineIcon />
+                        <InfoIcon />
                     </IconButton>
                 </MuiTooltip>
                 {hasData && <ChartExpandButton onClick={onExpand} />}
@@ -1919,11 +1918,12 @@ const styles = {
     },
     header: {
         textAlign: 'left',
-        marginTop: '15px',
-        marginBottom: '50px',
+        marginTop: '2px',
+        marginBottom: '20px',
         marginLeft: '70px',
     },
     title: {
+        fontWeight: "bold",
         margin: '0',
         fontSize: '2rem',
         color: 'white',

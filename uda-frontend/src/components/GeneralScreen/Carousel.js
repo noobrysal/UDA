@@ -4,7 +4,7 @@ import GeneralScreen from "./GeneralScreen";
 import AirSolo from "./AirSolo";
 import WaterSolo from "./WaterSolo";
 import SoilSolo from "./SoilSolo";
-import AirWater from "./AirWater";
+// import AirWater from "./AirWater";
 
 const Carousel = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -17,7 +17,7 @@ const Carousel = () => {
         { id: "general", Component: GeneralScreen },
         { id: "air", Component: AirSolo },
         { id: "water", Component: WaterSolo },
-        { id: "air-water", Component: AirWater },
+        // { id: "air-water", Component: AirWater },
         { id: "soil", Component: SoilSolo },
     ];
 
