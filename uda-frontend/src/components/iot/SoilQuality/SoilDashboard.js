@@ -89,7 +89,7 @@ const SoilDashboard = () => {
                         <tr>
                             <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(140, 1, 4, 1)", color: "#fff" }}>Waterlogged</td>
                             <td style={styles.tooltipTableCell}>101 - ∞</td>
-                            <td style={styles.tooltipTableCell}>35 - ∞</td>
+                            <td style={styles.tooltipTableCell}>86 - ∞</td>
                             <td style={{ ...styles.tooltipTableCell, textAlign: "left" }}>Soil is waterlogged, and humidity is excessive. Immediate drainage is required to prevent plant damage. Avoid adding water to the area and monitor for signs of flooding or erosion.</td>
                         </tr>
                     </tbody>
