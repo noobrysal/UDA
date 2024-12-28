@@ -16,7 +16,6 @@ import {
     Legend,
 } from 'chart.js';
 import { color, height, width } from '@mui/system';
-import InfoIcon from '@mui/icons-material/Info';
 
 // Register chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -40,6 +39,8 @@ const WaterDashboard = () => {
     const [comparisonData, setComparisonData] = useState(null); // State for comparison chart data
     const [showComparisonTooltip, setShowComparisonTooltip] = useState(false);
 
+    const [isAtBottom, setIsAtBottom] = useState(false);
+
     const handleComparisonTooltipToggle = () => {
         setShowComparisonTooltip(!showComparisonTooltip);
     };
@@ -47,66 +48,38 @@ const WaterDashboard = () => {
     const renderComparisonTooltipContent = () => {
         return (
             <div>
-                <h4 style={{...styles.tooltipHeader, marginBottom: '20px'}}>Water Quality Thresholds</h4>
+                <h4 style={{ ...styles.tooltipHeader, marginBottom: '20px' }}>Water Quality Thresholds</h4>
                 <table style={styles.tooltipTable}>
                     <thead>
                         <tr>
                             <th style={styles.tooltipTableHeader}>Category</th>
-                            <th style={{ ...styles.tooltipTableHeader, width: '11%'}}>pH</th>
-                            <th style={{ ...styles.tooltipTableHeader, width: '12%'}}>Temperature (°C)</th>
-                            <th style={{ ...styles.tooltipTableHeader, width: '12%'}}>TSS (mg/L)</th>
-                            <th style={{ ...styles.tooltipTableHeader, width: '12%'}}>TDS (ppm)</th>
+                            <th style={{ ...styles.tooltipTableHeader, width: '12%' }}>TSS (mg/L)</th>
+                            <th style={{ ...styles.tooltipTableHeader, width: '12%' }}>TDS (ppm)</th>
+                            <th style={styles.tooltipTableHeader}>Cautionary Statement</th>
+
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(199, 46, 46, 1)", color: "#fff" }}>Too Acidic</td>
-                            <td style={styles.tooltipTableCell}>0 - 6.49</td>
-                            <td style={styles.tooltipTableCell}>N/A</td>
-                            <td style={styles.tooltipTableCell}>N/A</td>
-                            <td style={styles.tooltipTableCell}>N/A</td>
-                        </tr>
-                        <tr>
                             <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(154, 205, 50, 1)", color: "#fff" }}>Acceptable</td>
-                            <td style={styles.tooltipTableCell}>6.5 - 8.5</td>
-                            <td style={styles.tooltipTableCell}>26 - 30</td>
                             <td style={styles.tooltipTableCell}>0 - 50</td>
                             <td style={styles.tooltipTableCell}>0 - 500</td>
-                        </tr>
-                        <tr>
-                            <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(230, 126, 14, 1)", color: "#fff" }}>Too Alkaline</td>
-                            <td style={styles.tooltipTableCell}>8.51 - ∞</td>
-                            <td style={styles.tooltipTableCell}>N/A</td>
-                            <td style={styles.tooltipTableCell}>N/A</td>
-                            <td style={styles.tooltipTableCell}>N/A</td>
-                        </tr>
-                        <tr>
-                            <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(199, 46, 46, 1)", color: "#fff" }}>Too Cold</td>
-                            <td style={styles.tooltipTableCell}>N/A</td>
-                            <td style={styles.tooltipTableCell}>0 - 25.99</td>
-                            <td style={styles.tooltipTableCell}>N/A</td>
-                            <td style={styles.tooltipTableCell}>N/A</td>
-                        </tr>
-                        <tr>
-                            <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(199, 46, 46, 1)", color: "#fff" }}>Too Hot</td>
-                            <td style={styles.tooltipTableCell}>N/A</td>
-                            <td style={styles.tooltipTableCell}>30.01 - ∞</td>
-                            <td style={styles.tooltipTableCell}>N/A</td>
-                            <td style={styles.tooltipTableCell}>N/A</td>
+                            <td style={styles.tooltipTableCell}>None.</td>
+
                         </tr>
                         <tr>
                             <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(199, 46, 46, 1)", color: "#fff" }}>Too Cloudy</td>
-                            <td style={styles.tooltipTableCell}>N/A</td>
-                            <td style={styles.tooltipTableCell}>N/A</td>
                             <td style={styles.tooltipTableCell}>50.01 - ∞</td>
                             <td style={styles.tooltipTableCell}>N/A</td>
+                            <td style={{ ...styles.tooltipTableCell, textAlign: "left" }}>Water is too turbid for normal use. Aquatic life may be stressed, and sedimentation may block sunlight required for underwater ecosystems. Avoid activities contributing to erosion or soil runoff.</td>
+
                         </tr>
                         <tr>
                             <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(199, 46, 46, 1)", color: "#fff" }}>High Dissolved Substances</td>
                             <td style={styles.tooltipTableCell}>N/A</td>
-                            <td style={styles.tooltipTableCell}>N/A</td>
-                            <td style={styles.tooltipTableCell}>N/A</td>
                             <td style={styles.tooltipTableCell}>500.01 - ∞</td>
+                            <td style={{ ...styles.tooltipTableCell, textAlign: "left" }}>Water contains a high level of dissolved substances. It may not be suitable for drinking, irrigation, or aquatic life. Sources of pollution should be identified and mitigated immediately.</td>
+
                         </tr>
                     </tbody>
                 </table>
@@ -285,6 +258,17 @@ const WaterDashboard = () => {
 
         return () => clearInterval(timer);
     }, [locations.length, isTransitioning, transitionDirection]);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const scrolledToBottom =
+                window.innerHeight + window.pageYOffset >= document.documentElement.scrollHeight - 100;
+            setIsAtBottom(scrolledToBottom);
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     const calculateSummary = (waterData) => {
         const summaries = waterData.map(({ data, summaryComparisonData }) => {
@@ -717,11 +701,11 @@ const WaterDashboard = () => {
             const ctx = canvas.getContext("2d");
             canvas.width = 10; // Adjust for stripe density
             canvas.height = 10;
-        
+
             // Fill the background with the base color
             ctx.fillStyle = baseColor;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
+
             // Add stripes
             ctx.strokeStyle = stripeColor;
             ctx.lineWidth = 3; // Adjust stripe thickness
@@ -729,10 +713,10 @@ const WaterDashboard = () => {
             ctx.moveTo(0, canvas.height);
             ctx.lineTo(canvas.width, 0);
             ctx.stroke();
-        
+
             return ctx.createPattern(canvas, "repeat");
         };
-        
+
         const data = {
             labels,
             datasets: [
@@ -1442,13 +1426,27 @@ const WaterDashboard = () => {
                     <div style={styles.renderComparisonBox}>
                         {/* Header Title and Subtitle */}
                         <div style={styles.comparisonChartHeader}>
-                            <h2 style={styles.comparisonChartTitle}>
-                                Comparison Chart
-                                <InfoIcon style={styles.tooltipIcon} onClick={handleComparisonTooltipToggle} />
-                            </h2>
+                            <h2 style={styles.comparisonChartTitle}>Comparison Chart</h2>
                             <p style={styles.comparisonChartSubtitle}>
                                 This chart displays a comparison between two selected datasets over time
                             </p>
+                            <button
+                                style={{
+                                    ...styles.thresholdLevelsButton,
+                                    ...(isAtBottom ? styles.thresholdLevelsButtonTop : styles.thresholdLevelsButtonBottom)
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.target.style.boxShadow = '0 0 15px 5px rgba(55, 237, 45, 0.8)';
+                                    e.target.style.transform = 'scale(1.05)'; // Remove the translateY part
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.target.style.boxShadow = '';
+                                    e.target.style.transform = ''; // Reset to default
+                                }}
+                                onClick={handleComparisonTooltipToggle}
+                            >
+                                Threshold Levels
+                            </button>
                         </div>
 
                         {/* Render Comparison Chart */}
@@ -2112,15 +2110,6 @@ const styles = {
             flexWrap: 'nowrap',
         }
     },
-    tooltipIcon: {
-        color: '#fff',
-        cursor: 'pointer',
-        fontSize: '1.5rem',
-        marginLeft: '10px',
-        // borderRadius: '50%',
-        // backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        // padding: '5px',
-    },
     tooltipOverlay: {
         position: 'fixed',
         top: 0,
@@ -2153,6 +2142,26 @@ const styles = {
     tooltipTableCell: {
         border: '1px solid rgba(255, 255, 255)',
         padding: '10px',
+    },
+    thresholdLevelsButton: {
+        padding: '10px 20px',
+        background: 'linear-gradient(50deg, #007a74, #04403d)',
+        color: '#fff',
+        border: 'none',
+        borderRadius: '15px',
+        cursor: 'pointer',
+        fontSize: '1rem',
+        transition: 'all 0.3s ease',
+        position: 'fixed',
+        right: '30px',
+        zIndex: 1000,
+        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
+    },
+    thresholdLevelsButtonBottom: {
+        bottom: '30px',
+    },
+    thresholdLevelsButtonTop: {
+        top: '30px',
     },
 };
 

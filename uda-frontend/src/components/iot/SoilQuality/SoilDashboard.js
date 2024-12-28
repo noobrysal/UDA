@@ -39,6 +39,7 @@ const SoilDashboard = () => {
 
     const [comparisonData, setComparisonData] = useState(null); // State for comparison chart data
     const [showComparisonTooltip, setShowComparisonTooltip] = useState(false);
+    const [isAtBottom, setIsAtBottom] = useState(false);
 
     const handleComparisonTooltipToggle = () => {
         setShowComparisonTooltip(!showComparisonTooltip);
@@ -47,46 +48,49 @@ const SoilDashboard = () => {
     const renderComparisonTooltipContent = () => {
         return (
             <div>
-                <h4 style={{...styles.tooltipHeader, marginBottom: '20px'}}>Soil Quality Thresholds</h4>
+                <h4 style={{ ...styles.tooltipHeader, marginBottom: '20px' }}>Soil Quality Thresholds</h4>
                 <table style={styles.tooltipTable}>
                     <thead>
                         <tr>
                             <th style={styles.tooltipTableHeader}>Category</th>
-                            <th style={{ ...styles.tooltipTableHeader, width: '11%'}}>Soil Moisture</th>
-                            <th style={{ ...styles.tooltipTableHeader, width: '12%'}}>Temperature</th>
-                            <th style={styles.tooltipTableHeader}>Humidity</th>
+                            <th style={{ ...styles.tooltipTableHeader, width: '11%' }}>Soil Moisture</th>
+                            <th style={{ ...styles.tooltipTableHeader, width: '12%' }}>Humidty</th>
+                            <th style={styles.tooltipTableHeader}>Cautionary Statements</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(232, 44, 4, 1)", color: "#fff" }}>Dry</td>
                             <td style={styles.tooltipTableCell}>0 - 19.99</td>
-                            <td style={styles.tooltipTableCell}>-∞ - 4.99</td>
                             <td style={styles.tooltipTableCell}>0 - 29.99</td>
+                            <td style={{ ...styles.tooltipTableCell, textAlign: "left" }}>Soil moisture and humidity are critically low. Plants may experience severe stress, and irrigation is necessary to prevent wilting. Avoid prolonged exposure to dry conditions for crops.</td>
                         </tr>
                         <tr>
                             <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(250, 196, 62, 1)", color: "#fff" }}>Low Moisture</td>
                             <td style={styles.tooltipTableCell}>20 - 39.99</td>
-                            <td style={styles.tooltipTableCell}>5 - 14.99</td>
                             <td style={styles.tooltipTableCell}>30 - 49.99</td>
+                            <td style={{ ...styles.tooltipTableCell, textAlign: "left" }}>Soil and humidity levels are below optimal. Consider moderate irrigation to maintain plant health and improve growth conditions.</td>
+
                         </tr>
                         <tr>
                             <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(154, 205, 50, 1)", color: "#fff" }}>Optimal</td>
                             <td style={styles.tooltipTableCell}>40 - 70.99</td>
-                            <td style={styles.tooltipTableCell}>15 - 29.99</td>
                             <td style={styles.tooltipTableCell}>50 - 70.99</td>
+                            <td style={{ ...styles.tooltipTableCell, textAlign: "left" }}>Soil and humidity levels are below optimal. Consider moderate irrigation to maintain plant health and improve growth conditions.</td>
+
                         </tr>
                         <tr>
                             <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(230, 126, 14, 1)", color: "#fff" }}>Saturated</td>
                             <td style={styles.tooltipTableCell}>71 - 100</td>
-                            <td style={styles.tooltipTableCell}>30 - 34.99</td>
                             <td style={styles.tooltipTableCell}>71 - 85.99</td>
+                            <td style={{ ...styles.tooltipTableCell, textAlign: "left" }}>Soil is saturated, and humidity is high. Ensure proper drainage to prevent waterlogging and reduce risks of root rot or fungal diseases.</td>
+
                         </tr>
                         <tr>
                             <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(140, 1, 4, 1)", color: "#fff" }}>Waterlogged</td>
                             <td style={styles.tooltipTableCell}>101 - ∞</td>
                             <td style={styles.tooltipTableCell}>35 - ∞</td>
-                            <td style={styles.tooltipTableCell}>86 - ∞</td>
+                            <td style={{ ...styles.tooltipTableCell, textAlign: "left" }}>Soil is waterlogged, and humidity is excessive. Immediate drainage is required to prevent plant damage. Avoid adding water to the area and monitor for signs of flooding or erosion.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -690,11 +694,11 @@ const SoilDashboard = () => {
             const ctx = canvas.getContext("2d");
             canvas.width = 10; // Adjust for stripe density
             canvas.height = 10;
-        
+
             // Fill the background with the base color
             ctx.fillStyle = baseColor;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
+
             // Add stripes
             ctx.strokeStyle = stripeColor;
             ctx.lineWidth = 3; // Adjust stripe thickness
@@ -702,10 +706,10 @@ const SoilDashboard = () => {
             ctx.moveTo(0, canvas.height);
             ctx.lineTo(canvas.width, 0);
             ctx.stroke();
-        
+
             return ctx.createPattern(canvas, "repeat");
         };
-        
+
         const data = {
             labels,
             datasets: [
@@ -1035,6 +1039,18 @@ const SoilDashboard = () => {
             </button>
         </div>
     );
+
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const scrolledToBottom =
+                window.innerHeight + window.pageYOffset >= document.documentElement.scrollHeight - 100;
+            setIsAtBottom(scrolledToBottom);
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     return (
         <div style={styles.body}>
@@ -1390,12 +1406,27 @@ const SoilDashboard = () => {
                     <div style={styles.renderComparisonBox}>
                         {/* Header Title and Subtitle */}
                         <div style={styles.comparisonChartHeader}>
-                            <h2 style={styles.comparisonChartTitle}>Comparison Chart
-                            <InfoIcon style={styles.tooltipIcon} onClick={handleComparisonTooltipToggle} /></h2>                   
+                            <h2 style={styles.comparisonChartTitle}>Comparison Chart</h2>
                             <p style={styles.comparisonChartSubtitle}>
                                 This chart displays a comparison between two selected datasets over time
                             </p>
-                            
+                            <button
+                                style={{
+                                    ...styles.thresholdLevelsButton,
+                                    ...(isAtBottom ? styles.thresholdLevelsButtonTop : styles.thresholdLevelsButtonBottom)
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.target.style.boxShadow = '0 0 15px 5px rgba(255, 247, 0, 0.8)'; // Apply glow on hover
+                                    e.target.style.transform = 'scale(1.05)'; // Remove the translateY part
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.target.style.boxShadow = '';
+                                    e.target.style.transform = ''; // Reset to default
+                                }}
+                                onClick={handleComparisonTooltipToggle}
+                            >
+                                Threshold Levels
+                            </button>
                         </div>
 
                         {/* Render Comparison Chart */}
@@ -1419,7 +1450,7 @@ const SoilDashboard = () => {
                     {/* Filters Row */}
                     <AlertFilters />
                 </div>
-                    
+
                 {/* Alert Log with Time Log Container */}
                 <div
                     ref={logsContainerRef}
@@ -1993,15 +2024,6 @@ const styles = {
             flexWrap: 'nowrap',
         }
     },
-    tooltipIcon: {
-        color: '#fff',
-        cursor: 'pointer',
-        fontSize: '1.5rem',
-        marginLeft: '10px',
-        // borderRadius: '50%',
-        // backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        // padding: '5px',
-    },
     tooltipOverlay: {
         position: 'fixed',
         top: 0,
@@ -2035,7 +2057,28 @@ const styles = {
         border: '1px solid rgba(255, 255, 255)',
         padding: '10px',
     },
+    thresholdLevelsButton: {
+        padding: '10px 20px',
+        background: 'linear-gradient(50deg, #d3c740, #524d18)',
+        color: '#fff',
+        border: 'none',
+        borderRadius: '15px',
+        cursor: 'pointer',
+        fontSize: '1rem',
+        transition: 'all 0.3s ease',
+        position: 'fixed',
+        right: '30px',
+        zIndex: 1000,
+        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
+    },
+    thresholdLevelsButtonBottom: {
+        bottom: '30px',
+    },
+    thresholdLevelsButtonTop: {
+        top: '30px',
+    },
 };
+
 
 
 export default SoilDashboard;

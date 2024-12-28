@@ -48,13 +48,13 @@ const AirDashboard = () => {
     const renderComparisonTooltipContent = () => {
         return (
             <div>
-                <h4 style={{...styles.tooltipHeader, marginBottom: '20px'}}>Air Quality Thresholds</h4>
+                <h4 style={{ ...styles.tooltipHeader, marginBottom: '20px' }}>Air Quality Thresholds</h4>
                 <table style={styles.tooltipTable}>
                     <thead>
                         <tr>
                             <th style={styles.tooltipTableHeader}>Category</th>
-                            <th style={{ ...styles.tooltipTableHeader, width: '11%'}}>Particle Matter 10 (PM10)</th>
-                            <th style={{ ...styles.tooltipTableHeader, width: '12%'}}>Particle Matter 2.5 (PM2.5)</th>
+                            <th style={{ ...styles.tooltipTableHeader, width: '11%' }}>Particle Matter 10 (PM10)</th>
+                            <th style={{ ...styles.tooltipTableHeader, width: '12%' }}>Particle Matter 2.5 (PM2.5)</th>
                             <th style={styles.tooltipTableHeader}>Cautionary Statement</th>
                         </tr>
                     </thead>
@@ -726,11 +726,11 @@ const AirDashboard = () => {
             const ctx = canvas.getContext("2d");
             canvas.width = 10; // Adjust for stripe density
             canvas.height = 10;
-        
+
             // Fill the background with the base color
             ctx.fillStyle = baseColor;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
+
             // Add stripes
             ctx.strokeStyle = stripeColor;
             ctx.lineWidth = 3; // Adjust stripe thickness
@@ -738,7 +738,7 @@ const AirDashboard = () => {
             ctx.moveTo(0, canvas.height);
             ctx.lineTo(canvas.width, 0);
             ctx.stroke();
-        
+
             return ctx.createPattern(canvas, "repeat");
         };
 
@@ -1047,6 +1047,18 @@ const AirDashboard = () => {
         fetchLogs();
     }, [logFilters]);
 
+    const [isAtBottom, setIsAtBottom] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const scrolledToBottom =
+                window.innerHeight + window.pageYOffset >= document.documentElement.scrollHeight - 100;
+            setIsAtBottom(scrolledToBottom);
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     return (
         <div style={styles.body}>
@@ -1058,11 +1070,9 @@ const AirDashboard = () => {
                         style={styles.detailedAirButton}
                         onMouseEnter={(e) => {
                             e.target.style.boxShadow = '0 0 15px 5px rgba(0, 198, 255, 0.8)'; // Apply glow on hover
-                            e.target.style.transform = 'scale(1.05)'; // Slightly enlarge the button
                         }}
                         onMouseLeave={(e) => {
                             e.target.style.boxShadow = ''; // Remove glow
-                            e.target.style.transform = ''; // Reset size
                         }}
                         onClick={handleButtonClick} // Trigger navigation on button click
                     >
@@ -1430,13 +1440,27 @@ const AirDashboard = () => {
                     <div style={styles.renderComparisonBox}>
                         {/* Header Title and Subtitle */}
                         <div style={styles.comparisonChartHeader}>
-                            <h2 style={styles.comparisonChartTitle}>Comparison Chart
-                                <InfoIcon style={styles.tooltipIcon} onClick={handleComparisonTooltipToggle} />
-                            </h2>
+                            <h2 style={styles.comparisonChartTitle}>Comparison Chart</h2>
                             <p style={styles.comparisonChartSubtitle}>
                                 This chart displays a comparison between two selected datasets over time
                             </p>
-                            
+                            <button
+                                style={{
+                                    ...styles.thresholdLevelsButton,
+                                    ...(isAtBottom ? styles.thresholdLevelsButtonTop : styles.thresholdLevelsButtonBottom)
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.target.style.boxShadow = '0 0 15px 5px rgba(0, 198, 255, 0.8)';
+                                    e.target.style.transform = 'scale(1.05)'; // Remove the translateY part
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.target.style.boxShadow = '';
+                                    e.target.style.transform = ''; // Reset to default
+                                }}
+                                onClick={handleComparisonTooltipToggle}
+                            >
+                                Threshold Levels
+                            </button>
                         </div>
 
                         {/* Render Comparison Chart */}
@@ -1971,7 +1995,7 @@ const styles = {
         display: 'flex',
         justifyContent: 'space-between', // Ensures title is on the left and subtitle on the right
         alignItems: 'center',
-        // marginBottom: '20px',
+        position: 'relative', // Added for floating button positioning
     },
     comparisonChartTitle: {
         color: '#fff',
@@ -1989,6 +2013,26 @@ const styles = {
         marginRight: '15px',
         textAlign: 'right', // Align subtitle to the right
         flex: 1,
+    },
+    thresholdLevelsButton: {
+        padding: '10px 20px',
+        background: 'linear-gradient(50deg, #00CCDD, #006E77)',
+        color: '#fff',
+        border: 'none',
+        borderRadius: '15px',
+        cursor: 'pointer',
+        fontSize: '1rem',
+        transition: 'all 0.3s ease',
+        position: 'fixed',
+        right: '30px',
+        zIndex: 1000,
+        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
+    },
+    thresholdLevelsButtonBottom: {
+        bottom: '30px',
+    },
+    thresholdLevelsButtonTop: {
+        top: '30px',
     },
 
 
@@ -2127,15 +2171,6 @@ const styles = {
             marginRight: '10px',
             padding: '5px', // Minimal padding for mobile
         },
-    },
-    tooltipIcon: {
-        color: '#fff',
-        cursor: 'pointer',
-        fontSize: '1.5rem',
-        marginLeft: '10px',
-        // borderRadius: '50%',
-        // backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        // padding: '5px',
     },
     tooltipOverlay: {
         position: 'fixed',
