@@ -1379,7 +1379,7 @@ const SoilView = () => {
                         <tr>
                             <td style={{ ...styles.tooltipTableCell, backgroundColor: thresholds.soil_moisture[2].color }}>Optimal</td>
                             <td style={styles.tooltipTableCell}>40–70.99%</td>
-                            <td style={styles.tooltipTableCell}>Soil moisture is at optimal levels for plant growth.</td>
+                            <td style={styles.tooltipTableCell}>None.</td>
                         </tr>
                         <tr>
                             <td style={{ ...styles.tooltipTableCell, backgroundColor: thresholds.soil_moisture[3].color }}>Saturated</td>

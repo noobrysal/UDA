@@ -76,7 +76,7 @@ const SoilDashboard = () => {
                             <td style={{ ...styles.tooltipTableCell, backgroundColor: "rgba(154, 205, 50, 1)", color: "#fff" }}>Optimal</td>
                             <td style={styles.tooltipTableCell}>40 - 70.99</td>
                             <td style={styles.tooltipTableCell}>50 - 70.99</td>
-                            <td style={{ ...styles.tooltipTableCell, textAlign: "left" }}>Soil and humidity levels are below optimal. Consider moderate irrigation to maintain plant health and improve growth conditions.</td>
+                            <td style={{ ...styles.tooltipTableCell, textAlign: "left" }}>None.</td>
 
                         </tr>
                         <tr>
