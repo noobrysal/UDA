@@ -1235,7 +1235,7 @@ const SoilView = () => {
                     const status = getSoilQualityStatus(value, metric.id);
                     return status?.color || 'rgba(75, 192, 192, 0.6)';
                 }),
-                borderRadius: 25,
+                borderRadius: 4,
             }]
         };
 
@@ -1259,7 +1259,7 @@ const SoilView = () => {
                     callback: (value) => `${value}%`,
                 },
                 grid: {
-                    display: false,
+                    display: true,
                 },
             },
             x: {
@@ -1268,18 +1268,19 @@ const SoilView = () => {
                     minRotation: 0,
                     maxRotation: 0,
                     font: {
-                        size: 12,
+                        size: 18, // Adjust the size as needed
+                        weight: 'bold' // Add bold font weight
                     },
                     padding: 10,
                 },
                 grid: {
-                    display: false,
+                    display: true,
                 },
             },
         },
         elements: {
             bar: {
-                borderRadius: 10,
+                // borderRadius: 10,
                 borderSkipped: false,
             },
         },
@@ -1302,6 +1303,7 @@ const SoilView = () => {
                         const metrics = ['soil_moisture', 'temperature', 'humidity'];
                         const metricId = metrics[context.dataIndex];
                         const originalValue = hourData?.[metricId];
+                        const status = getSoilQualityStatus(originalValue, metricId);
 
                         let unit = '';
                         switch (metricId) {
@@ -1313,7 +1315,8 @@ const SoilView = () => {
 
                         return [
                             `Safety Level: ${context.raw.toFixed(1)}%`,
-                            `Actual Value: ${originalValue?.toFixed(1)}${unit}`
+                            `Actual Value: ${originalValue?.toFixed(1)}${unit}`,
+                            `Status: ${status?.label || 'N/A'}`
                         ];
                     },
                 },

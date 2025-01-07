@@ -1028,13 +1028,19 @@ const AirView = () => {
         const metricThresholds = thresholds[metricId];
         if (!metricThresholds) return 0;
 
-        // Special handling for PM2.5 and PM10
         if (['pm25', 'pm10'].includes(metricId)) {
-            const emergencyThreshold = metricThresholds[metricThresholds.length - 1].min;
-            const goodThreshold = metricThresholds[0].max;
-
-            if (value >= emergencyThreshold) return 0;
-            return Math.max(0, Math.min(100, ((emergencyThreshold - value) / (emergencyThreshold - goodThreshold)) * 100));
+            const totalThresholds = metricThresholds.length;
+            for (let i = 0; i < totalThresholds; i++) {
+                const threshold = metricThresholds[i];
+                if (value <= threshold.max) {
+                    const range = (100 / totalThresholds);
+                    const minPercentage = 100 - (range * (i + 1));
+                    const maxPercentage = 100 - (range * i);
+                    const percentage = minPercentage + ((value - threshold.min) / (threshold.max - threshold.min)) * range;
+                    return percentage;
+                }
+            }
+            return 0;
         }
 
         // For temperature
@@ -1114,7 +1120,7 @@ const AirView = () => {
                     const status = getAirQualityStatus(value, metric.id);
                     return status?.color || 'rgba(75, 192, 192, 0.6)';
                 }),
-                borderRadius: 25,
+                borderRadius: 4,
             }]
         };
     };
@@ -1132,7 +1138,7 @@ const AirView = () => {
                     callback: (value) => `${value}%`,
                 },
                 grid: {
-                    display: false,
+                    display: true,
                 },
             },
             x: {
@@ -1141,18 +1147,19 @@ const AirView = () => {
                     minRotation: 0,
                     maxRotation: 0,
                     font: {
-                        size: 12,
+                        size: 12, // Adjust the size as needed
+                        weight: 'bold' // Add bold font weight
                     },
                     padding: 10,
                 },
                 grid: {
-                    display: false,
+                    display: true,
                 },
             },
         },
         elements: {
             bar: {
-                borderRadius: 10,
+                // borderRadius: 10,
                 borderSkipped: false,
             },
         },
@@ -1173,9 +1180,11 @@ const AirView = () => {
                     label: (context) => {
                         const metricId = ['pm25', 'pm10', 'temperature', 'humidity', 'oxygen'][context.dataIndex];
                         const originalValue = hourlyData[selectedHourForNarrative]?.[metricId];
+                        const status = getAirQualityStatus(originalValue, metricId);
                         return [
                             `Safety Level: ${context.raw.toFixed(1)}%`,
-                            `Actual Value: ${originalValue?.toFixed(2)}`
+                            `Actual Value: ${originalValue?.toFixed(2)}`,
+                            `Status: ${status?.label || 'N/A'}`
                         ];
                     },
                 },

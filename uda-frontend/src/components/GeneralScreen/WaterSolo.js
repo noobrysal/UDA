@@ -1041,7 +1041,7 @@ const WaterView = () => {
                     const status = getWaterQualityStatus(value, metric.id);
                     return status?.color || 'rgba(24, 191, 15, 0.6)';
                 }),
-                borderRadius: 25,
+                borderRadius: 4,
             }]
         };
     };
@@ -1059,7 +1059,7 @@ const WaterView = () => {
                     callback: (value) => `${value}%`,
                 },
                 grid: {
-                    display: false,
+                    display: true,
                 },
             },
             x: {
@@ -1068,18 +1068,19 @@ const WaterView = () => {
                     minRotation: 0,
                     maxRotation: 0,
                     font: {
-                        size: 12,
+                        size: 18, // Adjust the size as needed
+                        weight: 'bold' // Add bold font weight
                     },
                     padding: 10,
                 },
                 grid: {
-                    display: false,
+                    display: true,
                 },
             },
         },
         elements: {
             bar: {
-                borderRadius: 10,
+                // borderRadius: 10,
                 borderSkipped: false,
             },
         },
@@ -1098,8 +1099,12 @@ const WaterView = () => {
             tooltip: {
                 callbacks: {
                     label: (context) => {
-                        const metricId = ['pH', 'temperature', 'tss', 'tds_ppm'][context.dataIndex];
-                        const originalValue = hourlyData[selectedHourForNarrative]?.[metricId];
+                        const hourData = hourlyData[selectedHourForNarrative];
+                        const metrics = ['pH', 'temperature', 'tss', 'tds_ppm'];
+                        const metricId = metrics[context.dataIndex];
+                        const originalValue = hourData?.[metricId];
+                        const status = getWaterQualityStatus(originalValue, metricId);
+
                         let unit = '';
                         switch (metricId) {
                             case 'temperature': unit = '°C'; break;
@@ -1107,15 +1112,17 @@ const WaterView = () => {
                             case 'tds_ppm': unit = 'ppm'; break;
                             default: unit = '';
                         }
+
                         return [
                             `Safety Level: ${context.raw.toFixed(1)}%`,
-                            `Actual Value: ${originalValue?.toFixed(2)}${unit}`
+                            `Actual Value: ${originalValue?.toFixed(1)}${unit}`,
+                            `Status: ${status?.label || 'N/A'}`
                         ];
                     },
                 },
             },
         },
-        onClick: handleChartClick,
+        onClick: handleMetricClick,
     };
 
     // Add this helper function near your other utility functions

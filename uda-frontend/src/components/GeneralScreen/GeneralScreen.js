@@ -6,7 +6,7 @@ import { supabaseAir } from '../iot/AirQuality/supabaseClient';
 import { supabaseWater } from '../iot/WaterQuality/supabaseClient';
 import axiosClient from '../iot/SoilQuality/axiosClient';
 import { useNavigate } from 'react-router-dom';
-import { border, display, margin, width } from '@mui/system';
+import { border, display, fontSize, fontWeight, margin, width } from '@mui/system';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { IconButton, Tooltip as MuiTooltip } from '@mui/material';
 
@@ -18,7 +18,7 @@ const GeneralScreen = () => {
     const [latestAirData, setLatestAirData] = useState(null);
     const [latestWaterData, setLatestWaterData] = useState(null);
     const [latestSoilData, setLatestSoilData] = useState(null);
-    const [showLast24Hours, setShowLast24Hours] = useState(false);
+    const [showLast24Hours, setShowLast24Hours] = useState(true); // Change initial state to true
     const [airData24Hours, setAirData24Hours] = useState([]);
     const [soilData24Hours, setSoilData24Hours] = useState([]);
     const [expandedStatus, setExpandedStatus] = useState({
@@ -443,7 +443,11 @@ const GeneralScreen = () => {
             },
             x: {
                 ticks: {
-                    color: '#fff'
+                    color: '#fff',
+                    font: {
+                        size: 16, // Adjust the size as needed
+                        weight: 'bold' // Add bold font weight
+                    }
                 },
                 grid: {
                     display: false
@@ -452,7 +456,7 @@ const GeneralScreen = () => {
         },
         elements: {
             bar: {
-                borderRadius: 20,
+                borderRadius: 4,
                 borderSkipped: false,
             },
         },
@@ -536,7 +540,11 @@ const GeneralScreen = () => {
             },
             x: {
                 ticks: {
-                    color: '#fff'
+                    color: '#fff',
+                    font: {
+                        size: 16, // Adjust the size as needed
+                        weight: 'bold' // Add bold font weight
+                    }
                 },
                 grid: {
                     display: false
@@ -545,7 +553,7 @@ const GeneralScreen = () => {
         },
         elements: {
             bar: {
-                borderRadius: 20,
+                borderRadius: 4,
                 borderSkipped: false,
             },
         },
@@ -1077,7 +1085,7 @@ const GeneralScreen = () => {
                         onClick={handleToggleView}
                         style={styles.toggleButton}
                     >
-                        {showLast24Hours ? 'Show Latest Only' : 'Show Last 24 Hours'}
+                        {showLast24Hours ? 'Show Latest Data' : 'Show Last 24 Hours'} {/* Swap the toggle text */}
                     </button>
                 </header>
             </div>
