@@ -15,7 +15,7 @@ import {
     LineElement,
     Title,
     Tooltip,
-    Legend,
+    Legend as ChartLegend,
 } from "chart.js";
 import { Tooltip as MuiTooltip, IconButton } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
@@ -38,7 +38,7 @@ ChartJS.register(
     LineElement,
     Title,
     Tooltip,
-    Legend,
+    ChartLegend,
     plugin
 );
 
@@ -698,7 +698,12 @@ const WaterQualityByDate = () => {
         };
 
         return (
-            <div style={{ position: 'relative' }}>
+            <div style={{ 
+                position: 'relative',
+                minHeight: '300px', // Add minimum height to ensure content fits
+                display: 'flex',
+                flexDirection: 'column'
+            }}>
                 <div style={{
                     position: 'absolute',
                     top: '10px',
@@ -739,8 +744,43 @@ const WaterQualityByDate = () => {
         );
     };
 
-    const Modal = ({ isOpen, onClose, children }) => {
+    // Update the Modal component to include current status
+    const Modal = ({ isOpen, onClose, children, title, metric }) => {
         if (!isOpen) return null;
+
+        // Calculate current status
+        const getCurrentStatus = () => {
+            if (viewMode === "hourly") {
+                const totalValue = filteredData.reduce((acc, item) => {
+                    const value = (metric === 'tss' || metric === 'tds_ppm') && item[metric] === null ? 0 : item[metric];
+                    return acc + value;
+                }, 0);
+                const averageValue = totalValue / filteredData.length;
+                const status = thresholds[metric].find(
+                    (threshold) => averageValue >= threshold.min && averageValue <= threshold.max
+                )?.label || "Unknown";
+                
+                return {
+                    value: Number(averageValue.toFixed(2)),
+                    status: status,
+                    backgroundColor: getColor(averageValue, metric)
+                };
+            } else {
+                const averageData = getFilteredDataForAverage(WaterData, metric);
+                const dailyAverageValue = averageData.reduce((acc, item) => acc + item.average, 0) / averageData.length;
+                const status = thresholds[metric].find(
+                    (threshold) => dailyAverageValue >= threshold.min && dailyAverageValue <= threshold.max
+                )?.label || "Unknown";
+
+                return {
+                    value: Number(dailyAverageValue.toFixed(2)),
+                    status: status,
+                    backgroundColor: getColor(dailyAverageValue, metric)
+                };
+            }
+        };
+
+        const currentStatus = getCurrentStatus();
 
         return (
             <div style={{
@@ -749,20 +789,91 @@ const WaterQualityByDate = () => {
                 left: 0,
                 right: 0,
                 bottom: 0,
-                backgroundColor: 'rgba(0, 0, 0, 0.7)',
                 display: 'flex',
-                justifyContent: 'center',
+                justifyContent: 'flex-start',
                 alignItems: 'center',
-                zIndex: 1000
+                zIndex: 1000,
+                marginLeft: '90px'
             }}>
                 <div style={{
-                    backgroundColor: 'rgba(98, 103, 108, 0.95)', // Gray background
+                    backgroundColor: 'rgb(0, 77, 64)', // Changed to dark green
                     padding: '20px',
                     borderRadius: '10px',
-                    width: '90%',
-                    height: '90%',
-                    position: 'relative'
+                    width: '99%',        
+                    height: '95%',       
+                    position: 'relative',
                 }}>
+                    {/* Chart Container */}
+                    <div style={{ 
+                        position: 'absolute',
+                        left: '20px',
+                        top: '20px',
+                        bottom: '20px',
+                        width: 'calc(100% - 300px)' // Full width minus legend width and padding
+                    }}>
+                        {children}
+                    </div>
+
+                    {/* Legend Container */}
+                    <div style={{
+                        position: 'absolute',
+                        right: '20px',
+                        top: '20px',
+                        width: '250px',
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                        borderRadius: '10px',
+                        padding: '20px'
+                    }}>
+                        {/* Thresholds Section */}
+                        <div style={{ marginBottom: '20px' }}>
+                            <h3 style={{ color: 'white', marginBottom: '20px' }}>{title} Thresholds</h3>
+                            {thresholds[metric].map((threshold, index) => (
+                                <div
+                                    key={index}
+                                    style={{
+                                        backgroundColor: threshold.color,
+                                        padding: '10px',
+                                        borderRadius: '5px',
+                                        marginBottom: '10px',
+                                        color: 'white'
+                                    }}
+                                >
+                                    <div style={{ fontWeight: 'bold' }}>{threshold.label}</div>
+                                    <div>{threshold.min} - {threshold.max === Infinity ? '∞' : threshold.max}</div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Current Status Section */}
+                        <div style={{
+                            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                            padding: '15px',
+                            borderRadius: '8px'
+                        }}>
+                            <div style={{
+                                color: 'white',
+                                marginBottom: '15px',
+                                fontSize: '1.1em',
+                                fontWeight: 'bold'
+                            }}>
+                                {viewMode === "hourly" ? "Current Status" : "Current Status"}
+                            </div>
+                            <div style={{ color: 'white', marginBottom: '8px' }}>
+                                Average: <span style={{ fontWeight: 'bold' }}>{currentStatus.value}</span>
+                            </div>
+                            <div style={{
+                                backgroundColor: currentStatus.backgroundColor,
+                                padding: '8px',
+                                borderRadius: '5px',
+                                color: 'white',
+                                fontWeight: 'bold',
+                                textAlign: 'center'
+                            }}>
+                                {currentStatus.status}
+                            </div>
+                        </div>
+                    </div>
+
                     <button
                         onClick={onClose}
                         style={{
@@ -773,12 +884,12 @@ const WaterQualityByDate = () => {
                             border: 'none',
                             color: 'white',
                             fontSize: '24px',
-                            cursor: 'pointer'
+                            cursor: 'pointer',
+                            zIndex: 1
                         }}
                     >
                         ×
                     </button>
-                    {children}
                 </div>
             </div>
         );
@@ -1032,7 +1143,8 @@ const WaterQualityByDate = () => {
 
                             setExpandedChart({
                                 data: expandedConfig,
-                                options: expandedOptions
+                                options: expandedOptions,
+                                metric: "pH"
                             });
                         }}
                         metric="pH"
@@ -1093,14 +1205,6 @@ const WaterQualityByDate = () => {
                                 }}
                             />
                         ) : null}
-
-                        {/* Legend Component */}
-                        <Legend
-                            thresholds={thresholds.pH}
-                            filteredData={filteredData}
-                            metric="pH"
-                            data={WaterData}
-                        />
                     </ChartContainer>
                 </div>
 
@@ -1149,7 +1253,8 @@ const WaterQualityByDate = () => {
 
                             setExpandedChart({
                                 data: expandedConfig,
-                                options: expandedOptions
+                                options: expandedOptions,
+                                metric: "temperature"
                             });
                         }}
                         metric="temperature"
@@ -1210,14 +1315,6 @@ const WaterQualityByDate = () => {
                                 }}
                             />
                         ) : null}
-
-                        {/* Legend Component */}
-                        <Legend
-                            thresholds={thresholds.temperature}
-                            filteredData={filteredData}
-                            metric="temperature"
-                            data={WaterData}
-                        />
                     </ChartContainer>
                 </div>
 
@@ -1266,7 +1363,8 @@ const WaterQualityByDate = () => {
 
                             setExpandedChart({
                                 data: expandedConfig,
-                                options: expandedOptions
+                                options: expandedOptions,
+                                metric: "tss"
                             });
                         }}
                         metric="tss"
@@ -1327,14 +1425,6 @@ const WaterQualityByDate = () => {
                                 }}
                             />
                         ) : null}
-
-                        {/* Legend Component */}
-                        <Legend
-                            thresholds={thresholds.tss}
-                            filteredData={filteredData}
-                            metric="tss"
-                            data={WaterData}
-                        />
                     </ChartContainer>
                 </div>
 
@@ -1371,7 +1461,8 @@ const WaterQualityByDate = () => {
 
                             setExpandedChart({
                                 data: config,
-                                options: expandedOptions
+                                options: expandedOptions,
+                                metric: "tds_ppm"
                             });
                         }}
                         metric="tds_ppm"
@@ -1432,14 +1523,6 @@ const WaterQualityByDate = () => {
                                 }}
                             />
                         ) : null}
-
-                        {/* Legend Component */}
-                        <Legend
-                            thresholds={thresholds.tds_ppm}
-                            filteredData={filteredData}
-                            metric="tds_ppm"
-                            data={WaterData}
-                        />
                     </ChartContainer>
                 </div>
 
@@ -1448,6 +1531,8 @@ const WaterQualityByDate = () => {
             <Modal
                 isOpen={expandedChart !== null}
                 onClose={() => setExpandedChart(null)}
+                title={expandedChart?.metric}
+                metric={expandedChart?.metric}
             >
                 <div style={{ width: '100%', height: '100%' }}>
                     {expandedChart && (
@@ -1475,7 +1560,8 @@ const styles = {
         width: '100%',
         height: '100%', // Ensures it covers the viewport height
         boxSizing: 'border-box',
-        overflow: 'hidden',
+        overflow: 'auto', // Change from hidden to auto
+        paddingBottom: '50px', // Add padding to bottom
         color: '#333',
     },
     header: {
@@ -1500,9 +1586,9 @@ const styles = {
         // maxWidth: '1600px',
         width: '100%',
         margin: '0 auto',
-        overflow: 'hidden',
-        // backgroundColor: 'rgba(255, 255, 255, 0.9)',
-        paddingLeft: '70px',
+        overflow: 'visible', // Change from hidden to visible
+        alignItems: 'stretch', // Make containers stretch to match heights
+        paddingLeft: '70px', 
     },
 
     // DIV 1CALENDAR CONTAINER CONTENT
@@ -1586,7 +1672,6 @@ const styles = {
     // DIV 2
     div2: {
         backgroundColor: 'rgba(98, 103, 108, 0.3)',
-        // border: '1px solid #ccc',
         borderRadius: '20px',
         textAlign: 'center',
         padding: '20px',
@@ -1596,12 +1681,14 @@ const styles = {
         boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
         transition: 'transform 0.2s',
         overflowWrap: 'break-word',
+        minHeight: '400px', // Add minimum height
+        display: 'flex',
+        flexDirection: 'column'
     },
 
     // DIV 3
     div3: {
         backgroundColor: 'rgba(98, 103, 108, 0.3)',
-        // border: '1px solid #ccc',
         borderRadius: '20px',
         textAlign: 'center',
         padding: '20px',
@@ -1611,12 +1698,14 @@ const styles = {
         boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
         transition: 'transform 0.2s',
         overflowWrap: 'break-word',
+        minHeight: '400px', // Add minimum height
+        display: 'flex',
+        flexDirection: 'column'
     },
 
     // DIV 4
     div4: {
         backgroundColor: 'rgba(98, 103, 108, 0.3)',
-        // border: '1px solid #ccc',
         borderRadius: '20px',
         textAlign: 'center',
         padding: '20px',
@@ -1626,12 +1715,14 @@ const styles = {
         boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
         transition: 'transform 0.2s',
         overflowWrap: 'break-word',
+        minHeight: '400px', // Add minimum height
+        display: 'flex',
+        flexDirection: 'column'
     },
 
     // DIV 5
     div5: {
         backgroundColor: 'rgba(98, 103, 108, 0.3)',
-        // border: '1px solid #ccc',
         borderRadius: '20px',
         textAlign: 'center',
         padding: '20px',
@@ -1641,12 +1732,14 @@ const styles = {
         boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
         transition: 'transform 0.2s',
         overflowWrap: 'break-word',
+        minHeight: '400px', // Add minimum height
+        display: 'flex',
+        flexDirection: 'column'
     },
 
     // DIV 6
     div6: {
         backgroundColor: 'rgba(98, 103, 108, 0.3)',
-        // border: '1px solid #ccc',
         borderRadius: '20px',
         textAlign: 'center',
         padding: '20px',

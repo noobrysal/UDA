@@ -615,6 +615,7 @@ const WaterView = () => {
             backgroundColor: "rgba(0, 204, 221, 0.46)",
             transform: "scale(1.05)",
         },
+        
         upperHourCard: {
             display: "flex",
             flexDirection: "column",

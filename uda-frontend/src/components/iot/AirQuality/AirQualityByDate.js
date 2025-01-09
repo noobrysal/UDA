@@ -15,7 +15,7 @@ import {
     LineElement,
     Title,
     Tooltip,
-    Legend,
+    Legend as ChartLegend,
 } from "chart.js";
 import { IconButton, Tooltip as MuiTooltip } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
@@ -39,7 +39,7 @@ ChartJS.register(
     LineElement,
     Title,
     Tooltip,
-    Legend,
+    ChartLegend,
     plugin
 );
 
@@ -447,7 +447,7 @@ const AirQualityByDate = () => {
         };
     };
 
-    const Legend = ({ thresholds, filteredData, metric, data }) => {
+    const Legend = ({ thresholds, filteredData, metric, data, isExpanded }) => {
         // Ensure filteredData is defined and has length
         if ((!filteredData || filteredData.length === 0) && (!data || data.length === 0)) {
             return (
@@ -493,102 +493,112 @@ const AirQualityByDate = () => {
         return (
             <div
                 style={{
-                    display: "inline-flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: isExpanded ? "15px" : "10px",
                     width: "100%",
-                    marginTop: "20px",
                 }}
             >
                 {/* Legend Container */}
                 <div
-                    className="legend-container"
-                    style={{ marginRight: "20px", width: "50%" }}
+                    style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "8px",
+                        width: "100%"
+                    }}
                 >
                     {thresholds.map((threshold, index) => (
                         <div
                             key={index}
                             style={{
                                 backgroundColor: threshold.color,
-                                padding: "5px",
+                                padding: "10px",
                                 borderRadius: "5px",
-                                display: "block",
-                                marginBottom: "3px",
                                 color: "#f5f5f5",
+                                fontSize: isExpanded ? "14px" : "12px",
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center"
                             }}
                         >
                             <span style={{ fontWeight: "bold" }}>
-                                {threshold.label + ": <"}
-                            </span>{" "}
-                            {threshold.max}
+                                {threshold.label}
+                            </span>
+                            <span>
+                                {"< " + threshold.max}
+                            </span>
                         </div>
                     ))}
                 </div>
 
-                {/* Narrative Report Container */}
-
-                {viewMode === "hourly" && (
-                    <div
-                        style={{
-                            textAlign: "right",
-                            padding: "10px",
-                            borderRadius: "5px",
-                            width: "50%",
-                        }}
-                    >
-                        <h4>
-                            {"Average " + metric.toUpperCase()} level for this hour is{" "}
-                            {value !== null && value !== undefined ? (
-                                <>
-                                    {value.toFixed(2)}
-                                    <br></br>
-                                    <span
-                                        style={{
+                {/* Status Display */}
+                {isExpanded && (
+                    <div style={{
+                        marginTop: "20px",
+                        padding: "15px",
+                        backgroundColor: "rgba(255, 255, 255, 0.1)",
+                        borderRadius: "5px",
+                        color: "white" // Add this to make all text white by default
+                    }}>
+                        <h4 style={{
+                            margin: "0 0 10px 0",
+                            color: "white",
+                            fontSize: "28px",
+                            fontWeight: "bold", 
+                            paddingBottom: "15px",
+                        }}>
+                            Current Status:
+                        </h4>
+                        <div style={{ color: "white", paddingBottom: "10px", }}> {/* Add container with white text */}
+                            <h4>
+                                {"Average " + metric.toUpperCase()} level for this hour is{" "}
+                                {value !== null && value !== undefined ? (
+                                    <>
+                                        {value.toFixed(2)}
+                                        <br></br>
+                                        <span style={{
                                             backgroundColor: backgroundColor,
                                             padding: "2px 5px",
                                             borderRadius: "7px",
-                                            color: "colors.Black",
-                                        }}
-                                    >
-                                        ({status})
-                                    </span>
-                                </>
-                            ) : (
-                                "No data"
-                            )}
-                        </h4>
-                    </div>
-                )}
-                {viewMode === "average" && (
-                    <div
-                        style={{
-                            textAlign: "right",
-                            padding: "10px",
-                            borderRadius: "5px",
-                            width: "50%",
-                        }}
-                    >
-                        <h4>
-                            {"Average " + metric.toUpperCase()} level for this day is{" "}
-                            {dailyAverageValue !== null && value !== undefined ? (
-                                <>
-                                    {dailyAverageValue.toFixed(2)}
-                                    <br></br>
-                                    <span
-                                        style={{
-                                            backgroundColor: averagebackgroundColor,
-                                            padding: "2px 5px",
-                                            borderRadius: "7px",
-                                            color: "colors.Black",
-                                        }}
-                                    >
-                                        ({averageStatus})
-                                    </span>
-                                </>
-                            ) : (
-                                "No data"
-                            )}
-                        </h4>
+                                            color: "#000000", // Make the status text black for better contrast
+                                            fontWeight: "bold"
+                                        }}>
+                                            ({status})
+                                        </span>
+                                    </>
+                                ) : (
+                                    "No data"
+                                )}
+                            </h4>
+                        </div>
+                        {viewMode === "average" && (
+                            <div style={{
+                                borderRadius: "5px",
+                                color: "white" // Add white color for average view text
+                            }}>
+                                <h4>
+                                    {"Average " + metric.toUpperCase()} level for this day is{" "}
+                                    {dailyAverageValue !== null && value !== undefined ? (
+                                        <>
+                                            {dailyAverageValue.toFixed(2)}
+                                            <br></br>
+                                            <span style={{
+                                                backgroundColor: averagebackgroundColor,
+                                                padding: "2px 5px",
+                                                borderRadius: "7px",
+                                                color: "#000000", // Make the status text black for better contrast
+                                                fontWeight: "bold"
+                                            }}>
+                                                ({averageStatus})
+                                            </span>
+                                        </>
+                                    ) : (
+                                        "No data"
+                                    )}
+                                </h4>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>
@@ -664,8 +674,8 @@ const AirQualityByDate = () => {
         </div>
     );
 
-    // Add Modal component
-    const Modal = ({ isOpen, onClose, children }) => {
+    // Update the Modal component
+    const Modal = ({ isOpen, onClose, children, metric, filteredData, airData }) => {
         if (!isOpen) return null;
 
         return (
@@ -675,19 +685,19 @@ const AirQualityByDate = () => {
                 left: 0,
                 right: 0,
                 bottom: 0,
-                backgroundColor: 'rgba(0, 0, 0, 0.7)',
                 display: 'flex',
-                justifyContent: 'center',
+                justifyContent: 'flex-start',
                 alignItems: 'center',
-                zIndex: 1000
+                zIndex: 1000,
+                marginLeft: '90px'
             }}>
                 <div style={{
-                    backgroundColor: 'rgba(98, 103, 108, 0.95)',
+                    backgroundColor: 'rgba(0, 20, 57, 1)',
                     padding: '20px',
                     borderRadius: '10px',
-                    width: '90%',
-                    height: '90%',
-                    position: 'relative'
+                    width: '99%',
+                    height: '95%',
+                    position: 'relative',
                 }}>
                     <button
                         onClick={onClose}
@@ -699,12 +709,55 @@ const AirQualityByDate = () => {
                             border: 'none',
                             color: 'white',
                             fontSize: '24px',
-                            cursor: 'pointer'
+                            cursor: 'pointer',
+                            zIndex: 2
                         }}
                     >
                         ×
                     </button>
-                    {children}
+                    {/* Main Container */}
+                    <div style={{ 
+                        width: '100%',
+                        height: '100%',
+                        display: 'flex',
+                        gap: '20px'
+                    }}>
+                        {/* Chart Container */}
+                        <div style={{ 
+                            flex: '1',
+                            height: '100%',
+                            backgroundColor: 'rgba(0, 0, 0, 0.2)',
+                            borderRadius: '10px',
+                            padding: '15px'
+                        }}>
+                            {children}
+                        </div>
+                        {/* Thresholds Container */}
+                        <div style={{ 
+                            width: '300px',
+                            height: '100%',
+                            backgroundColor: 'rgba(0, 0, 0, 0.2)',
+                            borderRadius: '10px',
+                            padding: '20px',
+                            overflowY: 'auto'
+                        }}>
+                            <h3 style={{ 
+                                color: 'white',
+                                marginTop: 0,
+                                marginBottom: '15px',
+                                fontSize: '1.2em'
+                            }}>
+                                Thresholds
+                            </h3>
+                            <Legend
+                                thresholds={thresholds[metric]}
+                                filteredData={filteredData}
+                                metric={metric}
+                                data={airData}
+                                isExpanded={true}
+                            />
+                        </div>
+                    </div>
                 </div>
             </div>
         );
@@ -982,7 +1035,8 @@ const AirQualityByDate = () => {
 
                             setExpandedChart({
                                 data: config,
-                                options: expandedOptions
+                                options: expandedOptions,
+                                metric: "pm25"  // Add metric information
                             });
                         }}
                         metricType="pm25"
@@ -1119,14 +1173,6 @@ const AirQualityByDate = () => {
                         {(viewMode === "hourly" && filteredData.length === 0) || (viewMode === "average" && airData.length === 0) ? (
                             <p>No data found for this hour.</p>
                         ) : null}
-
-                        {/* Legend Component */}
-                        <Legend
-                            thresholds={thresholds.pm25}
-                            filteredData={filteredData}
-                            metric="pm25"
-                            data={airData}
-                        />
                     </ChartContainer>
                 </div>
 
@@ -1173,7 +1219,8 @@ const AirQualityByDate = () => {
 
                             setExpandedChart({
                                 data: config,
-                                options: expandedOptions
+                                options: expandedOptions,
+                                metric: "pm10"  // Add metric information
                             });
                         }}
                         metricType="pm10"
@@ -1307,14 +1354,6 @@ const AirQualityByDate = () => {
                         {(viewMode === "hourly" && filteredData.length === 0) || (viewMode === "average" && airData.length === 0) ? (
                             <p>No data found for this hour.</p>
                         ) : null}
-
-                        {/* Legend Component */}
-                        <Legend
-                            thresholds={thresholds.pm10}
-                            filteredData={filteredData}
-                            metric="pm10"
-                            data={airData}
-                        />
                     </ChartContainer>
                 </div>
 
@@ -1361,7 +1400,8 @@ const AirQualityByDate = () => {
 
                             setExpandedChart({
                                 data: config,
-                                options: expandedOptions
+                                options: expandedOptions,
+                                metric: "humidity"  // Add metric information
                             });
                         }}
                         metricType="humidity"
@@ -1495,14 +1535,6 @@ const AirQualityByDate = () => {
                         {(viewMode === "hourly" && filteredData.length === 0) || (viewMode === "average" && airData.length === 0) ? (
                             <p>No data found for this hour.</p>
                         ) : null}
-
-                        {/* Legend Component */}
-                        <Legend
-                            thresholds={thresholds.humidity}
-                            filteredData={filteredData}
-                            metric="humidity"
-                            data={airData}
-                        />
                     </ChartContainer>
                 </div>
 
@@ -1549,7 +1581,8 @@ const AirQualityByDate = () => {
 
                             setExpandedChart({
                                 data: config,
-                                options: expandedOptions
+                                options: expandedOptions,
+                                metric: "temperature"  // Add metric information
                             });
                         }}
                         metricType="temperature"
@@ -1683,14 +1716,6 @@ const AirQualityByDate = () => {
                         {(viewMode === "hourly" && filteredData.length === 0) || (viewMode === "average" && airData.length === 0) ? (
                             <p>No data found for this hour.</p>
                         ) : null}
-
-                        {/* Legend Component */}
-                        <Legend
-                            thresholds={thresholds.temperature}
-                            filteredData={filteredData}
-                            metric="temperature"
-                            data={airData}
-                        />
                     </ChartContainer>
                 </div>
 
@@ -1737,7 +1762,8 @@ const AirQualityByDate = () => {
 
                             setExpandedChart({
                                 data: config,
-                                options: expandedOptions
+                                options: expandedOptions,
+                                metric: "oxygen"  // Add metric information
                             });
                         }}
                         metricType="oxygen"
@@ -1871,14 +1897,6 @@ const AirQualityByDate = () => {
                         {(viewMode === "hourly" && filteredData.length === 0) || (viewMode === "average" && airData.length === 0) ? (
                             <p>No data found for this hour.</p>
                         ) : null}
-
-                        {/* Legend Component */}
-                        <Legend
-                            thresholds={thresholds.oxygen}
-                            filteredData={filteredData}
-                            metric="oxygen"
-                            data={airData}
-                        />
                     </ChartContainer>
                 </div>
                 <ToastContainer />
@@ -1886,12 +1904,19 @@ const AirQualityByDate = () => {
             <Modal
                 isOpen={expandedChart !== null}
                 onClose={() => setExpandedChart(null)}
+                metric={expandedChart?.metric}
+                filteredData={filteredData}
+                airData={airData}
             >
-                <div style={{ width: '100%', height: '100%' }}>
+                <div style={{ width: '100%', height: '100%', position: 'relative' }}>
                     {expandedChart && (
                         <Line
                             data={expandedChart.data}
-                            options={expandedChart.options}
+                            options={{
+                                ...expandedChart.options,
+                                maintainAspectRatio: false,
+                                responsive: true,
+                            }}
                             style={{ width: '100%', height: '100%' }}
                         />
                     )}

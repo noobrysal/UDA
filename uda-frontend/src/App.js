@@ -25,7 +25,9 @@ import PrivateRoute from './components/auth/PrivateRoute'; // <-- Import Private
 import { AuthProvider } from './components/auth/AuthContext'; // Add this import
 import { useAuth } from './components/auth/AuthContext'; // Add this import
 import GlobalToast from './components/common/GlobalToast'; // <-- Import GlobalToast
-// import AirWater from './components/GeneralScreen/AirWater';
+import AirBar from './components/GeneralScreen/AirBar';
+import WaterBar from './components/GeneralScreen/WaterBar';
+import SoilBar from './components/GeneralScreen/SoilBar';
 
 // Add route title mapping
 const ROUTE_TITLES = {
@@ -39,8 +41,12 @@ const ROUTE_TITLES = {
   '/air-dashboard': 'Air Quality - UDA',
   '/water-dashboard': 'Water Quality - UDA',
   '/soil-dashboard': 'Soil Quality - UDA',
-  // '/air-water': 'Air & Water - UDA',
-  '/profile': 'Profile - UDA'
+  '/air-water': 'Air & Water - UDA',
+  '/profile': 'Profile - UDA',
+
+  '/air-bar': 'Air Quality Chart - UDA',
+  '/water-bar': 'Water Quality Chart - UDA',
+  '/soil-bar': 'Soil Quality Chart - UDA'
 };
 
 const GlobalStyle = createGlobalStyle`
@@ -114,7 +120,9 @@ const AppContent = () => {
             {/* Dashboard Routes */}
             <Route path="/carousel" element={<Carousel />} />
             <Route path="/general-screen" element={<GeneralScreen />} />
-            {/* <Route path="/air-water" element={<AirWater />} /> */}
+            <Route path="/air-bar" element={<AirBar />} />
+            <Route path="/water-bar" element={<WaterBar />} />
+            <Route path="/soil-bar" element={<SoilBar />} />
 
             {/* Air Quality Routes */}
             <Route path="/air" element={<AirSolo />} />

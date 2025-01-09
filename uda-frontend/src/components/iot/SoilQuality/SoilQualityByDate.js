@@ -383,7 +383,7 @@ const SoilQualityByDate = () => {
         };
     };
 
-    const Legend = ({ thresholds, filteredData, metric, data }) => {
+    const Legend = ({ thresholds, filteredData, metric, data, isExpanded }) => {
         // Ensure filteredData is defined and has length
         if ((!filteredData || filteredData.length === 0) && (!data || data.length === 0)) {
             return (
@@ -421,61 +421,72 @@ const SoilQualityByDate = () => {
 
         return (
             <div style={{
-                display: "inline-flex",
-                justifyContent: "space-between",
-                alignItems: "center",
+                display: "flex",
+                flexDirection: "column",
+                gap: isExpanded ? "15px" : "10px",
                 width: "100%",
-                marginTop: "20px",
             }}>
                 {/* Legend Container */}
-                <div className="legend-container" style={{ marginRight: "20px", width: "50%" }}>
+                <div style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "8px",
+                    width: "100%"
+                }}>
                     {thresholds.map((threshold, index) => (
                         <div
                             key={index}
                             style={{
                                 backgroundColor: threshold.color,
-                                padding: "5px",
+                                padding: "10px",
                                 borderRadius: "5px",
-                                display: "block",
-                                marginBottom: "3px",
                                 color: "#f5f5f5",
+                                fontSize: isExpanded ? "14px" : "12px",
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center"
                             }}
                         >
                             <span style={{ fontWeight: "bold" }}>
-                                {threshold.label + ": <"}
-                            </span>{" "}
-                            {threshold.max}
+                                {threshold.label}
+                            </span>
+                            <span>
+                                {"< " + threshold.max}
+                            </span>
                         </div>
                     ))}
                 </div>
 
-                {/* Status Display */}
-                <div style={{
-                    textAlign: "right",
-                    padding: "10px",
-                    borderRadius: "5px",
-                    width: "50%",
-                }}>
-                    <h4>
-                        {`Average ${metric.toUpperCase()} level for this ${viewMode === "hourly" ? "hour" : "day"} is `}
-                        {value !== null && !isNaN(value) ? (
-                            <>
-                                {value.toFixed(2)}
-                                <br />
-                                <span style={{
-                                    backgroundColor: backgroundColor,
-                                    padding: "2px 5px",
-                                    borderRadius: "7px",
-                                    color: "#fff",
-                                }}>
-                                    ({status})
-                                </span>
-                            </>
-                        ) : (
-                            "No data"
-                        )}
-                    </h4>
-                </div>
+                {/* Status Display - Only show in expanded view */}
+                {isExpanded && (
+                    <div style={{
+                        marginTop: "20px",
+                        padding: "15px",
+                        backgroundColor: "rgba(255, 255, 255, 0.1)",
+                        borderRadius: "5px",
+                        color: "white"
+                    }}>
+                        <h4>
+                            {`Average ${metric.toUpperCase()} level for this ${viewMode === "hourly" ? "hour" : "day"} is `}
+                            {value !== null && !isNaN(value) ? (
+                                <>
+                                    {value.toFixed(2)}
+                                    <br />
+                                    <span style={{
+                                        backgroundColor: backgroundColor,
+                                        padding: "2px 5px",
+                                        borderRadius: "7px",
+                                        color: "#fff",
+                                    }}>
+                                        ({status})
+                                    </span>
+                                </>
+                            ) : (
+                                "No data"
+                            )}
+                        </h4>
+                    </div>
+                )}
             </div>
         );
     };
@@ -524,39 +535,18 @@ const SoilQualityByDate = () => {
         return (
             <>
                 <div style={styles.div2}>
-                    {/* Soil Moisture Chart */}
                     <div className="chart-container">
                         {renderChart("Soil Moisture", "soil_moisture")}
-                        <Legend
-                            thresholds={thresholds.soil_moisture}
-                            filteredData={filteredData}
-                            metric="soil_moisture"
-                            data={soilData}
-                        />
                     </div>
                 </div>
                 <div style={styles.div3}>
-                    {/* Temperature Chart */}
                     <div className="chart-container">
                         {renderChart("Temperature", "temperature")}
-                        <Legend
-                            thresholds={thresholds.temperature}
-                            filteredData={filteredData}
-                            metric="temperature"
-                            data={soilData}
-                        />
                     </div>
                 </div>
                 <div style={styles.div4}>
-                    {/* Humidity Chart */}
                     <div className="chart-container">
                         {renderChart("Humidity", "humidity")}
-                        <Legend
-                            thresholds={thresholds.humidity}
-                            filteredData={filteredData}
-                            metric="humidity"
-                            data={soilData}
-                        />
                     </div>
                 </div>
             </>
@@ -618,7 +608,7 @@ const SoilQualityByDate = () => {
         </div>
     );
 
-    const Modal = ({ isOpen, onClose, children }) => {
+    const Modal = ({ isOpen, onClose, children, metric, filteredData, soilData }) => {
         if (!isOpen) return null;
 
         return (
@@ -628,19 +618,19 @@ const SoilQualityByDate = () => {
                 left: 0,
                 right: 0,
                 bottom: 0,
-                backgroundColor: 'rgba(0, 0, 0, 0.7)',
                 display: 'flex',
-                justifyContent: 'center',
+                justifyContent: 'flex-start',
                 alignItems: 'center',
-                zIndex: 1000
+                zIndex: 1000,
+                marginLeft: '90px'
             }}>
                 <div style={{
-                    backgroundColor: 'rgba(98, 103, 108, 0.95)',
+                    backgroundColor: 'rgb(70, 57, 1)', // Changed to dark brown
                     padding: '20px',
                     borderRadius: '10px',
-                    width: '90%',
-                    height: '90%',
-                    position: 'relative'
+                    width: '99%',
+                    height: '95%',
+                    position: 'relative',
                 }}>
                     <button
                         onClick={onClose}
@@ -652,12 +642,55 @@ const SoilQualityByDate = () => {
                             border: 'none',
                             color: 'white',
                             fontSize: '24px',
-                            cursor: 'pointer'
+                            cursor: 'pointer',
+                            zIndex: 2
                         }}
                     >
                         ×
                     </button>
-                    {children}
+                    {/* Main Container */}
+                    <div style={{ 
+                        width: '100%',
+                        height: '100%',
+                        display: 'flex',
+                        gap: '20px'
+                    }}>
+                        {/* Chart Container */}
+                        <div style={{ 
+                            flex: '1',
+                            height: '100%',
+                            backgroundColor: 'rgba(0, 0, 0, 0.2)',
+                            borderRadius: '10px',
+                            padding: '15px'
+                        }}>
+                            {children}
+                        </div>
+                        {/* Thresholds Container */}
+                        <div style={{ 
+                            width: '300px',
+                            height: '100%',
+                            backgroundColor: 'rgba(0, 0, 0, 0.2)',
+                            borderRadius: '10px',
+                            padding: '20px',
+                            overflowY: 'auto'
+                        }}>
+                            <h3 style={{ 
+                                color: 'white',
+                                marginTop: 0,
+                                marginBottom: '15px',
+                                fontSize: '1.2em'
+                            }}>
+                                Thresholds
+                            </h3>
+                            <Legend
+                                thresholds={thresholds[metric]}
+                                filteredData={filteredData}
+                                metric={metric}
+                                data={soilData}
+                                isExpanded={true}
+                            />
+                        </div>
+                    </div>
                 </div>
             </div>
         );
@@ -708,7 +741,8 @@ const SoilQualityByDate = () => {
 
                     setExpandedChart({
                         data: config,
-                        options: expandedOptions
+                        options: expandedOptions,
+                        metric: metric  // Removed label from here
                     });
                 }}
                 metric={metric.toLowerCase()}
@@ -993,12 +1027,19 @@ const SoilQualityByDate = () => {
             <Modal
                 isOpen={expandedChart !== null}
                 onClose={() => setExpandedChart(null)}
+                metric={expandedChart?.metric}
+                filteredData={filteredData}
+                soilData={soilData}
             >
-                <div style={{ width: '100%', height: '100%' }}>
+                <div style={{ width: '100%', height: '100%', position: 'relative' }}>
                     {expandedChart && (
                         <Line
                             data={expandedChart.data}
-                            options={expandedChart.options}
+                            options={{
+                                ...expandedChart.options,
+                                maintainAspectRatio: false,
+                                responsive: true,
+                            }}
                             style={{ width: '100%', height: '100%' }}
                         />
                     )}
