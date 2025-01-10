@@ -659,7 +659,7 @@ const SoilQualityByDate = () => {
                         <div style={{ 
                             flex: '1',
                             height: '100%',
-                            backgroundColor: 'rgba(0, 0, 0, 0.2)',
+                            backgroundColor: 'rgba(0, 0, 0, 0.4)',
                             borderRadius: '10px',
                             padding: '15px'
                         }}>
@@ -669,7 +669,7 @@ const SoilQualityByDate = () => {
                         <div style={{ 
                             width: '300px',
                             height: '100%',
-                            backgroundColor: 'rgba(0, 0, 0, 0.2)',
+                            backgroundColor: 'rgba(0, 0, 0, 0.4)',
                             borderRadius: '10px',
                             padding: '20px',
                             overflowY: 'auto'
@@ -722,11 +722,23 @@ const SoilQualityByDate = () => {
                         ...getChartOptions(label, metric),
                         scales: {
                             x: {
-                                ticks: { color: 'white' },
+                                ticks: { 
+                                    color: 'white',
+                                    font: {
+                                        size: 16,  // Increased from the default to 16
+                                        weight: 'bold'
+                                    }
+                                },
                                 grid: { color: 'rgba(255, 255, 255, 0.1)' }
                             },
                             y: {
-                                ticks: { color: 'white' },
+                                ticks: { 
+                                    color: 'white',
+                                    font: {
+                                        size: 16,  // Increased from the default to 16
+                                        weight: 'bold'
+                                    }
+                                },
                                 grid: { color: 'rgba(255, 255, 255, 0.1)' }
                             }
                         },

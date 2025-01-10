@@ -544,13 +544,11 @@ const AirQualityByDate = () => {
                         <h4 style={{
                             margin: "0 0 10px 0",
                             color: "white",
-                            fontSize: "28px",
-                            fontWeight: "bold", 
-                            paddingBottom: "15px",
+                            fontSize: "14px"
                         }}>
-                            Current Status:
+                            Current Status
                         </h4>
-                        <div style={{ color: "white", paddingBottom: "10px", }}> {/* Add container with white text */}
+                        <div style={{ color: "white" }}> {/* Add container with white text */}
                             <h4>
                                 {"Average " + metric.toUpperCase()} level for this hour is{" "}
                                 {value !== null && value !== undefined ? (
@@ -692,7 +690,7 @@ const AirQualityByDate = () => {
                 marginLeft: '90px'
             }}>
                 <div style={{
-                    backgroundColor: 'rgba(0, 20, 57, 1)',
+                    backgroundColor: 'rgb(0, 31, 88)',
                     padding: '20px',
                     borderRadius: '10px',
                     width: '99%',
@@ -726,7 +724,7 @@ const AirQualityByDate = () => {
                         <div style={{ 
                             flex: '1',
                             height: '100%',
-                            backgroundColor: 'rgba(0, 0, 0, 0.2)',
+                            backgroundColor: 'rgba(0, 0, 0, 0.4)',
                             borderRadius: '10px',
                             padding: '15px'
                         }}>
@@ -736,7 +734,7 @@ const AirQualityByDate = () => {
                         <div style={{ 
                             width: '300px',
                             height: '100%',
-                            backgroundColor: 'rgba(0, 0, 0, 0.2)',
+                            backgroundColor: 'rgba(0, 0, 0, 0.4)',
                             borderRadius: '10px',
                             padding: '20px',
                             overflowY: 'auto'
@@ -791,6 +789,204 @@ const AirQualityByDate = () => {
                 }
             }
         }
+    };
+
+    const renderChart = (label, metric) => {
+        const hasData = viewMode === "hourly" ? filteredData.length > 0 : airData.length > 0;
+        return (
+            <ChartContainer
+                hasData={hasData}
+                onExpand={() => {
+                    const config = viewMode === "hourly"
+                        ? createChartConfig(
+                            label,
+                            filteredData.map(item => ({
+                                value: item[metric],
+                                id: item.id
+                            })),
+                            metric
+                        )
+                        : createChartConfigForAverage(
+                            label,
+                            getFilteredDataForAverage(airData, metric),
+                            metric
+                        );
+
+                    const expandedOptions = {
+                        ...config.options,
+                        scales: {
+                            x: {
+                                ticks: { 
+                                    color: 'white',
+                                    font: {
+                                        size: 16,  // Increased to 16px to match WaterQualityByDate
+                                        weight: 'bold'
+                                    }
+                                },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            },
+                            y: {
+                                ticks: { 
+                                    color: 'white',
+                                    font: {
+                                        size: 16,  // Increased to 16px to match WaterQualityByDate
+                                        weight: 'bold'
+                                    }
+                                },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            }
+                        },
+                        plugins: {
+                            ...config.options?.plugins,
+                            legend: {
+                                labels: { color: 'white' }
+                            }
+                        },
+                        maintainAspectRatio: false
+                    };
+
+                    setExpandedChart({
+                        data: config,
+                        options: expandedOptions,
+                        metric: metric
+                    });
+                }}
+                metric={metric.toLowerCase()}
+            >
+                {/* Render Hourly Data Chart */}
+                {viewMode === "hourly" && filteredData.length > 0 ? (
+                    <Line
+                        data={createChartConfig(
+                            label,
+                            filteredData.map((item) => ({
+                                value: item[metric],
+                                borderColor: "white", // Line color set to white
+                                borderWidth: 2, // Adjust the line thickness
+                                id: item.id,
+                            })),
+                            metric
+                        )}
+                        height={250} // Adjust the height of the chart in pixels
+                        options={{
+                            responsive: true,
+                            spanGaps: true,
+                            scales: {
+                                x: {
+                                    ticks: {
+                                        color: 'white', // Set X axis tick text color to white
+                                    },
+                                    title: {
+                                        color: 'white', // Set X axis title color to white
+                                    },
+                                },
+                                y: {
+                                    ticks: {
+                                        color: 'white', // Set Y axis tick text color to white
+                                    },
+                                    title: {
+                                        color: 'white', // Set Y axis title color to white
+                                    },
+                                },
+                            },
+                            plugins: {
+                                legend: { position: "top", labels: { color: 'white' } }, // Set legend text color to white
+                                tooltip: {
+                                    callbacks: {
+                                        label: function (tooltipItem) {
+                                            const value = tooltipItem.raw;
+                                            const metricThresholds = thresholds[metric];
+
+                                            const matchedThreshold = metricThresholds.find(
+                                                (threshold) => value <= threshold.max
+                                            );
+                                            const thresholdRemark = matchedThreshold
+                                                ? matchedThreshold.label
+                                                : "Emergency";
+
+                                            return [`Value: ${value}`, `Status: ${thresholdRemark}`];
+                                        },
+                                    },
+                                },
+                                title: {
+                                    display: true,
+                                    text: label,
+                                    padding: { bottom: 10 },
+                                    color: 'white',
+                                    fontSize: 20,
+                                },
+                            },
+                            onClick: handlePointClick,
+                        }}
+                    />
+                ) : null}
+
+                {/* Render Average Data Chart */}
+                {viewMode === "average" && airData.length > 0 ? (
+                    <Line
+                        data={createChartConfigForAverage(
+                            label,
+                            getFilteredDataForAverage(airData, metric), // Use the preprocessed data for hourly averages
+                            metric
+                        )}
+                        height={250} // Adjust the height of the chart in pixels
+                        options={{
+                            responsive: true,
+                            spanGaps: true,
+                            scales: {
+                                x: {
+                                    ticks: {
+                                        color: 'white', // Set X axis tick text color to white
+                                    },
+                                    title: {
+                                        color: 'white', // Set X axis title color to white
+                                    },
+                                },
+                                y: {
+                                    ticks: {
+                                        color: 'white', // Set Y axis tick text color to white
+                                    },
+                                    title: {
+                                        color: 'white', // Set Y axis title color to white
+                                    },
+                                },
+                            },
+                            plugins: {
+                                legend: { position: "top", labels: { color: 'white' } }, // Set legend text color to white
+                                tooltip: {
+                                    callbacks: {
+                                        label: function (tooltipItem) {
+                                            const value = tooltipItem.raw;
+                                            const metricThresholds = thresholds[metric];
+
+                                            const matchedThreshold = metricThresholds.find(
+                                                (threshold) => value <= threshold.max
+                                            );
+                                            const thresholdRemark = matchedThreshold
+                                                ? matchedThreshold.label
+                                                : "Emergency";
+
+                                            return [`Value: ${value}`, `Status: ${thresholdRemark}`];
+                                        },
+                                    },
+                                },
+                                title: {
+                                    display: true,
+                                    text: label,
+                                    padding: { bottom: 10 },
+                                    color: 'white',
+                                },
+                            },
+                            onClick: handleAverageChartClick,
+                        }}
+                    />
+                ) : null}
+
+                {/* Show "No data found for this hour" when there's no data for either chart */}
+                {(viewMode === "hourly" && filteredData.length === 0) || (viewMode === "average" && airData.length === 0) ? (
+                    <p>No data found for this hour.</p>
+                ) : null}
+            </ChartContainer>
+        );
     };
 
     return (
@@ -994,910 +1190,27 @@ const AirQualityByDate = () => {
 
                 {/* Div 2 - PM2.5 */}
                 <div style={styles.div2}>
-                    <ChartContainer
-                        hasData={viewMode === "hourly" ? filteredData.length > 0 : airData.length > 0}
-                        onExpand={() => {
-                            const config = viewMode === "hourly"
-                                ? createChartConfig(
-                                    "PM25",
-                                    filteredData.map(item => ({
-                                        value: item.pm25,
-                                        id: item.id
-                                    })),
-                                    "pm25"
-                                )
-                                : createChartConfigForAverage(
-                                    "PM25",
-                                    getFilteredDataForAverage(airData, "pm25"),
-                                    "pm25"
-                                );
-
-                            const expandedOptions = {
-                                ...config.options,
-                                scales: {
-                                    x: {
-                                        ticks: { color: 'white' },
-                                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                                    },
-                                    y: {
-                                        ticks: { color: 'white' },
-                                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                                    }
-                                },
-                                plugins: {
-                                    ...config.options?.plugins,
-                                    legend: {
-                                        labels: { color: 'white' }
-                                    }
-                                },
-                                maintainAspectRatio: false
-                            };
-
-                            setExpandedChart({
-                                data: config,
-                                options: expandedOptions,
-                                metric: "pm25"  // Add metric information
-                            });
-                        }}
-                        metricType="pm25"
-                    >
-                        {/* Render Hourly Data Chart */}
-                        {viewMode === "hourly" && filteredData.length > 0 ? (
-                            <Line
-                                data={createChartConfig(
-                                    "PM25",
-                                    filteredData.map((item) => ({
-                                        value: item.pm25,
-                                        borderColor: "white", // Line color set to white
-                                        borderWidth: 2, // Adjust the line thickness
-                                        id: item.id,
-                                    })),
-                                    "pm25"
-                                )}
-                                height={250} // Adjust the height of the chart in pixels
-                                options={{
-                                    responsive: true,
-                                    spanGaps: true,
-                                    scales: {
-                                        x: {
-                                            ticks: {
-                                                color: 'white', // Set X axis tick text color to white
-                                            },
-                                            title: {
-                                                color: 'white', // Set X axis title color to white
-                                            },
-                                        },
-                                        y: {
-                                            ticks: {
-                                                color: 'white', // Set Y axis tick text color to white
-                                            },
-                                            title: {
-                                                color: 'white', // Set Y axis title color to white
-                                            },
-                                        },
-                                    },
-                                    plugins: {
-                                        legend: { position: "top", labels: { color: 'white' } }, // Set legend text color to white
-                                        tooltip: {
-                                            callbacks: {
-                                                label: function (tooltipItem) {
-                                                    const value = tooltipItem.raw;
-                                                    const metricThresholds = thresholds.pm25;
-
-                                                    const matchedThreshold = metricThresholds.find(
-                                                        (threshold) => value <= threshold.max
-                                                    );
-                                                    const thresholdRemark = matchedThreshold
-                                                        ? matchedThreshold.label
-                                                        : "Emergency";
-
-                                                    return [`Value: ${value}`, `Status: ${thresholdRemark}`];
-                                                },
-                                            },
-                                        },
-                                        title: {
-                                            display: true,
-                                            text: "PM2.5",
-                                            padding: { bottom: 10 },
-                                            color: 'white',
-                                            fontSize: 20,
-                                        },
-                                    },
-                                    onClick: handlePointClick,
-                                }}
-                            />
-                        ) : null}
-
-                        {/* Render Average Data Chart */}
-                        {viewMode === "average" && airData.length > 0 ? (
-                            <Line
-                                data={createChartConfigForAverage(
-                                    "PM25",
-                                    getFilteredDataForAverage(airData, "pm25"), // Use the preprocessed data for hourly averages
-                                    "pm25"
-                                )}
-                                height={250} // Adjust the height of the chart in pixels
-                                options={{
-                                    responsive: true,
-                                    spanGaps: true,
-                                    scales: {
-                                        x: {
-                                            ticks: {
-                                                color: 'white', // Set X axis tick text color to white
-                                            },
-                                            title: {
-                                                color: 'white', // Set X axis title color to white
-                                            },
-                                        },
-                                        y: {
-                                            ticks: {
-                                                color: 'white', // Set Y axis tick text color to white
-                                            },
-                                            title: {
-                                                color: 'white', // Set Y axis title color to white
-                                            },
-                                        },
-                                    },
-                                    plugins: {
-                                        legend: { position: "top", labels: { color: 'white' } }, // Set legend text color to white
-                                        tooltip: {
-                                            callbacks: {
-                                                label: function (tooltipItem) {
-                                                    const value = tooltipItem.raw;
-                                                    const metricThresholds = thresholds.pm25;
-
-                                                    const matchedThreshold = metricThresholds.find(
-                                                        (threshold) => value <= threshold.max
-                                                    );
-                                                    const thresholdRemark = matchedThreshold
-                                                        ? matchedThreshold.label
-                                                        : "Emergency";
-
-                                                    return [`Value: ${value}`, `Status: ${thresholdRemark}`];
-                                                },
-                                            },
-                                        },
-                                        title: {
-                                            display: true,
-                                            text: "PM2.5",
-                                            padding: { bottom: 10 },
-                                            color: 'white',
-                                        },
-                                    },
-                                    onClick: handleAverageChartClick,
-                                }}
-                            />
-                        ) : null}
-
-                        {/* Show "No data found for this hour" when there's no data for either chart */}
-                        {(viewMode === "hourly" && filteredData.length === 0) || (viewMode === "average" && airData.length === 0) ? (
-                            <p>No data found for this hour.</p>
-                        ) : null}
-                    </ChartContainer>
+                    {renderChart("PM25", "pm25")}
                 </div>
 
                 {/* Div 3 - PM10 */}
                 <div style={styles.div3}>
-                    <ChartContainer
-                        hasData={viewMode === "hourly" ? filteredData.length > 0 : airData.length > 0}
-                        onExpand={() => {
-                            const config = viewMode === "hourly"
-                                ? createChartConfig(
-                                    "PM10",
-                                    filteredData.map(item => ({
-                                        value: item.pm10,
-                                        id: item.id
-                                    })),
-                                    "pm10"
-                                )
-                                : createChartConfigForAverage(
-                                    "PM10",
-                                    getFilteredDataForAverage(airData, "pm10"),
-                                    "pm10"
-                                );
-
-                            const expandedOptions = {
-                                ...config.options,
-                                scales: {
-                                    x: {
-                                        ticks: { color: 'white' },
-                                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                                    },
-                                    y: {
-                                        ticks: { color: 'white' },
-                                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                                    }
-                                },
-                                plugins: {
-                                    ...config.options?.plugins,
-                                    legend: {
-                                        labels: { color: 'white' }
-                                    }
-                                },
-                                maintainAspectRatio: false
-                            };
-
-                            setExpandedChart({
-                                data: config,
-                                options: expandedOptions,
-                                metric: "pm10"  // Add metric information
-                            });
-                        }}
-                        metricType="pm10"
-                    >
-                        {/* Render Hourly Data Chart for PM10 */}
-                        {viewMode === "hourly" && filteredData.length > 0 ? (
-                            <Line
-                                data={createChartConfig(
-                                    "PM10",
-                                    filteredData.map((item) => ({
-                                        value: item.pm10,
-                                        id: item.id,
-                                    })),
-                                    "pm10"
-                                )}
-                                height={250} // Adjust the height of the chart in pixels
-                                options={{
-                                    responsive: true,
-                                    spanGaps: true,
-                                    plugins: {
-                                        legend: { position: "top", labels: { color: 'white' } },
-                                        tooltip: {
-                                            callbacks: {
-                                                label: function (tooltipItem) {
-                                                    const value = tooltipItem.raw;
-                                                    const metricThresholds = thresholds.pm10;
-
-                                                    const matchedThreshold = metricThresholds.find(
-                                                        (threshold) => value <= threshold.max
-                                                    );
-                                                    const thresholdRemark = matchedThreshold
-                                                        ? matchedThreshold.label
-                                                        : "Emergency";
-
-                                                    return [`Value: ${value}`, `Status: ${thresholdRemark}`];
-                                                },
-                                            },
-                                        },
-                                        title: {
-                                            display: true,
-                                            text: "PM10",
-                                            padding: { bottom: 10 },
-                                            color: 'white',
-                                        },
-                                    },
-                                    scales: {
-                                        x: {
-                                            ticks: {
-                                                color: 'white', // Set X axis tick text color to white
-                                            },
-                                            title: {
-                                                color: 'white', // Set X axis title color to white
-                                            },
-                                        },
-                                        y: {
-                                            ticks: {
-                                                color: 'white', // Set Y axis tick text color to white
-                                            },
-                                            title: {
-                                                color: 'white', // Set Y axis title color to white
-                                            },
-                                        },
-                                    },
-                                    onClick: handlePointClick,
-                                }}
-                            />
-                        ) : null}
-
-                        {/* Render Average Data Chart for PM10 */}
-                        {viewMode === "average" && airData.length > 0 ? (
-                            <Line
-                                data={createChartConfigForAverage(
-                                    "PM10",
-                                    getFilteredDataForAverage(airData, "pm10"), // Use the preprocessed data for hourly averages
-                                    "pm10"
-                                )}
-                                height={250} // Adjust the height of the chart in pixels
-                                options={{
-                                    responsive: true,
-                                    spanGaps: true,
-                                    plugins: {
-                                        legend: { position: "top", labels: { color: 'white' } },
-                                        tooltip: {
-                                            callbacks: {
-                                                label: function (tooltipItem) {
-                                                    const value = tooltipItem.raw;
-                                                    const metricThresholds = thresholds.pm10;
-
-                                                    const matchedThreshold = metricThresholds.find(
-                                                        (threshold) => value <= threshold.max
-                                                    );
-                                                    const thresholdRemark = matchedThreshold
-                                                        ? matchedThreshold.label
-                                                        : "Emergency";
-
-                                                    return [`Value: ${value}`, `Status: ${thresholdRemark}`];
-                                                },
-                                            },
-                                        },
-                                        title: {
-                                            display: true,
-                                            text: "PM10",
-                                            padding: { bottom: 10 },
-                                            color: 'white',
-                                        },
-                                    },
-                                    scales: {
-                                        x: {
-                                            ticks: {
-                                                color: 'white', // Set X axis tick text color to white
-                                            },
-                                            title: {
-                                                color: 'white', // Set X axis title color to white
-                                            },
-                                        },
-                                        y: {
-                                            ticks: {
-                                                color: 'white', // Set Y axis tick text color to white
-                                            },
-                                            title: {
-                                                color: 'white', // Set Y axis title color to white
-                                            },
-                                        },
-                                    },
-                                    onClick: handleAverageChartClick,
-                                }}
-                            />
-                        ) : null}
-
-                        {/* Show "No data found for this hour" when there's no data for either chart */}
-                        {(viewMode === "hourly" && filteredData.length === 0) || (viewMode === "average" && airData.length === 0) ? (
-                            <p>No data found for this hour.</p>
-                        ) : null}
-                    </ChartContainer>
+                    {renderChart("PM10", "pm10")}
                 </div>
 
                 {/* Div 4 - Humidity */}
                 <div style={styles.div4}>
-                    <ChartContainer
-                        hasData={viewMode === "hourly" ? filteredData.length > 0 : airData.length > 0}
-                        onExpand={() => {
-                            const config = viewMode === "hourly"
-                                ? createChartConfig(
-                                    "Humidity",
-                                    filteredData.map(item => ({
-                                        value: item.humidity,
-                                        id: item.id
-                                    })),
-                                    "humidity"
-                                )
-                                : createChartConfigForAverage(
-                                    "Humidity",
-                                    getFilteredDataForAverage(airData, "humidity"),
-                                    "humidity"
-                                );
-
-                            const expandedOptions = {
-                                ...config.options,
-                                scales: {
-                                    x: {
-                                        ticks: { color: 'white' },
-                                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                                    },
-                                    y: {
-                                        ticks: { color: 'white' },
-                                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                                    }
-                                },
-                                plugins: {
-                                    ...config.options?.plugins,
-                                    legend: {
-                                        labels: { color: 'white' }
-                                    }
-                                },
-                                maintainAspectRatio: false
-                            };
-
-                            setExpandedChart({
-                                data: config,
-                                options: expandedOptions,
-                                metric: "humidity"  // Add metric information
-                            });
-                        }}
-                        metricType="humidity"
-                    >
-                        {/* Render Hourly Data Chart for Humidity */}
-                        {viewMode === "hourly" && filteredData.length > 0 ? (
-                            <Line
-                                data={createChartConfig(
-                                    "Humidity",
-                                    filteredData.map((item) => ({
-                                        value: item.humidity,
-                                        id: item.id,
-                                    })),
-                                    "humidity"
-                                )}
-                                height={250} // Adjust the height of the chart in pixels
-                                options={{
-                                    responsive: true,
-                                    spanGaps: true,
-                                    plugins: {
-                                        legend: { position: "top", labels: { color: 'white' } },
-                                        tooltip: {
-                                            callbacks: {
-                                                label: function (tooltipItem) {
-                                                    const value = tooltipItem.raw;
-                                                    const metricThresholds = thresholds.humidity;
-
-                                                    const matchedThreshold = metricThresholds.find(
-                                                        (threshold) => value <= threshold.max
-                                                    );
-                                                    const thresholdRemark = matchedThreshold
-                                                        ? matchedThreshold.label
-                                                        : "Emergency";
-
-                                                    return [`Value: ${value}`, `Status: ${thresholdRemark}`];
-                                                },
-                                            },
-                                        },
-                                        title: {
-                                            display: true,
-                                            text: "HUMIDITY",
-                                            padding: { bottom: 10 },
-                                            color: 'white',
-                                        },
-                                    },
-                                    scales: {
-                                        x: {
-                                            ticks: {
-                                                color: 'white', // Set X axis tick text color to white
-                                            },
-                                            title: {
-                                                color: 'white', // Set X axis title color to white
-                                            },
-                                        },
-                                        y: {
-                                            ticks: {
-                                                color: 'white', // Set Y axis tick text color to white
-                                            },
-                                            title: {
-                                                color: 'white', // Set Y axis title color to white
-                                            },
-                                        },
-                                    },
-                                    onClick: handlePointClick,
-                                }}
-                            />
-                        ) : null}
-
-                        {/* Render Average Data Chart for Humidity */}
-                        {viewMode === "average" && airData.length > 0 ? (
-                            <Line
-                                data={createChartConfigForAverage(
-                                    "Humidity",
-                                    getFilteredDataForAverage(airData, "humidity"), // Use the preprocessed data for hourly averages
-                                    "humidity"
-                                )}
-                                height={250} // Adjust the height of the chart in pixels
-                                options={{
-                                    responsive: true,
-                                    spanGaps: true,
-                                    plugins: {
-                                        legend: { position: "top", labels: { color: 'white' } },
-                                        tooltip: {
-                                            callbacks: {
-                                                label: function (tooltipItem) {
-                                                    const value = tooltipItem.raw;
-                                                    const metricThresholds = thresholds.humidity;
-
-                                                    const matchedThreshold = metricThresholds.find(
-                                                        (threshold) => value <= threshold.max
-                                                    );
-                                                    const thresholdRemark = matchedThreshold
-                                                        ? matchedThreshold.label
-                                                        : "Emergency";
-
-                                                    return [`Value: ${value}`, `Status: ${thresholdRemark}`];
-                                                },
-                                            },
-                                        },
-                                        title: {
-                                            display: true,
-                                            text: "HUMIDITY",
-                                            padding: { bottom: 10 },
-                                            color: 'white',
-                                        },
-                                    },
-                                    scales: {
-                                        x: {
-                                            ticks: {
-                                                color: 'white', // Set X axis tick text color to white
-                                            },
-                                            title: {
-                                                color: 'white', // Set X axis title color to white
-                                            },
-                                        },
-                                        y: {
-                                            ticks: {
-                                                color: 'white', // Set Y axis tick text color to white
-                                            },
-                                            title: {
-                                                color: 'white', // Set Y axis title color to white
-                                            },
-                                        },
-                                    },
-                                    onClick: handleAverageChartClick,
-                                }}
-                            />
-                        ) : null}
-
-                        {/* Show "No data found for this hour" when there's no data for either chart */}
-                        {(viewMode === "hourly" && filteredData.length === 0) || (viewMode === "average" && airData.length === 0) ? (
-                            <p>No data found for this hour.</p>
-                        ) : null}
-                    </ChartContainer>
+                    {renderChart("Humidity", "humidity")}
                 </div>
 
                 {/* Div 5 - Temperature */}
                 <div style={styles.div5}>
-                    <ChartContainer
-                        hasData={viewMode === "hourly" ? filteredData.length > 0 : airData.length > 0}
-                        onExpand={() => {
-                            const config = viewMode === "hourly"
-                                ? createChartConfig(
-                                    "Temperature",
-                                    filteredData.map(item => ({
-                                        value: item.temperature,
-                                        id: item.id
-                                    })),
-                                    "temperature"
-                                )
-                                : createChartConfigForAverage(
-                                    "Temperature",
-                                    getFilteredDataForAverage(airData, "temperature"),
-                                    "temperature"
-                                );
-
-                            const expandedOptions = {
-                                ...config.options,
-                                scales: {
-                                    x: {
-                                        ticks: { color: 'white' },
-                                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                                    },
-                                    y: {
-                                        ticks: { color: 'white' },
-                                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                                    }
-                                },
-                                plugins: {
-                                    ...config.options?.plugins,
-                                    legend: {
-                                        labels: { color: 'white' }
-                                    }
-                                },
-                                maintainAspectRatio: false
-                            };
-
-                            setExpandedChart({
-                                data: config,
-                                options: expandedOptions,
-                                metric: "temperature"  // Add metric information
-                            });
-                        }}
-                        metricType="temperature"
-                    >
-                        {/* Render Hourly Data Chart for Temperature */}
-                        {viewMode === "hourly" && filteredData.length > 0 ? (
-                            <Line
-                                data={createChartConfig(
-                                    "Temperature",
-                                    filteredData.map((item) => ({
-                                        value: item.temperature,
-                                        id: item.id,
-                                    })),
-                                    "temperature"
-                                )}
-                                height={250} // Adjust the height of the chart in pixels
-                                options={{
-                                    responsive: true,
-                                    spanGaps: true,
-                                    plugins: {
-                                        legend: { position: "top", labels: { color: 'white' } },
-                                        tooltip: {
-                                            callbacks: {
-                                                label: function (tooltipItem) {
-                                                    const value = tooltipItem.raw;
-                                                    const metricThresholds = thresholds.temperature;
-
-                                                    const matchedThreshold = metricThresholds.find(
-                                                        (threshold) => value <= threshold.max
-                                                    );
-                                                    const thresholdRemark = matchedThreshold
-                                                        ? matchedThreshold.label
-                                                        : "Emergency";
-
-                                                    return [`Value: ${value}`, `Status: ${thresholdRemark}`];
-                                                },
-                                            },
-                                        },
-                                        title: {
-                                            display: true,
-                                            text: "TEMPERATURE",
-                                            padding: { bottom: 10 },
-                                            color: 'white',
-                                        },
-                                    },
-                                    scales: {
-                                        x: {
-                                            ticks: {
-                                                color: 'white', // Set X axis tick text color to white
-                                            },
-                                            title: {
-                                                color: 'white', // Set X axis title color to white
-                                            },
-                                        },
-                                        y: {
-                                            ticks: {
-                                                color: 'white', // Set Y axis tick text color to white
-                                            },
-                                            title: {
-                                                color: 'white', // Set Y axis title color to white
-                                            },
-                                        },
-                                    },
-                                    onClick: handlePointClick,
-                                }}
-                            />
-                        ) : null}
-
-                        {/* Render Average Data Chart for Temperature */}
-                        {viewMode === "average" && airData.length > 0 ? (
-                            <Line
-                                data={createChartConfigForAverage(
-                                    "Temperature",
-                                    getFilteredDataForAverage(airData, "temperature"), // Use the preprocessed data for hourly averages
-                                    "temperature"
-                                )}
-                                height={250} // Adjust the height of the chart in pixels
-                                options={{
-                                    responsive: true,
-                                    spanGaps: true,
-                                    plugins: {
-                                        legend: { position: "top", labels: { color: 'white' } },
-                                        tooltip: {
-                                            callbacks: {
-                                                label: function (tooltipItem) {
-                                                    const value = tooltipItem.raw;
-                                                    const metricThresholds = thresholds.temperature;
-
-                                                    const matchedThreshold = metricThresholds.find(
-                                                        (threshold) => value <= threshold.max
-                                                    );
-                                                    const thresholdRemark = matchedThreshold
-                                                        ? matchedThreshold.label
-                                                        : "Emergency";
-
-                                                    return [`Value: ${value}`, `Status: ${thresholdRemark}`];
-                                                },
-                                            },
-                                        },
-                                        title: {
-                                            display: true,
-                                            text: "TEMPERATURE",
-                                            padding: { bottom: 10 },
-                                            color: 'white',
-                                        },
-                                    },
-                                    scales: {
-                                        x: {
-                                            ticks: {
-                                                color: 'white', // Set X axis tick text color to white
-                                            },
-                                            title: {
-                                                color: 'white', // Set X axis title color to white
-                                            },
-                                        },
-                                        y: {
-                                            ticks: {
-                                                color: 'white', // Set Y axis tick text color to white
-                                            },
-                                            title: {
-                                                color: 'white', // Set Y axis title color to white
-                                            },
-                                        },
-                                    },
-                                    onClick: handleAverageChartClick,
-                                }}
-                            />
-                        ) : null}
-
-                        {/* Show "No data found for this hour" when there's no data for either chart */}
-                        {(viewMode === "hourly" && filteredData.length === 0) || (viewMode === "average" && airData.length === 0) ? (
-                            <p>No data found for this hour.</p>
-                        ) : null}
-                    </ChartContainer>
+                    {renderChart("Temperature", "temperature")}
                 </div>
 
                 {/* Div 6 - Oxygen */}
                 <div style={styles.div6}>
-                    <ChartContainer
-                        hasData={viewMode === "hourly" ? filteredData.length > 0 : airData.length > 0}
-                        onExpand={() => {
-                            const config = viewMode === "hourly"
-                                ? createChartConfig(
-                                    "Oxygen",
-                                    filteredData.map(item => ({
-                                        value: item.oxygen,
-                                        id: item.id
-                                    })),
-                                    "oxygen"
-                                )
-                                : createChartConfigForAverage(
-                                    "Oxygen",
-                                    getFilteredDataForAverage(airData, "oxygen"),
-                                    "oxygen"
-                                );
-
-                            const expandedOptions = {
-                                ...config.options,
-                                scales: {
-                                    x: {
-                                        ticks: { color: 'white' },
-                                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                                    },
-                                    y: {
-                                        ticks: { color: 'white' },
-                                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                                    }
-                                },
-                                plugins: {
-                                    ...config.options?.plugins,
-                                    legend: {
-                                        labels: { color: 'white' }
-                                    }
-                                },
-                                maintainAspectRatio: false
-                            };
-
-                            setExpandedChart({
-                                data: config,
-                                options: expandedOptions,
-                                metric: "oxygen"  // Add metric information
-                            });
-                        }}
-                        metricType="oxygen"
-                    >
-                        {/* Render Hourly Data Chart for Oxygen */}
-                        {viewMode === "hourly" && filteredData.length > 0 ? (
-                            <Line
-                                data={createChartConfig(
-                                    "Oxygen",
-                                    filteredData.map((item) => ({
-                                        value: item.oxygen,
-                                        id: item.id,
-                                    })),
-                                    "oxygen"
-                                )}
-                                height={250} // Adjust the height of the chart in pixels
-                                options={{
-                                    responsive: true,
-                                    spanGaps: true,
-                                    plugins: {
-                                        legend: { position: "top", labels: { color: 'white' } },
-                                        tooltip: {
-                                            callbacks: {
-                                                label: function (tooltipItem) {
-                                                    const value = tooltipItem.raw;
-                                                    const metricThresholds = thresholds.oxygen;
-
-                                                    const matchedThreshold = metricThresholds.find(
-                                                        (threshold) => value <= threshold.max
-                                                    );
-                                                    const thresholdRemark = matchedThreshold
-                                                        ? matchedThreshold.label
-                                                        : "Emergency";
-
-                                                    return [`Value: ${value}`, `Status: ${thresholdRemark}`];
-                                                },
-                                            },
-                                        },
-                                        title: {
-                                            display: true,
-                                            text: "OXYGEN",
-                                            padding: { bottom: 10 },
-                                            color: 'white',
-                                        },
-                                    },
-                                    scales: {
-                                        x: {
-                                            ticks: {
-                                                color: 'white', // Set X axis tick text color to white
-                                            },
-                                            title: {
-                                                color: 'white', // Set X axis title color to white
-                                            },
-                                        },
-                                        y: {
-                                            ticks: {
-                                                color: 'white', // Set Y axis tick text color to white
-                                            },
-                                            title: {
-                                                color: 'white', // Set Y axis title color to white
-                                            },
-                                        },
-                                    },
-                                    onClick: handlePointClick,
-                                }}
-                            />
-                        ) : null}
-
-                        {/* Render Average Data Chart for Oxygen */}
-                        {viewMode === "average" && airData.length > 0 ? (
-                            <Line
-                                data={createChartConfigForAverage(
-                                    "Oxygen",
-                                    getFilteredDataForAverage(airData, "oxygen"), // Use the preprocessed data for hourly averages
-                                    "oxygen"
-                                )}
-                                height={250} // Adjust the height of the chart in pixels
-                                options={{
-                                    responsive: true,
-                                    spanGaps: true,
-                                    plugins: {
-                                        legend: { position: "top", labels: { color: 'white' } },
-                                        tooltip: {
-                                            callbacks: {
-                                                label: function (tooltipItem) {
-                                                    const value = tooltipItem.raw;
-                                                    const metricThresholds = thresholds.oxygen;
-
-                                                    const matchedThreshold = metricThresholds.find(
-                                                        (threshold) => value <= threshold.max
-                                                    );
-                                                    const thresholdRemark = matchedThreshold
-                                                        ? matchedThreshold.label
-                                                        : "Emergency";
-
-                                                    return [`Value: ${value}`, `Status: ${thresholdRemark}`];
-                                                },
-                                            },
-                                        },
-                                        title: {
-                                            display: true,
-                                            text: "OXYGEN",
-                                            padding: { bottom: 10 },
-                                            color: 'white',
-                                        },
-                                    },
-                                    scales: {
-                                        x: {
-                                            ticks: {
-                                                color: 'white', // Set X axis tick text color to white
-                                            },
-                                            title: {
-                                                color: 'white', // Set X axis title color to white
-                                            },
-                                        },
-                                        y: {
-                                            ticks: {
-                                                color: 'white', // Set Y axis tick text color to white
-                                            },
-                                            title: {
-                                                color: 'white', // Set Y axis title color to white
-                                            },
-                                        },
-                                    },
-                                    onClick: handleAverageChartClick,
-                                }}
-                            />
-                        ) : null}
-
-                        {/* Show "No data found for this hour" when there's no data for either chart */}
-                        {(viewMode === "hourly" && filteredData.length === 0) || (viewMode === "average" && airData.length === 0) ? (
-                            <p>No data found for this hour.</p>
-                        ) : null}
-                    </ChartContainer>
+                    {renderChart("Oxygen", "oxygen")}
                 </div>
                 <ToastContainer />
             </div>
@@ -1934,8 +1247,7 @@ const styles = {
         backgroundRepeat: 'no-repeat',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed', // Prevent background from scrolling with content
-        // minHeight: '100vh', // Ensures full height
-        height: '100%', // Ensures it covers the viewport height
+        minHeight: '100vh',
         boxSizing: 'border-box',
         width: '100%',
         overflow: 'hidden',

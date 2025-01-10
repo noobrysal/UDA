@@ -796,33 +796,33 @@ const WaterQualityByDate = () => {
                 marginLeft: '90px'
             }}>
                 <div style={{
-                    backgroundColor: 'rgb(0, 77, 64)', // Changed to dark green
+                    backgroundColor: 'rgb(0, 85, 42)', // Changed to a darker green
                     padding: '20px',
                     borderRadius: '10px',
                     width: '99%',        
                     height: '95%',       
                     position: 'relative',
+                    display: 'flex',  // Add flex display
+                    gap: '20px'      // Add gap between containers
                 }}>
                     {/* Chart Container */}
                     <div style={{ 
-                        position: 'absolute',
-                        left: '20px',
-                        top: '20px',
-                        bottom: '20px',
-                        width: 'calc(100% - 300px)' // Full width minus legend width and padding
+                        flex: '1',
+                        backgroundColor: 'rgb(0, 48, 28)',
+                        borderRadius: '10px',
+                        padding: '20px',
+                        height: '100%',  // Account for padding
                     }}>
                         {children}
                     </div>
 
                     {/* Legend Container */}
                     <div style={{
-                        position: 'absolute',
-                        right: '20px',
-                        top: '20px',
-                        width: '250px',
-                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                        width: '300px',
+                        backgroundColor: 'rgb(0, 48, 28)',
                         borderRadius: '10px',
-                        padding: '20px'
+                        padding: '20px',
+                        height: '100%',  // Account for padding
                     }}>
                         {/* Thresholds Section */}
                         <div style={{ marginBottom: '20px' }}>
@@ -1114,11 +1114,23 @@ const WaterQualityByDate = () => {
                                 ...config.options,
                                 scales: {
                                     x: {
-                                        ticks: { color: 'white' },
+                                        ticks: { 
+                                            color: 'white',
+                                            font: {
+                                                size: 16,  // Increased from 14 to 16
+                                                weight: 'bold'
+                                            }
+                                        },
                                         grid: { color: 'rgba(255, 255, 255, 0.1)' }
                                     },
                                     y: {
-                                        ticks: { color: 'white' },
+                                        ticks: { 
+                                            color: 'white',
+                                            font: {
+                                                size: 16,  // Increased from 14 to 16
+                                                weight: 'bold'
+                                            }
+                                        },
                                         grid: { color: 'rgba(255, 255, 255, 0.1)' }
                                     }
                                 },
@@ -1224,11 +1236,23 @@ const WaterQualityByDate = () => {
                                 ...config.options,
                                 scales: {
                                     x: {
-                                        ticks: { color: 'white' },
+                                        ticks: { 
+                                            color: 'white',
+                                            font: {
+                                                size: 16,  // Increased from 14 to 16
+                                                weight: 'bold'
+                                            }
+                                        },
                                         grid: { color: 'rgba(255, 255, 255, 0.1)' }
                                     },
                                     y: {
-                                        ticks: { color: 'white' },
+                                        ticks: { 
+                                            color: 'white',
+                                            font: {
+                                                size: 16,  // Increased from 14 to 16
+                                                weight: 'bold'
+                                            }
+                                        },
                                         grid: { color: 'rgba(255, 255, 255, 0.1)' }
                                     }
                                 },
@@ -1334,11 +1358,23 @@ const WaterQualityByDate = () => {
                                 ...config.options,
                                 scales: {
                                     x: {
-                                        ticks: { color: 'white' },
+                                        ticks: { 
+                                            color: 'white',
+                                            font: {
+                                                size: 16,  // Increased from 14 to 16
+                                                weight: 'bold'
+                                            }
+                                        },
                                         grid: { color: 'rgba(255, 255, 255, 0.1)' }
                                     },
                                     y: {
-                                        ticks: { color: 'white' },
+                                        ticks: { 
+                                            color: 'white',
+                                            font: {
+                                                size: 16,  // Increased from 14 to 16
+                                                weight: 'bold'
+                                            }
+                                        },
                                         grid: { color: 'rgba(255, 255, 255, 0.1)' }
                                     }
                                 },
@@ -1448,12 +1484,24 @@ const WaterQualityByDate = () => {
                                 },
                                 scales: {
                                     x: {
-                                        ticks: { color: 'black' },
-                                        grid: { color: 'rgba(0, 0, 0, 0.1)' }
+                                        ticks: { 
+                                            color: 'white',
+                                            font: {
+                                                size: 16,  // Increased from 14 to 16
+                                                weight: 'bold'
+                                            }
+                                        },
+                                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
                                     },
                                     y: {
-                                        ticks: { color: 'black' },
-                                        grid: { color: 'rgba(0, 0, 0, 0.1)' }
+                                        ticks: { 
+                                            color: 'white',
+                                            font: {
+                                                size: 16,  // Increased from 14 to 16
+                                                weight: 'bold'
+                                            }
+                                        },
+                                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
                                     }
                                 },
                                 maintainAspectRatio: false

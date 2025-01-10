@@ -311,6 +311,14 @@ const SidebarComponent = () => {
                                             isCollapsed={isCollapsed}
                                         />
                                         <SubMenuItem
+                                            title="Air Charts"
+                                            to="/air-bar"
+                                            icon={<AirOutlinedIcon />}
+                                            selected={selected}
+                                            setSelected={setSelected}
+                                            isCollapsed={isCollapsed}
+                                        />
+                                        <SubMenuItem
                                             title="Water Dashboard"
                                             to="/water"
                                             icon={<WaterOutlinedIcon />}
@@ -319,8 +327,24 @@ const SidebarComponent = () => {
                                             isCollapsed={isCollapsed}
                                         />
                                         <SubMenuItem
+                                            title="Water Charts"
+                                            to="/water-bar"
+                                            icon={<WaterOutlinedIcon />}
+                                            selected={selected}
+                                            setSelected={setSelected}
+                                            isCollapsed={isCollapsed}
+                                        />
+                                        <SubMenuItem
                                             title="Soil Dashboard"
                                             to="/soil"
+                                            icon={<TerrainRoundedIcon />}
+                                            selected={selected}
+                                            setSelected={setSelected}
+                                            isCollapsed={isCollapsed}
+                                        />
+                                        <SubMenuItem
+                                            title="Soil Charts"
+                                            to="/soil-bar"
                                             icon={<TerrainRoundedIcon />}
                                             selected={selected}
                                             setSelected={setSelected}
