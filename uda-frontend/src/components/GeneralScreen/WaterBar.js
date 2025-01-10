@@ -50,6 +50,12 @@ const WaterBar = () => {
         getCurrentHourBlock(new Date().getHours())
     );
     const [showTooltip, setShowTooltip] = useState(false);
+    const [showThresholdInfo, setShowThresholdInfo] = useState({
+        pH: false,
+        temperature: false,
+        tss: false,
+        tds_ppm: false
+    });
 
     const handleTooltipToggle = () => {
         setShowTooltip(!showTooltip);
@@ -76,6 +82,67 @@ const WaterBar = () => {
         ],
     };
 
+    const thresholdInfoWater = [
+        {
+            level: "Acceptable",
+            color: "rgba(154, 205, 50)",
+            description: "The water quality is within safe limits. Both TSS and TDS levels are within acceptable ranges, indicating good water clarity and mineral content.",
+            icon: "✅",
+            recommendations: [
+                "Continue regular monitoring",
+                "Maintain current filtration system",
+                "Document conditions for reference"
+            ]
+        },
+        {
+            level: "Too Cloudy",
+            color: "rgba(199, 46, 46)",
+            description: "Total Suspended Solids (TSS) are too high, making the water cloudy. This affects water clarity and may indicate contamination.",
+            icon: "🌫️",
+            recommendations: [
+                "Check filtration systems",
+                "Increase settling time",
+                "Investigate source of turbidity"
+            ]
+        },
+        {
+            level: "Too Acidic",
+            metric: "pH",
+            color: "rgba(199, 46, 46)",
+            description: "The water pH is too acidic, which can affect aquatic life and water quality. Low pH levels may cause corrosion and affect chemical processes.",
+            icon: "⚠️",
+            recommendations: [
+                "Check water treatment systems",
+                "Monitor chemical additions",
+                "Adjust pH using appropriate treatments"
+            ]
+        },
+        {
+            level: "Acceptable",
+            metric: "pH",
+            color: "rgba(154, 205, 50)",
+            description: "The water pH is within the ideal range (6.5-8.5), providing a balanced environment for aquatic life and optimal water quality.",
+            icon: "✅",
+            recommendations: [
+                "Continue regular monitoring",
+                "Maintain current treatment systems",
+                "Document successful conditions"
+            ]
+        },
+        {
+            level: "Too Alkaline",
+            metric: "pH",
+            color: "rgba(230, 126, 14)",
+            description: "The water pH is too alkaline, which can affect water quality and aquatic life. High pH levels may cause scaling and reduce treatment effectiveness.",
+            icon: "⚡",
+            recommendations: [
+                "Investigate source of high pH",
+                "Adjust treatment processes",
+                "Consider pH reduction methods"
+            ]
+        },
+    ];
+
     const fetchDayData = async () => {
         try {
             setLoading(true);
@@ -88,7 +155,7 @@ const WaterBar = () => {
                 .from('sensor_data')
                 .select('*')
                 .gte('timestamp', selectedDay.toISOString())
-                .lte('timestamp', nextDay.toISOString())
+                .lt('timestamp', nextDay.toISOString())
                 .order('timestamp', { ascending: true });
 
             if (error) throw error;
@@ -106,17 +173,15 @@ const WaterBar = () => {
                     return recordHour === hour;
                 });
 
-                if (hourData.length === 0) {
-                    return {
-                        hour,
-                        pH: null,
-                        temperature: null,
-                        tss: null,
-                        tds_ppm: null,
-                        status: null,
-                        color: null
-                    };
-                }
+                if (hourData.length === 0) return {
+                    hour,
+                    pH: null,
+                    temperature: null,
+                    tss: null,
+                    tds_ppm: null,
+                    status: null,
+                    color: null
+                };
 
                 const metrics = {};
                 ['pH', 'temperature', 'tss', 'tds_ppm'].forEach(metric => {
@@ -149,6 +214,19 @@ const WaterBar = () => {
         fetchDayData();
     }, [selectedDate]);
 
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setShowThresholdInfo(prevState => ({
+                pH: !prevState.pH,
+                temperature: !prevState.temperature,
+                tss: !prevState.tss,
+                tds_ppm: !prevState.tds_ppm
+            }));
+        }, 10000); // Toggle every 10 seconds
+
+        return () => clearInterval(interval);
+    }, []);
+
     const getWaterQualityStatus = (value, metricId) => {
         if (value === null || value === undefined) return null;
 
@@ -172,7 +250,7 @@ const WaterBar = () => {
             labels: [metricId.toUpperCase()],
             datasets: [{
                 label: `${metricId.toUpperCase()} Measurement`,
-                data: [value !== null && value !== undefined ? value : 0],
+                data: [value !== null && value !== undefined ? Number(value.toFixed(2)) : 0],
                 backgroundColor: [status?.color || 'rgba(75, 192, 192, 0.6)'],
                 borderRadius: 4,
             }]
@@ -185,47 +263,43 @@ const WaterBar = () => {
         scales: {
             y: {
                 beginAtZero: true,
+                grid: {
+                    color: 'rgba(255, 255, 255, 0.1)',
+                },
                 ticks: {
                     color: '#fff',
-                },
-                grid: {
-                    display: true,
-                    color: 'rgba(255, 255, 255, 0.3)',
+                    font: {
+                        size: 12
+                    },
+                    callback: function (value) {
+                        return value.toFixed(0);
+                    },
+                    autoSkip: false,  // Show all ticks
+                    maxTicksLimit: 10  // Maximum number of ticks to show
                 },
             },
             x: {
+                grid: {
+                    display: false
+                },
                 ticks: {
                     color: '#fff',
-                    minRotation: 0,
-                    maxRotation: 0,
                     font: {
                         size: 14,
                         weight: 'bold'
-                    },
-                    padding: 10,
-                },
-                grid: {
-                    display: false,
-                    color: 'rgba(255, 255, 255, 0.5)',
-                },
-            },
-        },
-        elements: {
-            bar: {
-                borderSkipped: false,
-            },
-        },
-        datasets: {
-            bar: {
-                barPercentage: 0.2,
-                categoryPercentage: 1,
-            },
+                    }
+                }
+            }
         },
         plugins: {
             legend: {
+                display: true,
                 labels: {
                     color: '#fff',
-                },
+                    font: {
+                        size: 12
+                    }
+                }
             },
             tooltip: {
                 callbacks: {
@@ -239,6 +313,30 @@ const WaterBar = () => {
                         ];
                     },
                 },
+            },
+        },
+        layout: {
+            padding: {
+                left: 25,    // Increased left padding
+                right: 25,   // Increased right padding
+                top: 25,     // Increased top padding
+                bottom: 15   // Increased bottom padding
+            }
+        },
+        elements: {
+            bar: {
+                borderWidth: 2,
+                borderRadius: 4,
+                borderSkipped: false,
+            }
+        },
+        barThickness: 40,
+        datasets: {
+            bar: {
+                barThickness: 60,  // Make bars thicker
+                maxBarThickness: 80,  // Maximum thickness
+                barPercentage: 0.5,  // Control bar width relative to category
+                categoryPercentage: 0.8,  // Control spacing between bars
             },
         },
     };
@@ -264,21 +362,107 @@ const WaterBar = () => {
     };
 
     const getAverageWaterQualityStatus = (hourData) => {
-        if (!hourData || (!hourData.pH && !hourData.temperature && !hourData.tss && !hourData.tds_ppm)) return null;
+        if (!hourData || (!hourData.tds_ppm && !hourData.tss)) return null;
 
-        const pHStatus = getWaterQualityStatus(hourData.pH, 'pH');
-        const temperatureStatus = getWaterQualityStatus(hourData.temperature, 'temperature');
-        const tssStatus = getWaterQualityStatus(hourData.tss, 'tss');
         const tdsStatus = getWaterQualityStatus(hourData.tds_ppm, 'tds_ppm');
+        const tssStatus = getWaterQualityStatus(hourData.tss, 'tss');
 
-        // Get the more severe status
-        const statuses = [pHStatus, temperatureStatus, tssStatus, tdsStatus].filter(Boolean);
-        return statuses.reduce((prev, current) => {
-            const prevIndex = thresholds[current.metric].findIndex(t => t.label === prev.label);
-            const currentIndex = thresholds[current.metric].findIndex(t => t.label === current.label);
-            return currentIndex > prevIndex ? current : prev;
-        }, statuses[0]);
+        if (tdsStatus?.label === "High Dissolved Substances") return tdsStatus;
+        if (tssStatus?.label === "Too Cloudy") return tssStatus;
+        if (tdsStatus?.label === "Acceptable" && tssStatus?.label === "Acceptable") return tdsStatus;
+
+        return tdsStatus || tssStatus;
     };
+
+    const renderHourCards = () => (
+        <div style={styles.hoursContainer}>
+            {visibleHourRange.map((hour) => {
+                const hourData = hourlyData[hour];
+                const waterQualityStatus = getAverageWaterQualityStatus(hourData);
+
+                return (
+                    <div
+                        key={hour}
+                        style={{
+                            ...styles.upperHourCard,
+                            ...(hour === selectedHourForNarrative ? styles.selectedHourCard : {}),
+                            border: hour === selectedHourForNarrative ? '3px solid #00fffb' : 'none',
+                        }}
+                        onClick={() => setSelectedHourForNarrative(hour)}
+                    >
+                        <div style={styles.hourText}>{formatHour(hour)}</div>
+                        {waterQualityStatus && (
+                            <div style={{
+                                textAlign: 'center',
+                                fontSize: '10px',
+                                color: '#fff',
+                                marginTop: '5px',
+                                fontWeight: 'bold',
+                                backgroundColor: waterQualityStatus.color,
+                                padding: '5px 10px',
+                                borderRadius: '20px',
+                                minWidth: '50px',
+                            }}>
+                                {waterQualityStatus.label}
+                            </div>
+                        )}
+                    </div>
+                );
+            })}
+        </div>
+    );
+
+    const renderThresholdInfo = (metricId) => {
+        const status = getWaterQualityStatus(hourlyData[selectedHourForNarrative]?.[metricId], metricId);
+        const thresholdData = thresholdInfoWater.find(t => t.level === status?.label);
+
+        return (
+            <div style={styles.thresholdInfoContainer}>
+                <h2 style={styles.thresholdTitle}>{thresholdData?.level}</h2>
+                <p style={styles.thresholdDescription}>{thresholdData?.description}</p>
+                <ul style={styles.recommendationsList}>
+                    {thresholdData?.recommendations.map((rec, index) => (
+                        <li key={index} style={styles.recommendationItem}>{rec}</li>
+                    ))}
+                </ul>
+            </div>
+        );
+    };
+
+    const renderMetricBox = (metricId, title) => (
+        <div style={styles.box1}>
+            <div style={styles.iotHeaderBox}>
+                <div style={styles.statusHeader}>
+                    {hourlyData[selectedHourForNarrative] && (
+                        <div
+                            style={{
+                                ...styles.statusBox,
+                                backgroundColor: getWaterQualityStatus(
+                                    hourlyData[selectedHourForNarrative][metricId],
+                                    metricId
+                                )?.color,
+                                cursor: 'pointer'
+                            }}
+                            onClick={() => setShowThresholdInfo(prev => ({ ...prev, [metricId]: !prev[metricId] }))}
+                        >
+                            <p style={styles.statusText}>
+                                {getWaterQualityStatus(
+                                    hourlyData[selectedHourForNarrative][metricId],
+                                    metricId
+                                )?.label || 'N/A'}
+                            </p>
+                        </div>
+                    )}
+                </div>
+            </div>
+            <div style={styles.chartContainer}>
+                {showThresholdInfo[metricId] ?
+                    renderThresholdInfo(metricId) :
+                    <Bar data={getBarChartData(metricId)} options={barChartOptions} />
+                }
+            </div>
+        </div>
+    );
 
     return (
         <div style={styles.fullcontainer}>
@@ -311,29 +495,7 @@ const WaterBar = () => {
                                 >
                                     <ArrowLeftIcon style={{ fontSize: 60 }} />
                                 </button>
-
-                                <div style={styles.hoursContainer}>
-                                    {visibleHourRange.map((hour) => {
-                                        const hourData = hourlyData[hour];
-                                        const waterQualityStatus = getAverageWaterQualityStatus(hourData);
-
-                                        return (
-                                            <div
-                                                key={hour}
-                                                style={{
-                                                    ...styles.upperHourCard,
-                                                    ...(hour === selectedHourForNarrative ? styles.selectedHourCard : {}),
-                                                    border: hour === selectedHourForNarrative ? '3px solid #00fffb' : 'none',
-                                                }}
-                                                onClick={() => setSelectedHourForNarrative(hour)}
-                                            >
-                                                <div style={styles.hourText}>{formatHour(hour)}</div>
-                                                <div style={styles.statusText}>{waterQualityStatus?.label || 'N/A'}</div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-
+                                {renderHourCards()}
                                 <button
                                     style={styles.hourButton}
                                     onClick={() => handleHourRangeShift('next')}
@@ -347,35 +509,13 @@ const WaterBar = () => {
             </div>
 
             <div style={styles.gridContainer}>
-                {/* Water Quality Column */}
                 <div style={styles.column}>
-                    <div style={styles.box1}>
-                        <div style={styles.iotHeaderBox}>
-                            <h3 style={styles.metricTitle}>pH</h3>
-                            {/*<Bar data={getBarChartData('pH')} options={barChartOptions} /> */}
-                        </div>
-                    </div>
-                    <div style={styles.box2}>
-                        <div style={styles.iotHeaderBox}>
-                            <h3 style={styles.metricTitle}>Temperature</h3>
-                            {/*<Bar data={getBarChartData('temperature')} options={barChartOptions} /> */}
-                        </div>
-                    </div>
+                    {renderMetricBox('pH', 'pH Level')}
+                    {renderMetricBox('temperature', 'Temperature')}
                 </div>
-
                 <div style={styles.column}>
-                    <div style={styles.box3}>
-                        <div style={styles.iotHeaderBox}>
-                            <h3 style={styles.metricTitle}>TSS</h3>
-                            {/*<Bar data={getBarChartData('tss')} options={barChartOptions} />*/}
-                        </div>
-                    </div>
-                    <div style={styles.box4}>
-                        <div style={styles.iotHeaderBox}>
-                            <h3 style={styles.metricTitle}>TDS</h3>
-                            {/*<Bar data={getBarChartData('tds_ppm')} options={barChartOptions} /> */}
-                        </div>
-                    </div>
+                    {renderMetricBox('tss', 'TSS')}
+                    {renderMetricBox('tds_ppm', 'TDS')}
                 </div>
             </div>
 
@@ -461,6 +601,7 @@ const styles = {
         gap: "20px",
         marginTop: "15px",
         marginLeft: "70px",
+        marginBottom: '20px', // Add margin to prevent cutoff
     },
 
     row: {
@@ -497,12 +638,13 @@ const styles = {
         borderRadius: "30px",
         display: "flex",
         flexDirection: "column",
-        alignItems: "flex-start",  // Align header to the left
+        alignItems: "center",  // Center children horizontally
         justifyContent: "flex-start",
         fontSize: "1.5rem",
         color: "#fff",
         fontWeight: "bold",
-        padding: "20px",
+        padding: "15px",
+        height: '250px',  // Increased from 200px to give more room for the chart
     },
     box2: {
         flex: 1,
@@ -611,15 +753,51 @@ const styles = {
         width: '100%',
     },
     statusBox: {
-        padding: '5px 10px',
+        padding: '3px 8px',  // Reduced padding
         borderRadius: '5px',
         color: '#fff',
         fontSize: '15px',
         fontWeight: 'bold',
         textAlign: 'center',
+        width: '80%',  // Match chart width
+        display: 'flex',
+        justifyContent: 'center',
+        margin: '0 auto 5px auto',  // Center the status box
     },
     statusText: {
         margin: 0,
+    },
+    chartContainer: {
+        width: '80%',
+        height: '200px',  // Increased from 160px
+        position: 'relative',
+        marginTop: '10px',
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    thresholdInfoContainer: {
+        color: '#fff',
+        textAlign: 'left',
+        fontSize: '0.9rem',  // Slightly smaller font
+    },
+    thresholdTitle: {
+        fontSize: '1.2rem',
+        fontWeight: 'bold',
+    },
+    thresholdDescription: {
+        fontSize: '0.9rem',
+        margin: '5px 0',  // Reduced margin
+    },
+    recommendationsList: {
+        listStyleType: 'disc',
+        paddingLeft: '20px',
+    },
+    recommendationItem: {
+        fontSize: '0.8rem',
+        margin: '3px 0',  // Reduced margin
     },
 };
 

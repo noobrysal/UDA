@@ -23,6 +23,7 @@ import { Tooltip, Tooltip as MuiTooltip } from '@mui/material';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import InfoIcon from '@mui/icons-material/Info';
+import ChartDataLabels from 'chartjs-plugin-datalabels'; // Add this import
 
 ChartJS.register(
     CategoryScale,
@@ -32,7 +33,8 @@ ChartJS.register(
     BarElement,  // Add this registration
     Title,
     ChartTooltip,
-    Legend
+    Legend,
+    ChartDataLabels // Add this registration
 );
 
 const AirView = () => {
@@ -508,7 +510,7 @@ const AirView = () => {
             flexDirection: "column",
             justifyContent: "space-between",
             gap: "20px",
-            
+
         },
 
         // UPPER LEFT BOX BAR CHART MERGED METRICS
@@ -517,7 +519,7 @@ const AirView = () => {
             backgroundColor: 'rgba(242, 242, 242, 0.1)',
             borderRadius: "20px",
             width: "36vw",
-            height: "65%",  // Keep the height as needed
+            height: "68%",  // Keep the height as needed
             padding: "15px",
             display: "flex",
             flexDirection: "column"
@@ -525,9 +527,10 @@ const AirView = () => {
         chartContainer: {
             // flex: 1,
             width: '100%',
-            height: '100%', // Set height as a percentage of the parent container's height
+            height: '100%', // Update to take full height since we removed narrative
+            marginBottom: '0', // Remove margin since we don't need spacing anymore
+            padding: '10px 20px', // Add some padding for labels
         },
-
         //LOWER LEFT THRESHOLD INFO SLIDER BOX
         lowerLeftBox: {
             // flex: 0.38, // Increase flex value to make the lower box taller
@@ -760,7 +763,7 @@ const AirView = () => {
             fontWeight: "bold",
             color: "#fff",
             marginBottom: "0px",
-            textAlign: "center",    
+            textAlign: "center",
         },
         progressWrapper: {
             display: "flex",
@@ -906,6 +909,7 @@ const AirView = () => {
             paddingLeft: "15px",
         },
         timeHeader: {
+            textAlign: "center",
             fontSize: "18px",
             fontWeight: "bold",
             marginBottom: "10px",
@@ -1100,7 +1104,7 @@ const AirView = () => {
         return 100; // Default return for any unhandled cases
     };
 
-    // Update the getBarChartData function
+    // Update the getBarChartData function to use status colors for bars
     const getBarChartData = () => {
         const hourData = hourlyData[selectedHourForNarrative];
         const relevantMetrics = metrics.filter(metric =>
@@ -1129,8 +1133,9 @@ const AirView = () => {
     const barChartOptions = {
         responsive: true,
         maintainAspectRatio: false,
+        indexAxis: 'y', // This makes the chart horizontal
         scales: {
-            y: {
+            x: { // Note: x and y axes are swapped for horizontal bars
                 beginAtZero: true,
                 max: 100,
                 ticks: {
@@ -1141,14 +1146,12 @@ const AirView = () => {
                     display: true,
                 },
             },
-            x: {
+            y: { // This was previously the x-axis
                 ticks: {
                     color: '#fff',
-                    minRotation: 0,
-                    maxRotation: 0,
                     font: {
-                        size: 12, // Adjust the size as needed
-                        weight: 'bold' // Add bold font weight
+                        size: 14,
+                        weight: 'bold'
                     },
                     padding: 10,
                 },
@@ -1171,9 +1174,7 @@ const AirView = () => {
         },
         plugins: {
             legend: {
-                labels: {
-                    color: '#fff',
-                },
+                display: false, // Hide the legend
             },
             tooltip: {
                 callbacks: {
@@ -1188,6 +1189,42 @@ const AirView = () => {
                         ];
                     },
                 },
+            },
+            datalabels: {
+                align: function (context) {
+                    const value = context.dataset.data[context.dataIndex];
+                    // If value is less than 25%, show label outside the bar
+                    return value < 25 ? 'right' : 'center';
+                },
+                anchor: function (context) {
+                    const value = context.dataset.data[context.dataIndex];
+                    // If value is less than 25%, anchor to end of bar
+                    return value < 25 ? 'end' : 'center';
+                },
+                offset: function (context) {
+                    const value = context.dataset.data[context.dataIndex];
+                    // Add offset only when label is outside the bar
+                    return value < 25 ? 4 : 0;
+                },
+                color: '#fff',
+                padding: {
+                    top: 4,
+                    bottom: 4,
+                    left: 6,
+                    right: 6
+                },
+                borderRadius: 4,
+                font: {
+                    size: 12,
+                    weight: 'bold'
+                },
+                formatter: function (value, context) {
+                    const metricId = ['pm25', 'pm10', 'temperature', 'humidity', 'oxygen'][context.dataIndex];
+                    const originalValue = hourlyData[selectedHourForNarrative]?.[metricId];
+                    const status = getAirQualityStatus(originalValue, metricId);
+                    return status?.label || 'N/A';
+                },
+                backgroundColor: 'rgba(70, 70, 70, 0.8)', // Consistent gray background for all labels
             },
         },
         onClick: handleChartClick,
@@ -1219,13 +1256,13 @@ const AirView = () => {
     const renderTooltipContent = () => {
         return (
             <div>
-                <h4 style={{...styles.tooltipHeader, marginBottom: '20px'}}>Air Quality Thresholds</h4>
+                <h4 style={{ ...styles.tooltipHeader, marginBottom: '20px' }}>Air Quality Thresholds</h4>
                 <table style={styles.tooltipTable}>
                     <thead>
                         <tr>
                             <th style={styles.tooltipTableHeader}>Category</th>
-                            <th style={{ ...styles.tooltipTableHeader, width: '11%'}}>Particle Matter 10 (PM10)</th>
-                            <th style={{ ...styles.tooltipTableHeader, width: '12%'}}>Particle Matter 2.5 (PM2.5)</th>
+                            <th style={{ ...styles.tooltipTableHeader, width: '11%' }}>Particle Matter 10 (PM10)</th>
+                            <th style={{ ...styles.tooltipTableHeader, width: '12%' }}>Particle Matter 2.5 (PM2.5)</th>
                             <th style={styles.tooltipTableHeader}>Cautionary Statement</th>
                         </tr>
                     </thead>
@@ -1323,8 +1360,13 @@ const AirView = () => {
                 {/* Left Container Section */}
                 <div style={styles.leftContainer}>
                     <div style={styles.upperLeftBox}>
+                        <h2 style={styles.upperRightHeader}>Air Quality Safety Level</h2>
                         <div style={styles.chartContainer}>
-                            <Bar data={getBarChartData()} options={barChartOptions} />
+                            <Bar
+                                data={getBarChartData()}
+                                options={barChartOptions}
+                                plugins={[ChartDataLabels]} // Add this line
+                            />
                         </div>
                     </div>
                     <div style={styles.lowerLeftBox}>
@@ -1343,12 +1385,12 @@ const AirView = () => {
                             </div>
                             {/* Navigation buttons */}
                             <div style={styles.slideHeaderRight}>
-                            <IconButton size="small" style={{ color: 'white' }} onClick={handleTooltipToggle}>
+                                <IconButton size="small" style={{ color: 'white' }} onClick={handleTooltipToggle}>
                                     <InfoOutlinedIcon fontSize="small" />
                                 </IconButton>
                                 <button onClick={prevSlide} style={styles.slideButton}>←</button>
                                 <button onClick={nextSlide} style={styles.slideButton}>→</button>
-                               
+
                             </div>
                         </div>
                         <div style={styles.slideshowBody}>
@@ -1453,7 +1495,7 @@ const AirView = () => {
                                             >
                                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0px', marginLeft: '15px' }}>
                                                     <h3 style={styles.metricTitle}>{metric.name}</h3>
-                                                
+
                                                     <MuiTooltip
                                                         title={metricDescriptions[metric.id] || ""}
                                                         arrow
@@ -1463,7 +1505,7 @@ const AirView = () => {
                                                             <InfoIcon fontSize="small" />
                                                         </IconButton>
                                                     </MuiTooltip>
-                                                    </div>
+                                                </div>
                                                 <div style={styles.progressWrapper}>
                                                     <div style={styles.circularProgressContainer}>
                                                         {value !== null && value !== undefined ? (
@@ -1603,3 +1645,4 @@ const AirView = () => {
 
 
 export default AirView;
+
