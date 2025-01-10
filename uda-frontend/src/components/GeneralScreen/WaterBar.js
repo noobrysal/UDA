@@ -32,6 +32,10 @@ ChartJS.register(
 );
 
 const WaterBar = () => {
+    const getCurrentLocalDate = () => {
+        const now = new Date();
+        return now.toLocaleDateString('en-CA'); // Returns YYYY-MM-DD format in local timezone
+    };
     const getCurrentHourBlock = (hour) => {
         const blockStart = Math.floor(hour / 6) * 6;
         return Array.from({ length: 6 }, (_, i) => (blockStart + i) % 24);
@@ -39,7 +43,7 @@ const WaterBar = () => {
 
     const [hourlyData, setHourlyData] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [selectedDate, setSelectedDate] = useState('');
+    const [selectedDate, setSelectedDate] = useState(getCurrentLocalDate());
     const [visibleHours, setVisibleHours] = useState([0]);
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [slideDirection, setSlideDirection] = useState('left');
@@ -83,65 +87,135 @@ const WaterBar = () => {
     };
 
     const thresholdInfoWater = [
-        {
-            level: "Acceptable",
-            color: "rgba(154, 205, 50)",
-            description: "The water quality is within safe limits. Both TSS and TDS levels are within acceptable ranges, indicating good water clarity and mineral content.",
-            icon: "✅",
-            recommendations: [
-                "Continue regular monitoring",
-                "Maintain current filtration system",
-                "Document conditions for reference"
-            ]
-        },
-        {
-            level: "Too Cloudy",
-            color: "rgba(199, 46, 46)",
-            description: "Total Suspended Solids (TSS) are too high, making the water cloudy. This affects water clarity and may indicate contamination.",
-            icon: "🌫️",
-            recommendations: [
-                "Check filtration systems",
-                "Increase settling time",
-                "Investigate source of turbidity"
-            ]
-        },
+        // pH Levels
         {
             level: "Too Acidic",
             metric: "pH",
             color: "rgba(199, 46, 46)",
-            description: "The water pH is too acidic, which can affect aquatic life and water quality. Low pH levels may cause corrosion and affect chemical processes.",
+            description: "The water is too acidic, which can harm aquatic life and affect water usability.",
             icon: "⚠️",
             recommendations: [
-                "Check water treatment systems",
-                "Monitor chemical additions",
-                "Adjust pH using appropriate treatments"
+                "• Use lime or other alkaline substances to neutralize acidity",
+                "• Avoid discharge of acidic substances into water",
+                "• Monitor aquatic ecosystems for stress"
             ]
         },
         {
             level: "Acceptable",
             metric: "pH",
             color: "rgba(154, 205, 50)",
-            description: "The water pH is within the ideal range (6.5-8.5), providing a balanced environment for aquatic life and optimal water quality.",
+            description: "The water pH is within the acceptable range, suitable for most uses and aquatic life.",
             icon: "✅",
             recommendations: [
-                "Continue regular monitoring",
-                "Maintain current treatment systems",
-                "Document successful conditions"
+                "• Maintain regular monitoring to ensure pH stability",
+                "• Avoid introducing contaminants that may affect pH balance",
+                "• Ensure proper filtration and treatment"
             ]
         },
         {
             level: "Too Alkaline",
             metric: "pH",
             color: "rgba(230, 126, 14)",
-            description: "The water pH is too alkaline, which can affect water quality and aquatic life. High pH levels may cause scaling and reduce treatment effectiveness.",
-            icon: "⚡",
+            description: "The water is too alkaline, which can reduce nutrient availability and harm aquatic organisms.",
+            icon: "⚠️",
             recommendations: [
-                "Investigate source of high pH",
-                "Adjust treatment processes",
-                "Consider pH reduction methods"
+                "• Apply acids or acidic compounds to adjust pH levels",
+                "• Check for sources of alkaline pollution",
+                "• Monitor for algae blooms or other signs of imbalance"
             ]
         },
+    
+        // Temperature Levels
+        {
+            level: "Too Cold",
+            metric: "Water Temperature",
+            color: "rgba(230, 126, 14)",
+            description: "Water temperature is too cold, which may reduce the metabolism of aquatic organisms.",
+            icon: "❄️",
+            recommendations: [
+                "• Consider using temperature regulation in controlled environments",
+                "• Monitor temperature-sensitive species",
+                "• Avoid thermal shock by gradual adjustments"
+            ]
+        },
+        {
+            level: "Acceptable",
+            metric: "Water Temperature",
+            color: "rgba(154, 205, 50)",
+            description: "Water temperature is within the acceptable range, supporting healthy aquatic life.",
+            icon: "🌊",
+            recommendations: [
+                "• Maintain consistent water temperature",
+                "• Avoid activities that may cause temperature fluctuations",
+                "• Regularly monitor for any sudden changes"
+            ]
+        },
+        {
+            level: "Too Hot",
+            metric: "Water Temperature",
+            color: "rgba(199, 46, 46)",
+            description: "Water temperature is too high, which can reduce oxygen levels and harm aquatic organisms.",
+            icon: "🔥",
+            recommendations: [
+                "• Implement cooling measures in industrial discharges",
+                "• Provide shading for small water bodies",
+                "• Avoid thermal pollution from power plants or other sources"
+            ]
+        },
+    
+        // TSS Levels
+        {
+            level: "Acceptable",
+            metric: "TSS (Total Suspended Solids)",
+            color: "rgba(154, 205, 50)",
+            description: "The water clarity is acceptable, with suspended solid levels within safe limits.",
+            icon: "💧",
+            recommendations: [
+                "• Maintain current water management practices",
+                "• Continue regular monitoring to detect changes",
+                "• Prevent soil erosion and runoff into water sources"
+            ]
+        },
+        {
+            level: "Too Cloudy",
+            metric: "TSS (Total Suspended Solids)",
+            color: "rgba(199, 46, 46)",
+            description: "The water is too cloudy, which can block sunlight and harm aquatic life.",
+            icon: "🌫️",
+            recommendations: [
+                "• Use filtration or sedimentation to reduce suspended solids",
+                "• Control runoff and erosion near water sources",
+                "• Inspect for algal blooms or other sources of turbidity"
+            ]
+        },
+    
+        // TDS Levels
+        {
+            level: "Acceptable",
+            metric: "TDS (Total Dissolved Substances)",
+            color: "rgba(154, 205, 50)",
+            description: "The dissolved substance levels are acceptable, ensuring water quality is safe for most uses.",
+            icon: "🌊",
+            recommendations: [
+                "• Continue regular monitoring to maintain levels",
+                "• Check for potential sources of dissolved substances",
+                "• Ensure proper filtration and treatment where needed"
+            ]
+        },
+        {
+            level: "High Dissolved Substances",
+            metric: "TDS (Total Dissolved Substances)",
+            color: "rgba(199, 46, 46)",
+            description: "The water contains high levels of dissolved substances, which can affect taste, usability, and aquatic life.",
+            icon: "⚠️",
+            recommendations: [
+                "• Use reverse osmosis or other purification methods",
+                "• Identify and eliminate sources of high TDS",
+                "• Monitor aquatic ecosystems for stress"
+            ]
+        }
     ];
+    
 
     const fetchDayData = async () => {
         try {
@@ -314,6 +388,14 @@ const WaterBar = () => {
                     },
                 },
             },
+            datalabels: {
+                color: '#fff', // Set the text color to white
+                font: {
+                    size: 18,
+                    weight: 'bold'
+                },
+                formatter: (value) => value.toFixed(2) // Format to 2 decimal places
+            }
         },
         layout: {
             padding: {
@@ -429,8 +511,8 @@ const WaterBar = () => {
         );
     };
 
-    const renderMetricBox = (metricId, title) => (
-        <div style={styles.box1}>
+    const renderMetricBox = (metricId, title, boxStyle) => (
+        <div style={boxStyle}>
             <div style={styles.iotHeaderBox}>
                 <div style={styles.statusHeader}>
                     {hourlyData[selectedHourForNarrative] && (
@@ -510,12 +592,12 @@ const WaterBar = () => {
 
             <div style={styles.gridContainer}>
                 <div style={styles.column}>
-                    {renderMetricBox('pH', 'pH Level')}
-                    {renderMetricBox('temperature', 'Temperature')}
+                    {renderMetricBox('pH', 'pH Level', styles.box1)}
+                    {renderMetricBox('temperature', 'Temperature', styles.box2)}
                 </div>
                 <div style={styles.column}>
-                    {renderMetricBox('tss', 'TSS')}
-                    {renderMetricBox('tds_ppm', 'TDS')}
+                    {renderMetricBox('tss', 'TSS', styles.box3)}
+                    {renderMetricBox('tds_ppm', 'TDS', styles.box4)}
                 </div>
             </div>
 
@@ -601,7 +683,6 @@ const styles = {
         gap: "20px",
         marginTop: "15px",
         marginLeft: "70px",
-        marginBottom: '20px', // Add margin to prevent cutoff
     },
 
     row: {
@@ -638,13 +719,12 @@ const styles = {
         borderRadius: "30px",
         display: "flex",
         flexDirection: "column",
-        alignItems: "center",  // Center children horizontally
+        alignItems: "flex-start",  // Align header to the left
         justifyContent: "flex-start",
         fontSize: "1.5rem",
         color: "#fff",
         fontWeight: "bold",
-        padding: "15px",
-        height: '250px',  // Increased from 200px to give more room for the chart
+        padding: "20px",
     },
     box2: {
         flex: 1,
@@ -699,7 +779,9 @@ const styles = {
         padding: "20px",
     },
     iotHeaderBox: {
-        marginBottom: '20px',
+        margin: 0,
+        fontWeight: "bold",
+        textAlign: "left",
     },
     waterHeaderTitle: {
         fontSize: "1.2rem",
@@ -753,51 +835,49 @@ const styles = {
         width: '100%',
     },
     statusBox: {
-        padding: '3px 8px',  // Reduced padding
+        padding: '5px 10px',
         borderRadius: '5px',
         color: '#fff',
         fontSize: '15px',
         fontWeight: 'bold',
         textAlign: 'center',
-        width: '80%',  // Match chart width
-        display: 'flex',
-        justifyContent: 'center',
-        margin: '0 auto 5px auto',  // Center the status box
     },
     statusText: {
         margin: 0,
     },
     chartContainer: {
-        width: '80%',
-        height: '200px',  // Increased from 160px
-        position: 'relative',
-        marginTop: '10px',
-        marginLeft: 'auto',
-        marginRight: 'auto',
+        width: '100%',
+        height: '100%',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
+        margin: '-20px 0',
+        // paddingBottom: '20px',
     },
     thresholdInfoContainer: {
         color: '#fff',
-        textAlign: 'left',
-        fontSize: '0.9rem',  // Slightly smaller font
+        justifyContent: 'flex-end',
     },
     thresholdTitle: {
-        fontSize: '1.2rem',
+        textAlign: 'center',
+        fontSize: '1.5rem',
         fontWeight: 'bold',
+        display: 'none',
     },
     thresholdDescription: {
-        fontSize: '0.9rem',
-        margin: '5px 0',  // Reduced margin
+        textAlign: 'left',
+        fontSize: '1.1rem',
+        margin: '10px 0',
     },
     recommendationsList: {
-        listStyleType: 'disc',
-        paddingLeft: '20px',
+        listStyleType: 'none',
+        padding: 0,
     },
     recommendationItem: {
-        fontSize: '0.8rem',
-        margin: '3px 0',  // Reduced margin
+        textAlign: 'left',
+        fontSize: '1rem',
+        margin: '5px 0',
+        fontWeight: 'normal',
     },
 };
 

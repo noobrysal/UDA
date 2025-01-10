@@ -2,7 +2,9 @@ import React, { useState, useEffect } from "react";
 import "./Carousel.css";
 import GeneralScreen from "./GeneralScreen";
 import AirSolo from "./AirSolo";
+import AirBar from "./AirBar";
 import WaterSolo from "./WaterSolo";
+import WaterBar from "./WaterBar";
 import SoilSolo from "./SoilSolo";
 // import AirWater from "./AirWater";
 
@@ -15,7 +17,9 @@ const Carousel = () => {
 
     const components = [
         { id: "general", Component: GeneralScreen },
+        { id: "air-bar", Component: AirBar },
         { id: "air", Component: AirSolo },
+        { id: "water-bar", Component: WaterBar },
         { id: "water", Component: WaterSolo },
         // { id: "air-water", Component: AirWater },
         { id: "soil", Component: SoilSolo },

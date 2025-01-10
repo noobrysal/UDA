@@ -42,7 +42,11 @@ const AirBar = () => {
     const [hourlyData, setHourlyData] = useState([]);
     const [selectedLocation, setSelectedLocation] = useState(3);
     const [loading, setLoading] = useState(true);
-    const [selectedDate, setSelectedDate] = useState('');
+    const [selectedDate, setSelectedDate] = useState(() => {
+        const today = new Date();
+        today.setDate(today.getDate() + 1); // Add 1 day
+        return today.toISOString().split('T')[0]; // Format to YYYY-MM-DD
+    });
     const [visibleHours, setVisibleHours] = useState([0]);
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [slideDirection, setSlideDirection] = useState('left');
@@ -555,6 +559,14 @@ const AirBar = () => {
                     },
                 },
             },
+            datalabels: {
+                color: '#fff', // Set the text color to white
+                font: {
+                    size: 18,
+                    weight: 'bold'
+                },
+                formatter: (value) => value.toFixed(2) // Format to 2 decimal places
+            }
         },
     };
 
@@ -1087,10 +1099,6 @@ const styles = {
         color: "#fff",
         fontWeight: "bold",
         padding: "20px",
-    },
-    soilHeaderTitle: {
-        fontSize: "1.2rem",
-        color: "#fff",
     },
 
     tooltipButton: {

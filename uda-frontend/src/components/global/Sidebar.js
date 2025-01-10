@@ -342,14 +342,14 @@ const SidebarComponent = () => {
                                             setSelected={setSelected}
                                             isCollapsed={isCollapsed}
                                         />
-                                        <SubMenuItem
+                                        {/* <SubMenuItem
                                             title="Soil Charts"
                                             to="/soil-bar"
                                             icon={<TerrainRoundedIcon />}
                                             selected={selected}
                                             setSelected={setSelected}
                                             isCollapsed={isCollapsed}
-                                        />
+                                        /> */}
                                     </div>
                                 )}
                             </Box>

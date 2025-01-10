@@ -480,7 +480,15 @@ const GeneralScreen = () => {
                         ];
                     }
                 }
-            }
+            },
+            datalabels: {
+                color: '#fff', // Set the text color to white
+                font: {
+                    size: 14, // Adjust the size as needed
+                    weight: 'bold'
+                },
+                formatter: (value) => `${value.toFixed(2)}%` // Format to 2 decimal places with percent sign
+            },
         }
     };
 
@@ -577,7 +585,15 @@ const GeneralScreen = () => {
                         ];
                     }
                 }
-            }
+            },
+            datalabels: {
+                color: '#fff', // Set the text color to white
+                font: {
+                    size: 14, // Adjust the size as needed
+                    weight: 'bold'
+                },
+                formatter: (value) => `${value.toFixed(2)}%` // Format to 2 decimal places with percent sign
+            },
         }
     };
 
@@ -1253,6 +1269,14 @@ const GeneralScreen = () => {
                                                             size: 14, // Optional: Adjust font size
                                                         },
                                                     },
+                                                },
+                                                datalabels: {
+                                                    color: '#fff', // Set the text color to white
+                                                    font: {
+                                                        size: 14, // Adjust the size as needed
+                                                        weight: 'bold'
+                                                    },
+                                                    formatter: (value) => `${value.toFixed(2)}%` // Format to 2 decimal places with percent sign
                                                 },
                                             },
                                         }}

@@ -529,7 +529,7 @@ const AirView = () => {
             width: '100%',
             height: '100%', // Update to take full height since we removed narrative
             marginBottom: '0', // Remove margin since we don't need spacing anymore
-            padding: '10px 20px', // Add some padding for labels
+            // padding: '10px', // Add some padding for labels
         },
         //LOWER LEFT THRESHOLD INFO SLIDER BOX
         lowerLeftBox: {

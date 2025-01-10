@@ -1321,6 +1321,13 @@ const SoilView = () => {
                     },
                 },
             },
+            datalabels: {
+                color: '#fff', // Set the text color to white
+                font: {
+                    weight: 'bold'
+                },
+                formatter: (value) => `${value}%`
+            }
         },
     };
 
