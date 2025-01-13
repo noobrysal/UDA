@@ -367,7 +367,7 @@ const WaterBar = () => {
         },
         plugins: {
             legend: {
-                display: true,
+                display: false,
                 labels: {
                     color: '#fff',
                     font: {
@@ -497,11 +497,9 @@ const WaterBar = () => {
     const renderThresholdInfo = (metricId) => {
         const status = getWaterQualityStatus(hourlyData[selectedHourForNarrative]?.[metricId], metricId);
         const thresholdData = thresholdInfoWater.find(t => t.level === status?.label);
-
+    
         return (
             <div style={styles.thresholdInfoContainer}>
-                <h2 style={styles.thresholdTitle}>{thresholdData?.level}</h2>
-                <p style={styles.thresholdDescription}>{thresholdData?.description}</p>
                 <ul style={styles.recommendationsList}>
                     {thresholdData?.recommendations.map((rec, index) => (
                         <li key={index} style={styles.recommendationItem}>{rec}</li>
@@ -534,6 +532,11 @@ const WaterBar = () => {
                                 )?.label || 'N/A'}
                             </p>
                         </div>
+                    )}
+                    {!showThresholdInfo[metricId] && (
+                        <h2 style={styles.waterHeaderTitle}>
+                            {thresholdInfoWater.find(t => t.level === getWaterQualityStatus(hourlyData[selectedHourForNarrative]?.[metricId], metricId)?.label)?.description}
+                        </h2>
                     )}
                 </div>
             </div>
@@ -784,10 +787,10 @@ const styles = {
         textAlign: "left",
     },
     waterHeaderTitle: {
-        fontSize: "1.2rem",
+        fontSize: "16px",
         color: "#fff",
-        textAlign: 'center',
-        marginLeft: '-60px',
+        textAlign: 'left',
+        marginLeft: '10px',
     },
     hourSelector: {
         display: 'flex',
@@ -849,7 +852,7 @@ const styles = {
         width: '100%',
         height: '100%',
         display: 'flex',
-        justifyContent: 'center',
+        // justifyContent: 'center',
         alignItems: 'center',
         margin: '-20px 0',
         // paddingBottom: '20px',
@@ -875,7 +878,7 @@ const styles = {
     },
     recommendationItem: {
         textAlign: 'left',
-        fontSize: '1rem',
+        fontSize: '1.3rem',
         margin: '5px 0',
         fontWeight: 'normal',
     },

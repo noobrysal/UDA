@@ -542,6 +542,7 @@ const AirBar = () => {
         },
         plugins: {
             legend: {
+                display: false,
                 labels: {
                     color: '#fff',
                 },
@@ -610,12 +611,10 @@ const AirBar = () => {
     const renderThresholdInfo = (metricId) => {
         const status = getAirQualityStatus(hourlyData[selectedHourForNarrative]?.[metricId], metricId);
         const thresholdData = thresholdInfoAir.find(t => t.level === status?.label && t.metric === metricId);
-
+    
         return (
             <div style={styles.thresholdInfoContainer}>
-                <h2 style={styles.thresholdTitle}>{thresholdData?.level}</h2>
-                <p style={styles.thresholdDescription}>{thresholdData?.description}</p>
-                <ul style={styles.recommendationsList}>
+                <ul style={styles.recommendationsList}> Recommendations:
                     {thresholdData?.recommendations.map((rec, index) => (
                         <li key={index} style={styles.recommendationItem}>{rec}</li>
                     ))}
@@ -738,7 +737,6 @@ const AirBar = () => {
                     <div style={styles.box1}>
                         <div style={styles.iotHeaderBox}>
                             <div style={styles.statusHeader}>
-                                {/* <h2 style={styles.airHeaderTitle}>PM2.5</h2> */}
                                 {hourlyData[selectedHourForNarrative] && (
                                     <div
                                         style={{
@@ -751,6 +749,11 @@ const AirBar = () => {
                                         <p style={styles.statusText}>{getAirQualityStatus(hourlyData[selectedHourForNarrative].pm25, 'pm25')?.label}</p>
                                     </div>
                                 )}
+                                {!showThresholdInfo.pm25 && (
+                                    <h2 style={styles.airHeaderTitle}>
+                                        {thresholdInfoAir.find(t => t.level === getAirQualityStatus(hourlyData[selectedHourForNarrative]?.pm25, 'pm25')?.label && t.metric === 'pm25')?.description}
+                                    </h2>
+                                )}
                             </div>
                         </div>
                         <div style={styles.chartContainer}>
@@ -760,7 +763,6 @@ const AirBar = () => {
                     <div style={styles.box3}>
                         <div style={styles.iotHeaderBox}>
                             <div style={styles.statusHeader}>
-                                {/* <h2 style={styles.airHeaderTitle}>Humidity</h2> */}
                                 {hourlyData[selectedHourForNarrative] && (
                                     <div
                                         style={{
@@ -772,6 +774,11 @@ const AirBar = () => {
                                     >
                                         <p style={styles.statusText}>{getAirQualityStatus(hourlyData[selectedHourForNarrative].humidity, 'humidity')?.label}</p>
                                     </div>
+                                )}
+                                {!showThresholdInfo.humidity && (
+                                    <h2 style={styles.airHeaderTitle}>
+                                        {thresholdInfoAir.find(t => t.level === getAirQualityStatus(hourlyData[selectedHourForNarrative]?.humidity, 'humidity')?.label && t.metric === 'humidity')?.description}
+                                    </h2>
                                 )}
                             </div>
                         </div>
@@ -786,7 +793,6 @@ const AirBar = () => {
                     <div style={styles.box4}>
                         <div style={styles.iotHeaderBox}>
                             <div style={styles.statusHeader}>
-                                {/* <h2 style={styles.waterHeaderTitle}>PM10</h2> */}
                                 {hourlyData[selectedHourForNarrative] && (
                                     <div
                                         style={{
@@ -799,6 +805,11 @@ const AirBar = () => {
                                         <p style={styles.statusText}>{getAirQualityStatus(hourlyData[selectedHourForNarrative].pm10, 'pm10')?.label}</p>
                                     </div>
                                 )}
+                                {!showThresholdInfo.pm10 && (
+                                    <h2 style={styles.airHeaderTitle}>
+                                        {thresholdInfoAir.find(t => t.level === getAirQualityStatus(hourlyData[selectedHourForNarrative]?.pm10, 'pm10')?.label && t.metric === 'pm10')?.description}
+                                    </h2>
+                                )}
                             </div>
                         </div>
                         <div style={styles.chartContainer}>
@@ -808,7 +819,6 @@ const AirBar = () => {
                     <div style={styles.box6}>
                         <div style={styles.iotHeaderBox}>
                             <div style={styles.statusHeader}>
-                                {/* <h2 style={styles.airHeaderTitle}>Oxygen</h2> */}
                                 {hourlyData[selectedHourForNarrative] && (
                                     <div
                                         style={{
@@ -820,6 +830,11 @@ const AirBar = () => {
                                     >
                                         <p style={styles.statusText}>{getAirQualityStatus(hourlyData[selectedHourForNarrative].oxygen, 'oxygen')?.label}</p>
                                     </div>
+                                )}
+                                {!showThresholdInfo.oxygen && (
+                                    <h2 style={styles.airHeaderTitle}>
+                                        {thresholdInfoAir.find(t => t.level === getAirQualityStatus(hourlyData[selectedHourForNarrative]?.oxygen, 'oxygen')?.label && t.metric === 'oxygen')?.description}
+                                    </h2>
                                 )}
                             </div>
                         </div>
@@ -834,7 +849,6 @@ const AirBar = () => {
                     <div style={styles.box7}>
                         <div style={styles.iotHeaderBox}>
                             <div style={styles.statusHeader}>
-                                {/* <h2 style={styles.soilHeaderTitle}>Temperature</h2> */}
                                 {hourlyData[selectedHourForNarrative] && (
                                     <div
                                         style={{
@@ -846,6 +860,11 @@ const AirBar = () => {
                                     >
                                         <p style={styles.statusText}>{getAirQualityStatus(hourlyData[selectedHourForNarrative].temperature, 'temperature')?.label}</p>
                                     </div>
+                                )}
+                                {!showThresholdInfo.temperature && (
+                                    <h2 style={styles.airHeaderTitle}>
+                                        {thresholdInfoAir.find(t => t.level === getAirQualityStatus(hourlyData[selectedHourForNarrative]?.temperature, 'temperature')?.label && t.metric === 'temperature')?.description}
+                                    </h2>
                                 )}
                             </div>
                         </div>
@@ -1035,10 +1054,10 @@ const styles = {
         padding: "20px",
     },
     airHeaderTitle: {
-        fontSize: "1.2rem",
+        fontSize: "14px",
         color: "#fff",
-        textAlign: 'center',
-        marginLeft: '-60px',
+        textAlign: 'left',
+        // paddingTop: '0px',
     },
 
     // Box styles WATER QUALITY
@@ -1067,10 +1086,6 @@ const styles = {
         color: "#fff",
         fontWeight: "bold",
         padding: "20px",
-    },
-    waterHeaderTitle: {
-        fontSize: "1.2rem",
-        color: "#fff",
     },
 
     // Box styles SOIL QUALITY
@@ -1123,10 +1138,10 @@ const styles = {
         width: '100%',
         height: '100%',
         display: 'flex',
-        justifyContent: 'center',
+        // justifyContent: 'center',
         alignItems: 'center',
         margin: '-20px 0',
-        // paddingBottom: '20px',
+        paddingBottom: '20px',
     },
     hourSelector: {
         display: 'flex',
@@ -1172,6 +1187,7 @@ const styles = {
         justifyContent: 'space-between',
         alignItems: 'center',
         width: '100%',
+        gap: '10px',
     },
     statusBox: {
         padding: '5px 10px',
@@ -1188,12 +1204,12 @@ const styles = {
         color: '#fff',
         justifyContent: 'flex-end',
     },
-    thresholdTitle: {
-        textAlign: 'center',
-        fontSize: '1.5rem',
-        fontWeight: 'bold',
-        display: 'none',
-    },
+    // thresholdTitle: {
+    //     textAlign: 'center',
+    //     fontSize: '1.5rem',
+    //     fontWeight: 'bold',
+    //     display: 'none',
+    // },
     thresholdDescription: {
         textAlign: 'left',
         fontSize: '1rem',
@@ -1205,7 +1221,7 @@ const styles = {
     },
     recommendationItem: {
         textAlign: 'left',
-        fontSize: '1rem',
+        fontSize: '1.2rem',
         margin: '5px 0',
         fontWeight: 'normal',
     },

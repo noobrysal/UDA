@@ -487,7 +487,12 @@ const GeneralScreen = () => {
                     size: 14, // Adjust the size as needed
                     weight: 'bold'
                 },
-                formatter: (value) => `${value.toFixed(2)}%` // Format to 2 decimal places with percent sign
+                formatter: (value) => {
+                    if (typeof value === 'number') {
+                        return `${value.toFixed(2)}%`; // Format to 2 decimal places with percent sign
+                    }
+                    return '0.00%'; // Default value if not a number
+                }
             },
         }
     };
@@ -592,18 +597,25 @@ const GeneralScreen = () => {
                     size: 14, // Adjust the size as needed
                     weight: 'bold'
                 },
-                formatter: (value) => `${value.toFixed(2)}%` // Format to 2 decimal places with percent sign
+                formatter: (value) => {
+                    if (typeof value === 'number') {
+                        return `${value.toFixed(2)}%`; // Format to 2 decimal places with percent sign
+                    }
+                    return '0.00%'; // Default value if not a number
+                }
             },
         }
     };
 
     // Soil Quality Gauge Configuration
+    const soilMoistureValue = latestSoilData?.soil_moisture ? parseFloat(latestSoilData.soil_moisture).toFixed(2) : '0';
+
     const soilGaugeData = {
         labels: ['Soil Moisture'],
         datasets: [{
-            data: [latestSoilData?.soil_moisture || 0, 100 - (latestSoilData?.soil_moisture || 0)],
+            data: [parseFloat(soilMoistureValue), 100 - parseFloat(soilMoistureValue)],
             backgroundColor: [
-                getColorForMetric(latestSoilData?.soil_moisture, 'soil_moisture', thresholdsSoil),
+                getColorForMetric(parseFloat(soilMoistureValue), 'soil_moisture', thresholdsSoil),
                 'rgba(200, 200, 200, 0.2)'
             ],
             circumference: 180,
@@ -1276,7 +1288,11 @@ const GeneralScreen = () => {
                                                         size: 14, // Adjust the size as needed
                                                         weight: 'bold'
                                                     },
-                                                    formatter: (value) => `${value.toFixed(2)}%` // Format to 2 decimal places with percent sign
+                                                    formatter: (value) => {
+                                                        if (typeof value === 'number') {
+                                                            return `${value.toFixed(2)}%`; // Format to 2 decimal places with percent sign
+                                                        }
+                                                    }
                                                 },
                                             },
                                         }}
