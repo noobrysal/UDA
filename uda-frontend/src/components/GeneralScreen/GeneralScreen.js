@@ -623,6 +623,40 @@ const GeneralScreen = () => {
         }]
     };
 
+    const soilGaugeOptions = {
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            },
+            tooltip: {
+                callbacks: {
+                    label: function (context) {
+                        if (context.dataIndex === 1) {
+                            return `${context.raw}%`; // Display only the number and percentage on the right side
+                        }
+                        return `Soil Moisture: ${context.raw}%`;
+                    }
+                }
+            },
+            datalabels: {
+                color: function(context) {
+                    return context.dataIndex === 1 ? 'rgba(0, 0, 0, 0)' : '#fff'; // Make the right side label invisible
+                },
+                font: {
+                    size: 14, // Adjust the size as needed
+                    weight: 'bold'
+                },
+                formatter: (value) => {
+                    if (typeof value === 'number') {
+                        return `${value.toFixed(2)}%`; // Format to 2 decimal places with percent sign
+                    }
+                    return '0.00%'; // Default value if not a number
+                }
+            }
+        }
+    };
+
     // Helper function to get color based on metric value
     function getColorForMetric(value, metric, thresholds) {
         // Handle null/undefined values
@@ -1271,31 +1305,7 @@ const GeneralScreen = () => {
                                 <div style={styles.clickableChart}>
                                     <Doughnut
                                         data={soilGaugeData}
-                                        options={{
-                                            maintainAspectRatio: false,
-                                            plugins: {
-                                                legend: {
-                                                    labels: {
-                                                        color: 'white', // Set the legend text color to white
-                                                        font: {
-                                                            size: 14, // Optional: Adjust font size
-                                                        },
-                                                    },
-                                                },
-                                                datalabels: {
-                                                    color: '#fff', // Set the text color to white
-                                                    font: {
-                                                        size: 14, // Adjust the size as needed
-                                                        weight: 'bold'
-                                                    },
-                                                    formatter: (value) => {
-                                                        if (typeof value === 'number') {
-                                                            return `${value.toFixed(2)}%`; // Format to 2 decimal places with percent sign
-                                                        }
-                                                    }
-                                                },
-                                            },
-                                        }}
+                                        options={soilGaugeOptions}
                                     />
                                 </div>
                             )}
