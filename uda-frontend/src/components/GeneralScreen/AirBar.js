@@ -44,7 +44,7 @@ const AirBar = () => {
     const [loading, setLoading] = useState(true);
     const [selectedDate, setSelectedDate] = useState(() => {
         const today = new Date();
-        today.setDate(today.getDate() + 1); // Add 1 day
+        today.setDate(today.getDate()); // current day
         return today.toISOString().split('T')[0]; // Format to YYYY-MM-DD
     });
     const [visibleHours, setVisibleHours] = useState([0]);
@@ -187,7 +187,7 @@ const AirBar = () => {
                 "• Follow emergency alerts strictly"
             ]
         },
-    
+
         // PM10 Levels
         {
             level: "Good",
@@ -261,7 +261,7 @@ const AirBar = () => {
                 "• Follow government health alerts"
             ]
         },
-    
+
         // Humidity Levels
         {
             level: "Poor",
@@ -299,7 +299,7 @@ const AirBar = () => {
                 "• Maintain hydration"
             ]
         },
-    
+
         // Temperature Levels
         {
             level: "Good",
@@ -349,7 +349,7 @@ const AirBar = () => {
                 "• Seek medical attention for heat-related symptoms"
             ]
         },
-    
+
         // Oxygen Levels
         {
             level: "Safe",
@@ -376,7 +376,7 @@ const AirBar = () => {
             ]
         }
     ];
-    
+
     useEffect(() => {
         const interval = setInterval(() => {
             setShowThresholdInfo(prevState => ({
@@ -611,7 +611,7 @@ const AirBar = () => {
     const renderThresholdInfo = (metricId) => {
         const status = getAirQualityStatus(hourlyData[selectedHourForNarrative]?.[metricId], metricId);
         const thresholdData = thresholdInfoAir.find(t => t.level === status?.label && t.metric === metricId);
-    
+
         return (
             <div style={styles.thresholdInfoContainer}>
                 <ul style={styles.recommendationsList}> Recommendations:
@@ -666,8 +666,8 @@ const AirBar = () => {
             </div>
 
             <div style={styles.hourcard}>
-            {/* 24-HOUR */}
-            <div style={styles.row}>
+                {/* 24-HOUR */}
+                <div style={styles.row}>
                     <div style={styles.box0}>
                         <div style={styles.iotHeaderBox}>
                             <h2 style={styles.airHeaderTitle}>24 Hour Air Quality View</h2>
